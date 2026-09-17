@@ -38,7 +38,7 @@ height: 100%;
 }
 body {
 background-color: var(--bg-color);
-padding: 4px 10px calc(var(--nav-height) + var(--safe-bottom) + 20px) 10px;
+padding: 4px 10px calc(var(--nav-height) + var(--safe-bottom) + 42px) 10px;
 display: flex;
 justify-content: center;
 align-items: flex-start;
@@ -149,11 +149,11 @@ font-weight: 800;
 .calendar-days {
 display: grid;
 grid-template-columns: repeat(7, 1fr);
-grid-auto-rows: minmax(64px, auto);
+grid-auto-rows: minmax(88px, auto);
 }
 .day-cell {
-min-height: 64px;
-max-height: 100px;
+min-height: 88px;
+max-height: 132px;
 padding: 3px 0;
 display: flex;
 flex-direction: column;
@@ -250,11 +250,16 @@ color: #ffffff;
 .shift-dot-item:hover {
 filter: brightness(0.95);
 }
+.shift-dot-item.long-press-dragging { opacity: 0.55; transform: scale(0.98); }
+.day-cell.drop-target { outline: 2px dashed var(--primary-dark); outline-offset: -3px; background: #E7F0FF !important; }
+#calendar-view {
+margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
+}
 #list-view {
-margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
+margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
 }
 #analytics-view{
-margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
+margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
 }
 .list-filter-bar {
 display: flex;
@@ -947,6 +952,15 @@ font-size: 0.88rem;
 <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
 </div>
 </div>
+<!-- Move / Copy Action Sheet -->
+<div class="action-menu-overlay" id="move-copy-overlay" onclick="closeMoveCopyMenu()">
+  <div class="action-sheet" onclick="event.stopPropagation()">
+    <div class="action-sheet-title" id="move-copy-title">移動 / 複製紀錄</div>
+    <button class="action-sheet-btn primary" onclick="moveOrCopyShift('move')">移動到此日期</button>
+    <button class="action-sheet-btn primary" onclick="moveOrCopyShift('copy')">複製到此日期</button>
+    <button class="action-sheet-btn" onclick="closeMoveCopyMenu()">取消</button>
+  </div>
+</div>
 <!-- Modal Form -->
 <div class="modal-overlay" id="modal-overlay">
 <div class="modal-content">
@@ -1545,6 +1559,89 @@ if (s.type === 'completed' || !s.type) mPayCompleted += pay;
 document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;
 document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;
 }
+let longPressTimer = null;
+let longPressShiftId = null;
+let longPressTriggered = false;
+let dragShiftId = null;
+let dragDestination = null;
+
+function startShiftLongPress(event, shiftId) {
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  cancelShiftLongPress();
+  longPressShiftId = shiftId;
+  longPressTriggered = false;
+  const item = event.currentTarget;
+  longPressTimer = setTimeout(() => {
+    longPressTriggered = true;
+    dragShiftId = shiftId;
+    item.classList.add('long-press-dragging');
+    if (navigator.vibrate) navigator.vibrate(20);
+    document.body.classList.add('dragging-shift');
+  }, 550);
+}
+function cancelShiftLongPress() {
+  if (longPressTimer) clearTimeout(longPressTimer);
+  longPressTimer = null;
+}
+function clearDropTarget() {
+  document.querySelectorAll('.day-cell.drop-target').forEach(el => el.classList.remove('drop-target'));
+}
+function finishShiftDrag() {
+  cancelShiftLongPress();
+  document.querySelectorAll('.long-press-dragging').forEach(el => el.classList.remove('long-press-dragging'));
+  document.body.classList.remove('dragging-shift');
+  if (dragShiftId && dragDestination) {
+    const shift = shifts.find(s => s.id === dragShiftId);
+    if (shift && dragDestination !== shift.date) {
+      window.pendingShiftId = dragShiftId;
+      window.pendingShiftDestination = dragDestination;
+      document.getElementById('move-copy-title').textContent = `${shift.company} → ${dragDestination}`;
+      document.getElementById('move-copy-overlay').classList.add('active');
+    }
+  }
+  clearDropTarget();
+  dragShiftId = null;
+  longPressShiftId = null;
+  dragDestination = null;
+}
+function closeMoveCopyMenu() {
+  document.getElementById('move-copy-overlay').classList.remove('active');
+  dragShiftId = null;
+  longPressShiftId = null;
+  dragDestination = null;
+}
+function moveOrCopyShift(mode) {
+  const destination = window.pendingShiftDestination;
+  const shiftId = window.pendingShiftId;
+  const shift = shifts.find(s => s.id === shiftId);
+  if (!shift || !destination) return closeMoveCopyMenu();
+  if (mode === 'move') shift.date = destination;
+  else shifts.push({ ...shift, id: Date.now(), date: destination });
+  saveData();
+  const refDate = new Date(destination + 'T12:00:00');
+  currentYear = refDate.getFullYear();
+  currentMonth = refDate.getMonth();
+  window.pendingShiftDestination = null;
+  window.pendingShiftId = null;
+  closeMoveCopyMenu();
+  renderCurrentView();
+}
+document.addEventListener('pointermove', event => {
+  if (!dragShiftId) return;
+  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
+  clearDropTarget();
+  if (target) {
+    target.classList.add('drop-target');
+    dragDestination = target.dataset.date;
+  }
+});
+document.addEventListener('pointerup', () => {
+  if (dragShiftId) {
+    window.pendingShiftId = dragShiftId;
+    window.pendingShiftDestination = dragDestination;
+    finishShiftDrag();
+  } else cancelShiftLongPress();
+});
 /* Render Calendar */
 function renderCalendar() {
 autoUpdatePastPlannedShifts();
@@ -1568,6 +1665,7 @@ for (let day = 1; day <= totalDays; day++) {
 const cell = document.createElement('div');
 cell.className = 'day-cell';
 const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+cell.dataset.date = dateStr;
 const dateObj = new Date(currentYear, currentMonth, day);
 const holidayInfo = getHolidayInfo(dateStr, dateObj);
 cell.onclick = () => {
@@ -1594,7 +1692,7 @@ mPayCompleted += pay;
 const isPlanned = s.type === 'planned';
 const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;
 shiftsHtml += `
-<div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); openShiftDetail(${s.id})" title="${s.company} (${timeTag}) $${pay}">
+<div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false;" onpointerdown="startShiftLongPress(event, ${s.id})" onpointercancel="cancelShiftLongPress()" title="${s.company} (${timeTag}) $${pay}">
 <div class="comp-name">${s.company}</div>
 <div class="shift-time">${timeTag}</div>
 <div class="shift-money">$${Math.round(pay)}</div>
