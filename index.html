@@ -840,6 +840,11 @@ color: var(--primary-dark);
 background: #ffebee;
 color: var(--danger);
 }
+#move-copy-overlay { background: transparent; justify-content: flex-start; align-items: flex-start; }
+#move-copy-overlay .action-sheet { width: auto; min-width: 142px; max-width: 210px; border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; padding-bottom: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.16); gap: 4px; }
+#move-copy-overlay .action-sheet-title { text-align: left; font-size: 0.72rem; padding: 4px 7px; margin-bottom: 0; white-space: nowrap; max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+#move-copy-overlay .action-sheet-btn { padding: 7px 9px; border: 0; border-radius: 8px; font-size: 0.76rem; text-align: left; white-space: nowrap; }
+
 .empty-msg {
 text-align: center;
 padding: 30px;
@@ -1596,6 +1601,16 @@ function finishShiftDrag() {
       window.pendingShiftId = dragShiftId;
       window.pendingShiftDestination = dragDestination;
       document.getElementById('move-copy-title').textContent = `${shift.company} → ${dragDestination}`;
+      const targetCell = document.querySelector(`.day-cell[data-date="${dragDestination}"]`);
+      const sheet = document.querySelector('#move-copy-overlay .action-sheet');
+      if (targetCell && sheet) {
+        const rect = targetCell.getBoundingClientRect();
+        const left = Math.min(window.innerWidth - 218, Math.max(8, rect.right - 8));
+        const top = Math.min(window.innerHeight - 105, Math.max(8, rect.top + 8));
+        sheet.style.position = 'fixed';
+        sheet.style.left = `${left}px`;
+        sheet.style.top = `${top}px`;
+      }
       document.getElementById('move-copy-overlay').classList.add('active');
     }
   }
@@ -1606,6 +1621,8 @@ function finishShiftDrag() {
 }
 function closeMoveCopyMenu() {
   document.getElementById('move-copy-overlay').classList.remove('active');
+  const sheet = document.querySelector('#move-copy-overlay .action-sheet');
+  if (sheet) { sheet.style.left = ''; sheet.style.top = ''; }
   dragShiftId = null;
   longPressShiftId = null;
   dragDestination = null;
