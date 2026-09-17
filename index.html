@@ -858,6 +858,9 @@ padding: 30px;
 color: var(--text-sub);
 font-size: 0.88rem;
 }
+
+/* Calendar swipe navigation */
+#calendar-days { touch-action: pan-y; }
 </style>
 </head>
 <body>
@@ -881,8 +884,7 @@ font-size: 0.88rem;
 <div class="calendar-header cardTitle">
 <h2 id="calendar-month-year"></h2>
 <div class="month-nav">
-<button class="btn-nav" id="prev-month">&lt;</button>
-<button class="btn-nav" id="next-month">&gt;</button>
+
 </div>
 </div>
 <div class="calendar-weekdays">
@@ -1555,8 +1557,6 @@ if (currentMonth > 11) { currentMonth = 0; currentYear++; }
 autoUpdatePastPlannedShifts();
 renderCurrentView();
 }
-document.getElementById('prev-month').addEventListener('click', () => changeMonth(-1));
-document.getElementById('next-month').addEventListener('click', () => changeMonth(1));
 document.getElementById('prev-month-a').addEventListener('click', () => changeMonth(-1));
 document.getElementById('next-month-a').addEventListener('click', () => changeMonth(1));
 function updateMonthSalaryCard() {
@@ -1682,6 +1682,9 @@ const today = new Date();
 for (let i = firstDay - 1; i >= 0; i--) {
 const cell = document.createElement('div');
 cell.className = 'day-cell other-month';
+const prevDate = new Date(currentYear, currentMonth, -(i));
+const prevDateStr = getLocalDateStr(prevDate);
+cell.dataset.date = prevDateStr;
 cell.innerHTML = `<span class="day-number">${prevLastDay - i}</span>`;
 daysContainer.appendChild(cell);
 }
@@ -1734,12 +1737,38 @@ const nextDays = (7 - (totalRendered % 7)) % 7;
 for (let i = 1; i <= nextDays; i++) {
 const cell = document.createElement('div');
 cell.className = 'day-cell other-month';
+const nextDate = new Date(currentYear, currentMonth + 1, i);
+const nextDateStr = getLocalDateStr(nextDate);
+cell.dataset.date = nextDateStr;
 cell.innerHTML = `<span class="day-number">${i}</span>`;
 daysContainer.appendChild(cell);
 }
 document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;
 document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;
 }
+/* Swipe calendar to change month */
+(function setupCalendarSwipe() {
+  const calendar = document.getElementById('calendar-days');
+  if (!calendar || calendar.dataset.swipeReady) return;
+  calendar.dataset.swipeReady = '1';
+  let startX = 0;
+  let startY = 0;
+  calendar.addEventListener('touchstart', event => {
+    if (event.touches.length !== 1) return;
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+  }, { passive: true });
+  calendar.addEventListener('touchend', event => {
+    if (!startX || !startY || event.changedTouches.length !== 1) return;
+    const dx = event.changedTouches[0].clientX - startX;
+    const dy = event.changedTouches[0].clientY - startY;
+    startX = 0;
+    startY = 0;
+    if (Math.abs(dx) < 60 || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
+    changeMonth(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+
 /* Render List View */
 function renderListView() {
 autoUpdatePastPlannedShifts();
