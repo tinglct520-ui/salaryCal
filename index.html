@@ -1,1739 +1,1758 @@
-<!DOCTYPE html>
-<html lang="zh-HK">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>兼職工時及薪酬管理</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-:root {
---bg-color: #f5f8fc;
---card-bg: #ffffff;
---primary: #6d90c4;
---primary-dark: #3f5f8f;
---primary-hover: #3f5f8f;
---primary-light: #eaf1fb;
---text-main: #212529;
---text-sub: #6c757d;
---border-color: #f5f8fa;
---accent-price: #2e7d32;
---plan-bg: #eaf1fb;
---plan-border: #90b8e0;
---danger: #e53935;
---holiday-red: #e53935;
---nav-height: 50px;
---safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-font-family: 'Nunito', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
--webkit-tap-highlight-color: transparent;
-}
-html, body {
-height: 100%;
-}
-body {
-background-color: var(--bg-color);
-padding: 4px 10px calc(var(--nav-height) + var(--safe-bottom) + 20px) 10px;
-display: flex;
-justify-content: center;
-align-items: flex-start;
-min-height: 100dvh;
-}
-.container {
-width: 100%;
-max-width: 600px;
-display: flex;
-flex-direction: column;
-gap: 13px;
-min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom) - 24px);
-}
-.top-header {
-display: flex;
-justify-content: center;
-align-items: center;
-padding: 2px 5px;
-position: relative;
-}
-.top-header h1 {
-color: var(--primary-dark);
-font-size: 1.35rem;
-font-weight: 800;
-text-align: center;
-width: 100%;
-}
-.card {
-background-color: var(--card-bg);
-border-radius: 20px;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-overflow: hidden;
-}
-.cardTitle {
-padding: 18px;
-}
-.month-salary-card {
-background: linear-gradient(135deg, #8fb1e0, var(--primary-dark));
-border-radius: 18px;
-padding: 18px 20px;
-color: white;
-display: flex;
-justify-content: space-between;
-align-items: center;
-box-shadow: 0 6px 15px rgba(63, 95, 143, 0.28);
-}
-.salary-box {
-display: flex;
-flex-direction: column;
-}
-.salary-box span {
-font-size: 0.76rem;
-color: rgba(255, 255, 255, 0.85);
-font-weight: 600;
-}
-.salary-box strong {
-font-size: 1.35rem;
-color: #ffffff;
-font-weight: 800;
-margin-top: 2px;
-}
-.salary-divider {
-width: 1px;
-height: 35px;
-background-color: rgba(255, 255, 255, 0.25);
-}
-.calendar-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 15px;
-}
-.calendar-header h2 {
-font-size: 1.1rem;
-color: var(--primary-dark);
-font-weight: 800;
-}
-.month-nav {
-display: flex;
-gap: 8px;
-}
-.btn-nav {
-background-color: var(--primary-light);
-color: var(--primary-dark);
-border: none;
-width: 32px;
-height: 32px;
-border-radius: 50%;
-font-size: 1rem;
-cursor: pointer;
-font-weight: 700;
-}
-.calendar-weekdays {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-text-align: center;
-font-weight: 700;
-color: var(--text-main);
-margin-bottom: 0;
-padding-bottom: 8px;
-font-size: 0.78rem;
-border-bottom: 1px solid var(--border-color);
-}
-.calendar-weekdays .sun-label {
-color: var(--holiday-red);
-font-weight: 800;
-}
-.calendar-days {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-grid-auto-rows: minmax(64px, auto);
-}
-.day-cell {
-min-height: 64px;
-max-height: 100px;
-padding: 3px 0;
-display: flex;
-flex-direction: column;
-align-items: center;
-cursor: pointer;
-background-color: #ffffff;
-transition: all 0.15s;
-overflow: hidden;
-border-bottom: 1px solid var(--border-color);
-border-right: 1px solid var(--border-color);
-}
-.day-cell:hover {
-background-color: #eef3f9;
-}
-.day-cell.other-month {
-opacity: 0.25;
-background-color: transparent;
-}
-.day-number {
-font-weight: 700;
-font-size: 0.72rem;
-line-height: 1;
-margin-bottom: 3px;
-flex-shrink: 0;
-}
-.day-cell.today {
-background-color: #F2F6FC;
-}
-.day-cell.today .day-number {
-color: var(--primary-dark);
-background: var(--primary-light);
-}
-.day-cell.is-holiday .day-number,
-.day-cell.is-holiday.today .day-number {
-color: var(--holiday-red);
-}
-.day-cell.is-holiday.today .day-number {
-background: #fdecea;
-}
-.holiday-label {
-font-size: 0.5rem;
-line-height: 1.05;
-color: var(--holiday-red);
-font-weight: 700;
-text-align: center;
-max-width: 100%;
-overflow: hidden;
-display: -webkit-box;
--webkit-line-clamp: 2;
--webkit-box-orient: vertical;
-flex-shrink: 0;
-margin-bottom: 1px;
-}
-.shift-items-wrap {
-width: 100%;
-display: flex;
-flex-direction: column;
-gap: 1px;
-overflow-y: auto;
-flex: 1;
-min-height: 0;
-}
-.shift-dot-item {
-background-color: var(--primary-dark);
-padding: 1px 0;
-width: 100%;
-text-align: center;
-cursor: pointer;
-transition: background-color 0.2s;
-font-size: 0.56rem;
-font-weight: 700;
-line-height: 1.3;
-flex-shrink: 0;
-}
-.shift-dot-item .comp-name {
-color: #ffffff;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
-font-size: 0.6rem;
-}
-.shift-dot-item .shift-time {
-color: #ffffff;
-font-size: 0.6rem;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-}
-.shift-dot-item .shift-money {
-font-weight: 800;
-font-size: 0.55rem;
-color: #ffffff;
-}
-.shift-dot-item:hover {
-filter: brightness(0.95);
-}
-#list-view {
-margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
-}
-#analytics-view{
-margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
-}
-.list-filter-bar {
-display: flex;
-gap: 8px;
-overflow-x: auto;
-padding-bottom: 8px;
-margin-bottom: 12px;
-}
-.filter-btn {
-background-color: #edf2f7;
-border: 1.5px solid transparent;
-padding: 6px 14px;
-border-radius: 20px;
-font-size: 0.8rem;
-font-weight: 700;
-color: var(--text-sub);
-cursor: pointer;
-white-space: nowrap;
-transition: all 0.2s ease;
-}
-.filter-btn.active {
-background-color: var(--primary);
-color: white;
-}
-.shift-list-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 12px;
-border-bottom: 1px solid var(--border-color);
-cursor: pointer;
-}
-.shift-list-item:hover {
-background-color: #fcfdfc;
-}
-.shift-list-item:last-child {
-border-bottom: none;
-}
-.shift-info h4 {
-font-size: 0.95rem;
-color: var(--text-main);
-}
-.shift-info p {
-font-size: 0.78rem;
-color: var(--text-sub);
-margin-top: 2px;
-}
-.shift-amount {
-text-align: right;
-}
-.shift-amount .price {
-font-size: 1rem;
-font-weight: 800;
-color: var(--accent-price);
-}
-.shift-amount .hrs {
-font-size: 0.75rem;
-color: var(--text-sub);
-}
-/* Analytics Styles */
-.analytics-summary-grid {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 8px;
-margin-bottom: 16px;
-}
-.stat-box {
-background: var(--primary-light);
-border-radius: 14px;
-padding: 12px 8px;
-text-align: center;
-display: flex;
-flex-direction: column;
-gap: 4px;
-}
-.stat-box span {
-font-size: 0.68rem;
-color: var(--primary-dark);
-font-weight: 700;
-}
-.stat-box strong {
-font-size: 1.05rem;
-color: var(--text-main);
-font-weight: 800;
-}
-.analytics-section-title {
-font-size: 0.88rem;
-font-weight: 800;
-color: var(--primary-dark);
-margin: 16px 0 8px 0;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-.company-stat-item {
-padding: 12px;
-border-bottom: 1px solid var(--border-color);
-background: #fafbfc;
-border-radius: 12px;
-margin-bottom: 8px;
-/* 改用 Grid 布局 */
-display: grid;
-grid-template-columns: 1fr auto; /* 左欄自適應，右欄依內容寬度 */
-grid-template-rows: auto auto; /* 上下兩行 */
-align-items: center; /* 垂直居中對齊 */
-column-gap: 12px; /* 左右欄間距 */
-row-gap: 4px; /* 左欄上下列間距 */
-}
-.company-stat-item:last-child {
-margin-bottom: 0;
-}
-.company-stat-top {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 6px;
-}
-/* 左欄 Row 1 */
-.company-stat-name {
-grid-column: 1;
-grid-row: 1;
-font-size: 0.88rem;
-font-weight: 800;
-display: flex;
-align-items: center;
-gap: 6px;
-}
-.company-stat-dot {
-width: 9px;
-height: 9px;
-border-radius: 50%;
-display: inline-block;
-}
-/* 右欄 佔據 2 Rows */
-.company-stat-pay {
-grid-column: 2;
-grid-row: 1 / span 2; /* 縱跨第一與第二列 */
-font-size: 1.1rem;
-font-weight: 800;
-color: var(--accent-price);
-text-align: right;
-}
-/* 左欄 Row 2 */
-.company-stat-meta {
-grid-column: 1;
-grid-row: 2;
-font-size: 0.74rem;
-color: var(--text-sub);
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-.payday-tag {
-font-size: 0.7rem;
-padding: 2px 8px;
-border-radius: 6px;
-font-weight: 700;
-}
-.payday-tag.due {
-background: #e8f5e9;
-color: #2e7d32;
-}
-.payday-tag.pending {
-background: #fff3e0;
-color: #e65100;
-}
-.company-stat-bar-bg {
-width: 100%;
-height: 6px;
-background: var(--border-color);
-border-radius: 4px;
-margin-top: 8px;
-overflow: hidden;
-}
-.company-stat-bar-fill {
-height: 100%;
-border-radius: 4px;
-}
-/* Payday Settings Block */
-.payday-setting-row {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 8px 4px;
-font-size: 0.82rem;
-border-bottom: 1px dashed var(--border-color);
-}
-.payday-setting-row select {
-padding: 4px 8px;
-border-radius: 8px;
-border: 1px solid var(--border-color);
-font-weight: 700;
-color: var(--primary-dark);
-background: #f8f9fa;
-}
-.fixed-bottom-nav {
-position: fixed;
-bottom: 0;
-left: 0;
-right: 0;
-height: calc(var(--nav-height) + var(--safe-bottom));
-padding-bottom: var(--safe-bottom);
-background-color: #ffffff;
-border-top: 1px solid #e9ecef;
-display: flex;
-justify-content: space-around;
-align-items: center;
-z-index: 999;
-box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-padding-left: 4px;
-padding-right: 4px;
-}
-.nav-item {
-flex: 1;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-background: none;
-border: none;
-color: var(--text-sub);
-font-size: 0.62rem;
-font-weight: 700;
-cursor: pointer;
-gap: 2px;
-height: 100%;
-min-width: 0;
-}
-.nav-item svg {
-width: 25px;
-height: 25x;
-fill: currentColor;
-}
-.nav-item.active {
-color: var(--primary-dark);
-}
-.nav-item-add-container {
-flex: 1;
-display: flex;
-justify-content: center;
-align-items: center;
-position: relative;
-max-width: 70px;
-}
-.btn-add-highlight {
-width: 42px;
-height: 42px;
-border-radius: 50%;
-background: linear-gradient(135deg, #8fb1e0, var(--primary-dark));
-color: white;
-border: 4px solid #ffffff;
-display: flex;
-justify-content: center;
-align-items: center;
-font-size: 1.7rem;
-cursor: pointer;
-transition: transform 0.2s;
-}
-.btn-add-highlight:active {
-transform: scale(0.92);
-}
-.modal-overlay {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0, 0, 0, 0.4);
-backdrop-filter: blur(4px);
-display: none;
-justify-content: center;
-align-items: flex-start;
-z-index: 1000;
-padding: 15px;
-overflow-y: auto;
--webkit-overflow-scrolling: touch;
-overscroll-behavior: contain;
-}
-.modal-overlay.active {
-display: flex;
-}
-.modal-content {
-background-color: var(--card-bg);
-width: 100%;
-max-width: 480px;
-border-radius: 20px;
-padding: 22px;
-box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-margin: 15px auto 40px auto;
--webkit-overflow-scrolling: touch;
-}
-.modal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 15px;
-position: relative;
-}
-.modal-header h2 {
-font-size: 1.2rem;
-color: var(--primary-dark);
-font-weight: 800;
-text-align: center;
-width: 100%;
-}
-.close-btn {
-background: none;
-border: none;
-font-size: 1.4rem;
-cursor: pointer;
-color: var(--text-sub);
-position: absolute;
-right: 0;
-top: 50%;
-transform: translateY(-50%);
-}
-.date-tag-badge {
-display: inline-block;
-background: var(--primary-light);
-color: var(--primary-dark);
-font-weight: 700;
-font-size: 0.98rem;
-padding: 9px 14px;
-border-radius: 10px;
-}
-.company-input-wrapper {
-position: relative;
-}
-.company-input-wrapper input {
-width: 100%;
-padding-right: 34px;
-}
-.company-input-wrapper::after {
-content: '';
-position: absolute;
-right: 14px;
-top: 50%;
-width: 8px;
-height: 8px;
-border-right: 2px solid var(--text-sub);
-border-bottom: 2px solid var(--text-sub);
-transform: translateY(-65%) rotate(45deg);
-pointer-events: none;
-}
-.analytics-summary-grid.grid-3 {
-grid-template-columns: repeat(3, 1fr);
-}
-.date-range-box {
-background: #f0f5fa;
-border: 1px solid #d4e2f2;
-border-radius: 12px;
-padding: 10px 12px 12px 12px;
-}
-.mini-cal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 8px;
-}
-.mini-cal-header span {
-font-weight: 800;
-font-size: 0.88rem;
-color: var(--primary-dark);
-}
-.mini-cal-header .btn-nav {
-width: 26px;
-height: 26px;
-font-size: 0.85rem;
-}
-.mini-cal-weekdays {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-text-align: center;
-font-size: 0.68rem;
-font-weight: 700;
-color: var(--text-sub);
-margin-bottom: 4px;
-}
-.mini-cal-days {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-row-gap: 2px;
-}
-.mini-cal-cell {
-position: relative;
-height: 34px;
-display: flex;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-}
-.mini-cal-cell.other-month {
-visibility: hidden;
-pointer-events: none;
-}
-.mini-cal-cell.in-range::before {
-content: '';
-position: absolute;
-top: 0;
-bottom: 0;
-left: 0;
-right: 0;
-background: var(--primary-light);
-}
-.mini-cal-cell.in-range.range-start::before {
-left: 50%;
-}
-.mini-cal-cell.in-range.range-end::before {
-right: 50%;
-}
-.mini-cal-num {
-position: relative;
-z-index: 1;
-width: 27px;
-height: 27px;
-display: flex;
-align-items: center;
-justify-content: center;
-border-radius: 50%;
-font-size: 0.76rem;
-font-weight: 700;
-border: 1.5px solid transparent;
-box-sizing: border-box;
-}
-.mini-cal-cell.today .mini-cal-num {
-border-color: var(--primary-dark);
-}
-.mini-cal-cell.is-holiday .mini-cal-num {
-color: var(--holiday-red);
-}
-.mini-cal-cell.range-start .mini-cal-num,
-.mini-cal-cell.range-end .mini-cal-num {
-background: var(--primary-dark);
-border-color: var(--primary-dark);
-color: #fff !important;
-}
-.date-summary-text {
-font-size: 0.78rem;
-font-weight: 700;
-color: var(--primary-dark);
-margin-top: 6px;
-}
-.form-grid {
-display: flex;
-flex-direction: column;
-gap: 12px;
-}
-.input-group {
-display: flex;
-flex-direction: column;
-gap: 4px;
-}
-.input-group label {
-font-size: 0.82rem;
-font-weight: 700;
-color: var(--primary-dark);
-}
-.input-group input {
-padding: 9px 12px;
-border: 1.5px solid var(--border-color);
-border-radius: 10px;
-font-size: 0.9rem;
-outline: none;
-background-color: #fdfdfc;
-}
-.time-range-group {
-display: flex;
-gap: 8px;
-align-items: center;
-}
-.time-range-group input {
-flex: 1;
-}
-.checkbox-group {
-display: flex;
-align-items: center;
-gap: 6px;
-margin-top: 2px;
-}
-.checkbox-group input[type="checkbox"] {
-width: 16px;
-height: 16px;
-accent-color: var(--primary);
-}
-.checkbox-group label {
-font-size: 0.85rem;
-cursor: pointer;
-font-weight: 600;
-}
-.deduct-input-wrapper {
-display: none;
-margin-top: 4px;
-padding: 8px 10px;
-background-color: #f0f5fa;
-border-radius: 8px;
-}
-.deduct-input-wrapper.active {
-display: flex;
-align-items: center;
-gap: 8px;
-}
-.calculated-duration {
-font-size: 0.82rem;
-color: var(--primary-dark);
-font-weight: 800;
-}
-.modal-btn-group {
-display: flex;
-gap: 10px;
-margin-top: 8px;
-}
-.btn-submit {
-flex: 1;
-background-color: var(--primary-dark);
-color: white;
-border: none;
-padding: 12px;
-border-radius: 12px;
-font-size: 0.95rem;
-font-weight: 800;
-cursor: pointer;
-}
-.btn-delete-item {
-background-color: #ffebee;
-color: var(--danger);
-border: 1px solid #ffcdd2;
-padding: 12px;
-border-radius: 12px;
-font-size: 0.9rem;
-font-weight: 700;
-cursor: pointer;
-}
-.action-menu-overlay {
-position: fixed;
-top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(0,0,0,0.3);
-display: none;
-justify-content: center;
-align-items: flex-end;
-z-index: 1001;
-}
-.action-menu-overlay.active {
-display: flex;
-}
-.action-sheet {
-background: white;
-width: 100%;
-max-width: 600px;
-border-radius: 20px 20px 0 0;
-padding: 20px;
-padding-bottom: calc(20px + var(--safe-bottom));
-display: flex;
-flex-direction: column;
-gap: 10px;
-}
-.action-sheet-title {
-text-align: center;
-font-weight: 800;
-color: var(--primary-dark);
-font-size: 0.95rem;
-margin-bottom: 4px;
-}
-.action-sheet-btn {
-padding: 12px;
-border: 1px solid var(--border-color);
-background: #f8f9fa;
-border-radius: 12px;
-font-weight: 700;
-font-size: 0.9rem;
-cursor: pointer;
-text-align: center;
-}
-.action-sheet-btn.primary {
-background: var(--primary-light);
-color: var(--primary-dark);
-}
-.action-sheet-btn.danger {
-background: #ffebee;
-color: var(--danger);
-}
-.empty-msg {
-text-align: center;
-padding: 30px;
-color: var(--text-sub);
-font-size: 0.88rem;
-}
-</style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2566">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.7px Arial; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
 </head>
 <body>
-<div class="container">
-<div class="top-header">
-<h1>🔥打工狗請努力🔥</h1>
-</div>
-<div class="month-salary-card">
-<div class="salary-box">
-<span>血汗已換取</span>
-<strong id="month-pay">$ 0</strong>
-</div>
-<div class="salary-divider"></div>
-<div class="salary-box">
-<span style="text-align:right;">本月努力指數</span>
-<strong id="month-total-est" style="text-align:right;">$ 0</strong>
-</div>
-</div>
-<!-- VIEW 1: Calendar View -->
-<div id="calendar-view" class="card">
-<div class="calendar-header cardTitle">
-<h2 id="calendar-month-year"></h2>
-<div class="month-nav">
-<button class="btn-nav" id="prev-month">&lt;</button>
-<button class="btn-nav" id="next-month">&gt;</button>
-</div>
-</div>
-<div class="calendar-weekdays">
-<div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div class="sun-label">日</div>
-</div>
-<div class="calendar-days" id="calendar-days"></div>
-</div>
-<!-- VIEW 2: List View -->
-<div id="list-view" class="card" style="display: none;">
-<div class="list-filter-bar cardTitle" id="company-filter-tabs"></div>
-<div id="shift-list-container"></div>
-</div>
-<!-- VIEW 3: Analytics View -->
-<div id="analytics-view" class="card cardTitle" style="display: none;">
-<div class="calendar-header">
-<h2 id="analytics-month-year"></h2>
-<div class="month-nav">
-<button class="btn-nav" id="prev-month-a">&lt;</button>
-<button class="btn-nav" id="next-month-a">&gt;</button>
-</div>
-</div>
-<div class="analytics-summary-grid">
-<div class="stat-box">
-<span>本月做狗總時數</span>
-<strong id="stat-hours">0h</strong>
-</div>
-<div class="stat-box">
-<span>本月已賺取</span>
-<strong id="stat-total-pay">$0</strong>
-</div>
-</div>
-<!-- 每月公司應收人工分析 -->
-<div class="analytics-section-title">
-<span>🏢 追糧報表</span>
-</div>
-<div id="company-breakdown-container"></div>
-<div class="analytics-section-title" style="margin-top: 20px;">
-<span>📊 累積血汗指數</span>
-</div>
-<div class="analytics-summary-grid">
-<div class="stat-box">
-<span>累積血汗</span>
-<strong id="stat-all-hours">0h</strong>
-</div>
-<div class="stat-box">
-<span>累積錢錢</span>
-<strong id="stat-all-pay">$0</strong>
-</div>
-</div>
-</div>
-</div>
-<!-- FIXED BOTTOM MENU BAR -->
-<nav class="fixed-bottom-nav">
-<button class="nav-item active" id="nav-calendar" onclick="switchNav('calendar-view')">
-<svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-</button>
-<button class="nav-item" id="nav-list" onclick="switchNav('list-view')">
-<svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-</button>
-<div class="nav-item-add-container">
-<button class="btn-add-highlight" onclick="openModal()">+</button>
-</div>
-<button class="nav-item" id="nav-analytics" onclick="switchNav('analytics-view')">
-<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
-</button>
-<button class="nav-item" id="nav-backup" onclick="openActionMenu()">
-<svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-</button>
-</nav>
-<!-- Action Sheet -->
-<div class="action-menu-overlay" id="action-menu-overlay" onclick="closeActionMenu()">
-<div class="action-sheet" onclick="event.stopPropagation()">
-<div class="action-sheet-title">備份與數據管理</div>
-<button class="action-sheet-btn primary" onclick="exportJSON(); closeActionMenu();">匯出 JSON 備份檔 (iCloud)</button>
-<button class="action-sheet-btn primary" onclick="exportCSV(); closeActionMenu();">匯出 CSV (Google Sheet / Excel)</button>
-<button class="action-sheet-btn" onclick="importJSON(); closeActionMenu();">匯入 JSON 備份檔</button>
-<button class="action-sheet-btn danger" onclick="confirmClearAll(); closeActionMenu();">清空所有紀錄</button>
-<button class="action-sheet-btn" style="color:var(--text-sub);" onclick="closeActionMenu()">取消</button>
-<input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
-</div>
-</div>
-<!-- Modal Form -->
-<div class="modal-overlay" id="modal-overlay">
-<div class="modal-content">
-<div class="modal-header">
-<h2 id="modal-title">有工番啦🤑</h2>
-<button class="close-btn" onclick="closeModal()">✕</button>
-</div>
-<form id="shift-form" class="form-grid">
-<input type="hidden" id="editing-shift-id" value="">
-<input type="hidden" id="shift-type" value="planned">
-<div class="input-group" id="date-range-container">
-<div class="date-range-box" id="date-range-box">
-<div class="mini-cal-header">
-<button type="button" class="btn-nav" id="mini-cal-prev">&lt;</button>
-<span id="mini-cal-month-year"></span>
-<button type="button" class="btn-nav" id="mini-cal-next">&gt;</button>
-</div>
-<div class="mini-cal-weekdays">
-<div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div style="color:var(--holiday-red);">日</div>
-</div>
-<div class="mini-cal-days" id="mini-cal-days"></div>
-<div class="date-summary-text" id="date-summary-text">已選 1 天</div>
-</div>
-<div class="date-tag-badge" id="date-tag-badge" style="display:none;"></div>
-</div>
-<div class="input-group">
-<label for="company">公司名稱</label>
-<div class="company-input-wrapper">
-<input type="text" id="company" list="company-list" required autocomplete="off">
-<datalist id="company-list"></datalist>
-</div>
-</div>
-<div class="input-group">
-<label for="event-name">Event</label>
-<input type="text" id="event-name">
-</div>
-<div class="input-group">
-<label for="rate">💰 錢錢 ($/hr)</label>
-<input type="number" id="rate" min="0" required>
-</div>
-<div class="input-group">
-<label>工作時間 (開始 - 結束)</label>
-<div class="time-range-group">
-<select id="start-time" required onchange="calcDuration()" style="padding: 9px; border-radius: 10px; border: 1.5px solid var(--border-color); flex: 1; font-weight: 700;"></select>
-<span>至</span>
-<select id="end-time" required onchange="calcDuration()" style="padding: 9px; border-radius: 10px; border: 1.5px solid var(--border-color); flex: 1; font-weight: 700;"></select>
-</div>
-</div>
-<div class="checkbox-group">
-<input type="checkbox" id="no-lunch-check" onchange="toggleDeductInput()">
-<label for="no-lunch-check">扣飯鐘</label>
-</div>
-<div class="deduct-input-wrapper" id="deduct-wrapper">
-<label style="font-size:0.8rem;">扣除時間：</label>
-<select id="deduct-minutes" onchange="calcDuration()" style="padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.85rem; background: white; outline: none; font-weight: 700;">
-<option value="30" selected>30 分鐘 </option>
-<option value="60">60 分鐘 </option>
-</select>
-</div>
-<div class="calculated-duration" id="duration-display">共 9 小時</div>
-<div class="modal-btn-group">
-<button type="button" class="btn-delete-item" id="btn-delete-modal" style="display:none;" onclick="deleteCurrentEditingShift()">刪除紀錄</button>
-<button type="submit" class="btn-submit" id="btn-submit-text">儲存紀錄</button>
-</div>
-</form>
-</div>
-</div>
-<script>
-let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];
-let companyPaydays = JSON.parse(localStorage.getItem('companyPaydays')) || {};
-let currentDate = new Date();
-let currentYear = currentDate.getFullYear();
-let currentMonth = currentDate.getMonth();
-let selectedCompanyFilter = "ALL";
-let selectedDatesList = [];
-let currentView = 'calendar-view';
-let modalRangeStart = null;
-let modalRangeEnd = null;
-let miniCalYear = new Date().getFullYear();
-let miniCalMonth = new Date().getMonth();
-let allowRangeSelection = true;
-const companyColorPalette = [
-{ bg: '#e3f2fd', border: '#90caf9', text: '#1976d2' },
-{ bg: '#f3e5f5', border: '#ce93d8', text: '#7b1fa2' },
-{ bg: '#fff3e0', border: '#ffcc80', text: '#e65100' },
-{ bg: '#e8f5e9', border: '#a5d6a7', text: '#2e7d32' },
-{ bg: '#fbe9e7', border: '#ffab91', text: '#d84315' },
-{ bg: '#e0f7fa', border: '#80deea', text: '#00838f' },
-{ bg: '#fffde7', border: '#fff59d', text: '#f57f17' },
-{ bg: '#f3e5f5', border: '#b39ddb', text: '#4527a0' }
-];
-let hkHolidays = {
-"2025-01-01": "元旦", "2025-01-29": "農曆年初一", "2025-01-30": "農曆年初二",
-"2025-01-31": "農曆年初三", "2025-04-04": "清明節", "2025-04-18": "耶穌受難節",
-"2025-04-19": "耶穌受難節翌日", "2025-04-21": "復活節星期一", "2025-05-01": "勞動節",
-"2025-05-05": "佛誕", "2025-05-31": "端午節", "2025-07-01": "香港特別行政區成立紀念日",
-"2025-10-01": "國慶日", "2025-10-07": "重陽節", "2025-10-29": "中秋節翌日",
-"2025-12-25": "聖誕節", "2025-12-26": "聖誕節後第一個周日",
-"2026-01-01": "元旦", "2026-02-17": "農曆年初一", "2026-02-18": "農曆年初二",
-"2026-02-19": "農曆年初三", "2026-04-03": "耶穌受難節", "2026-04-04": "清明節",
-"2026-04-06": "復活節星期一", "2026-04-07": "復活節星期一翌日", "2026-05-01": "勞動節",
-"2026-05-25": "佛誕", "2026-06-19": "端午節", "2026-07-01": "特區成立紀念日",
-"2026-09-26": "中秋節翌日", "2026-10-01": "國慶日", "2026-10-19": "重陽節",
-"2026-12-25": "聖誕節", "2026-12-26": "聖誕節後第一個周日"
-};
-(function fetchLiveHolidays() {
-fetch('https://www.1823.gov.hk/common/ical/tc.json')
-.then(res => res.json())
-.then(data => {
-const events = data && data.vcalendar && data.vcalendar[0] && data.vcalendar[0].vevent;
-if (!Array.isArray(events)) return;
-events.forEach(ev => {
-const raw = ev.dtstart && ev.dtstart[0];
-if (!raw || raw.length !== 8) return;
-const dateStr = `${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`;
-hkHolidays[dateStr] = ev.summary || hkHolidays[dateStr] || '';
-});
-renderCalendar();
-})
-.catch(() => {});
-})();
-function getHolidayInfo(dateStr, dateObj) {
-const isSun = dateObj.getDay() === 0;
-const holidayName = hkHolidays[dateStr];
-if (holidayName) return { isHoliday: true, label: holidayName };
-if (isSun) return { isHoliday: true, label: '' };
-return { isHoliday: false, label: '' };
-}
-const modalOverlay = document.getElementById('modal-overlay');
-const shiftForm = document.getElementById('shift-form');
-document.getElementById('start-time').value = "09:00";
-document.getElementById('end-time').value = "12:00";
-function formatShortTime(timeStr) {
-if (!timeStr) return '';
-const [h, m] = timeStr.split(':');
-const hourNum = parseInt(h, 10);
-return m === '00' ? `${hourNum}` : `${hourNum}:${m}`;
-}
-function getLocalDateStr(dateObj = new Date()) {
-const year = dateObj.getFullYear();
-const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-const day = String(dateObj.getDate()).padStart(2, '0');
-return `${year}-${month}-${day}`;
-}
-autoUpdatePastPlannedShifts();
-renderCalendar();
-function autoUpdatePastPlannedShifts() {
-const now = new Date();
-const todayStr = getLocalDateStr(now);
-let updated = false;
-shifts.forEach(s => {
-if (s.type === 'planned') {
-if (s.date < todayStr) {
-s.type = 'completed';
-updated = true;
-} else if (s.date === todayStr) {
-const endTimeStr = s.endTime || "23:59";
-const [eHours, eMins] = endTimeStr.split(':').map(Number);
-const shiftEndDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eHours, eMins);
-if (now >= shiftEndDateTime) {
-s.type = 'completed';
-updated = true;
-}
-}
-}
-});
-if (updated) {
-saveData();
-}
-}
-function switchNav(viewId) {
-autoUpdatePastPlannedShifts();
-currentView = viewId;
-document.getElementById('calendar-view').style.display = 'none';
-document.getElementById('list-view').style.display = 'none';
-document.getElementById('analytics-view').style.display = 'none';
-document.getElementById('nav-calendar').classList.remove('active');
-document.getElementById('nav-list').classList.remove('active');
-document.getElementById('nav-analytics').classList.remove('active');
-document.getElementById(viewId).style.display = 'block';
-if (viewId === 'calendar-view') {
-document.getElementById('nav-calendar').classList.add('active');
-renderCalendar();
-} else if (viewId === 'list-view') {
-document.getElementById('nav-list').classList.add('active');
-renderListView();
-} else if (viewId === 'analytics-view') {
-document.getElementById('nav-analytics').classList.add('active');
-renderAnalytics();
-}
-}
-// 1. 動態生成 00:00 - 23:30 (每 30 分鐘一格) 的下拉選單選項
-function populateTimeOptions() {
-const startSelect = document.getElementById('start-time');
-const endSelect = document.getElementById('end-time');
-if (!startSelect || !endSelect) return;
-let optionsHtml = '';
-for (let h = 7; h < 23; h++) {
-const hourStr = String(h).padStart(2, '0');
-optionsHtml += `<option value="${hourStr}:00">${hourStr}:00</option>`;
-optionsHtml += `<option value="${hourStr}:30">${hourStr}:30</option>`;
-}
-startSelect.innerHTML = optionsHtml;
-endSelect.innerHTML = optionsHtml;
-}
-// 2. 更新公司名稱歷史選單 (自動提取歷史紀錄)
-function updateCompanyDatalist() {
-const companyList = document.getElementById('company-list');
-if (!companyList) return;
-const savedCompanies = [...new Set(shifts.map(s => s.company).filter(Boolean))];
-companyList.innerHTML = savedCompanies.map(c => `<option value="${c}"></option>`).join('');
-}
-// 頁面初始化時執行
-populateTimeOptions();
-updateCompanyDatalist();
-// 修改 openModal 函數，加入預設時間與更新選單
-function openModal(selectedDateStr = null) {
-modalOverlay.classList.add('active');
-const todayStr = getLocalDateStr();
-const targetDate = selectedDateStr || todayStr;
-document.getElementById('modal-title').textContent = "有工番啦🤑";
-document.getElementById('editing-shift-id').value = "";
-document.getElementById('btn-delete-modal').style.display = "none";
-document.getElementById('date-range-container').style.display = "block";
-document.getElementById('date-range-box').style.display = "block";
-document.getElementById('date-tag-badge').style.display = "none";
-// 自動更新公司下拉歷史清單
-updateCompanyDatalist();
-// 預設時間 (例如 09:00 至 18:00)
-document.getElementById('start-time').value = "09:00";
-document.getElementById('end-time').value = "18:00";
-initMiniCalendar(targetDate, true);
-setShiftType('planned');
-calcDuration();
-}
-// 修改 openShiftDetail 函數，打開編輯時同步更新清單
-function openShiftDetail(shiftId) {
-const shift = shifts.find(s => s.id === shiftId);
-if (!shift) return;
-modalOverlay.classList.add('active');
-document.getElementById('modal-title').textContent = "傻仔打錯野？";
-document.getElementById('editing-shift-id').value = shift.id;
-document.getElementById('btn-delete-modal').style.display = "block";
-document.getElementById('date-range-container').style.display = "block";
-document.getElementById('date-range-box').style.display = "none";
-document.getElementById('date-tag-badge').style.display = "inline-block";
-document.getElementById('date-tag-badge').textContent = `已選 ${shift.date}`;
-updateCompanyDatalist();
-initMiniCalendar(shift.date, false);
-setShiftType(shift.type || 'completed');
-document.getElementById('company').value = shift.company;
-document.getElementById('event-name').value = shift.eventName === '-' ? '' : shift.eventName;
-document.getElementById('rate').value = shift.rate;
-document.getElementById('start-time').value = shift.startTime;
-document.getElementById('end-time').value = shift.endTime;
-if (shift.deductMins && shift.deductMins > 0) {
-document.getElementById('no-lunch-check').checked = true;
-document.getElementById('deduct-minutes').value = shift.deductMins;
-document.getElementById('deduct-wrapper').classList.add('active');
-} else {
-document.getElementById('no-lunch-check').checked = false;
-document.getElementById('deduct-wrapper').classList.remove('active');
-}
-calcDuration();
-}
-function closeModal() { modalOverlay.classList.remove('active'); }
-function initMiniCalendar(dateStr, canSelectRange) {
-const d = new Date(dateStr);
-miniCalYear = d.getFullYear();
-miniCalMonth = d.getMonth();
-modalRangeStart = dateStr;
-modalRangeEnd = null;
-allowRangeSelection = canSelectRange;
-selectedDatesList = [dateStr];
-renderMiniCalendar();
-updateDateSummary();
-}
-function renderMiniCalendar() {
-document.getElementById('mini-cal-month-year').textContent = `${miniCalYear} 年 ${miniCalMonth + 1} 月`;
-const daysContainer = document.getElementById('mini-cal-days');
-daysContainer.innerHTML = '';
-let rawFirstDay = new Date(miniCalYear, miniCalMonth, 1).getDay();
-let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;
-const totalDays = new Date(miniCalYear, miniCalMonth + 1, 0).getDate();
-const today = new Date();
-for (let i = 0; i < firstDay; i++) {
-const cell = document.createElement('div');
-cell.className = 'mini-cal-cell other-month';
-daysContainer.appendChild(cell);
-}
-for (let day = 1; day <= totalDays; day++) {
-const dateStr = `${miniCalYear}-${String(miniCalMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-const dateObj = new Date(miniCalYear, miniCalMonth, day);
-const cell = document.createElement('div');
-cell.className = 'mini-cal-cell';
-if (day === today.getDate() && miniCalMonth === today.getMonth() && miniCalYear === today.getFullYear()) {
-cell.classList.add('today');
-}
-const holidayInfo = getHolidayInfo(dateStr, dateObj);
-if (holidayInfo.isHoliday) cell.classList.add('is-holiday');
-const isStart = dateStr === modalRangeStart;
-const isEnd = modalRangeEnd ? dateStr === modalRangeEnd : isStart;
-const inRange = isDateInSelectedRange(dateStr);
-if (inRange) cell.classList.add('in-range');
-if (isStart) cell.classList.add('range-start');
-if (isEnd) cell.classList.add('range-end');
-cell.innerHTML = `<span class="mini-cal-num">${day}</span>`;
-cell.onclick = () => handleMiniCalClick(dateStr);
-daysContainer.appendChild(cell);
-}
-}
-function isDateInSelectedRange(dateStr) {
-if (!modalRangeStart) return false;
-if (!modalRangeEnd) return dateStr === modalRangeStart;
-return dateStr >= modalRangeStart && dateStr <= modalRangeEnd;
-}
-function handleMiniCalClick(dateStr) {
-if (!allowRangeSelection) {
-modalRangeStart = dateStr;
-modalRangeEnd = null;
-selectedDatesList = [dateStr];
-renderMiniCalendar();
-updateDateSummary();
-return;
-}
-if (!modalRangeStart || modalRangeEnd) {
-modalRangeStart = dateStr;
-modalRangeEnd = null;
-} else if (dateStr === modalRangeStart) {
-modalRangeEnd = null;
-} else if (dateStr < modalRangeStart) {
-modalRangeEnd = modalRangeStart;
-modalRangeStart = dateStr;
-} else {
-modalRangeEnd = dateStr;
-}
-if (modalRangeEnd) {
-selectedDatesList = [];
-let cur = new Date(modalRangeStart);
-const end = new Date(modalRangeEnd);
-while (cur <= end) {
-selectedDatesList.push(getLocalDateStr(cur));
-cur.setDate(cur.getDate() + 1);
-}
-} else {
-selectedDatesList = [modalRangeStart];
-}
-renderMiniCalendar();
-updateDateSummary();
-}
-function updateDateSummary() {
-document.getElementById('date-summary-text').textContent = `已選 ${selectedDatesList.length} 天`;
-}
-document.getElementById('mini-cal-prev').addEventListener('click', () => {
-miniCalMonth--;
-if (miniCalMonth < 0) { miniCalMonth = 11; miniCalYear--; }
-renderMiniCalendar();
-});
-document.getElementById('mini-cal-next').addEventListener('click', () => {
-miniCalMonth++;
-if (miniCalMonth > 11) { miniCalMonth = 0; miniCalYear++; }
-renderMiniCalendar();
-});
-function openActionMenu() { document.getElementById('action-menu-overlay').classList.add('active'); }
-function closeActionMenu() { document.getElementById('action-menu-overlay').classList.remove('active'); }
-function setShiftType(type) {
-document.getElementById('shift-type').value = type;
-document.getElementById('btn-submit-text').textContent = (type === 'completed') ? '儲存已完成工時' : '儲存排班';
-}
-function toggleDeductInput() {
-const isChecked = document.getElementById('no-lunch-check').checked;
-const wrapper = document.getElementById('deduct-wrapper');
-if (isChecked) {
-wrapper.classList.add('active');
-} else {
-wrapper.classList.remove('active');
-}
-calcDuration();
-}
-function getCalculatedDuration() {
-const startTime = document.getElementById('start-time').value;
-const endTime = document.getElementById('end-time').value;
-if (!startTime || !endTime) return 0;
-const [sHours, sMins] = startTime.split(':').map(Number);
-const [eHours, eMins] = endTime.split(':').map(Number);
-let startTotalMins = sHours * 60 + sMins;
-let endTotalMins = eHours * 60 + eMins;
-if (endTotalMins < startTotalMins) {
-endTotalMins += 24 * 60;
-}
-let diffMins = endTotalMins - startTotalMins;
-if (document.getElementById('no-lunch-check').checked) {
-const deductMins = parseFloat(document.getElementById('deduct-minutes').value) || 0;
-diffMins = Math.max(0, diffMins - deductMins);
-}
-return Math.round((diffMins / 60) * 100) / 100;
-}
-function calcDuration() {
-const dur = getCalculatedDuration();
-document.getElementById('duration-display').textContent = `共 ${dur} 小時`;
-}
-shiftForm.addEventListener('submit', (e) => {
-e.preventDefault();
-const editingId = document.getElementById('editing-shift-id').value;
-const duration = getCalculatedDuration();
-const isDeduct = document.getElementById('no-lunch-check').checked;
-const deductMins = isDeduct ? (parseFloat(document.getElementById('deduct-minutes').value) || 0) : 0;
-let type = document.getElementById('shift-type').value;
-const company = document.getElementById('company').value.trim();
-const eventName = document.getElementById('event-name').value.trim() || "-";
-const rate = parseFloat(document.getElementById('rate').value);
-const startTime = document.getElementById('start-time').value;
-const endTime = document.getElementById('end-time').value;
-const now = new Date();
-const todayStr = getLocalDateStr(now);
-if (editingId) {
-const targetIndex = shifts.findIndex(s => s.id == editingId);
-if (targetIndex !== -1) {
-let finalType = type;
-if (finalType === 'planned') {
-if (modalRangeStart < todayStr) {
-finalType = 'completed';
-} else if (modalRangeStart === todayStr) {
-const [eH, eM] = endTime.split(':').map(Number);
-const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
-if (now >= endDt) finalType = 'completed';
-}
-}
-shifts[targetIndex] = {
-id: Number(editingId),
-type: finalType,
-date: modalRangeStart,
-company: company,
-eventName: eventName,
-rate: rate,
-startTime: startTime,
-endTime: endTime,
-deductMins: deductMins,
-duration: duration
-};
-}
-} else {
-if (selectedDatesList.length === 0) {
-alert('請選擇日期');
-return;
-}
-selectedDatesList.forEach((dateStr, index) => {
-let finalType = type;
-if (finalType === 'planned') {
-if (dateStr < todayStr) {
-finalType = 'completed';
-} else if (dateStr === todayStr) {
-const [eH, eM] = endTime.split(':').map(Number);
-const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
-if (now >= endDt) finalType = 'completed';
-}
-}
-const newShift = {
-id: Date.now() + index,
-type: finalType,
-date: dateStr,
-company: company,
-eventName: eventName,
-rate: rate,
-startTime: startTime,
-endTime: endTime,
-deductMins: deductMins,
-duration: duration
-};
-shifts.push(newShift);
-});
-}
-saveData();
-const refDate = new Date(modalRangeStart);
-currentYear = refDate.getFullYear();
-currentMonth = refDate.getMonth();
-renderCurrentView();
-closeModal();
-document.getElementById('event-name').value = '';
-});
-function deleteCurrentEditingShift() {
-const editingId = document.getElementById('editing-shift-id').value;
-if (editingId) {
-deleteShift(Number(editingId));
-closeModal();
-}
-}
-function deleteShift(id) {
-shifts = shifts.filter(s => s.id !== id);
-saveData();
-renderCurrentView();
-}
-function renderCurrentView() {
-if (currentView === 'calendar-view') { renderCalendar(); }
-else if (currentView === 'list-view') { renderListView(); }
-else if (currentView === 'analytics-view') { renderAnalytics(); }
-else { renderCalendar(); }
-if (currentView !== 'calendar-view') { updateMonthSalaryCard(); }
-}
-function saveData() {
-localStorage.setItem('partTimeShifts', JSON.stringify(shifts));
-localStorage.setItem('companyPaydays', JSON.stringify(companyPaydays));
-}
-async function shareOrDownloadFile(filename, mimeType, content) {
-try {
-const blob = new Blob([content], { type: mimeType });
-const file = new File([blob], filename, { type: mimeType });
-if (navigator.canShare && navigator.canShare({ files: [file] })) {
-await navigator.share({
-files: [file],
-title: filename,
-text: '兼職紀錄備份'
-});
-return;
-}
-const url = URL.createObjectURL(blob);
-const link = document.createElement('a');
-link.href = url;
-link.download = filename;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-setTimeout(() => URL.revokeObjectURL(url), 2000);
-} catch (err) {
-if (err && err.name === 'AbortError') return;
-console.error('Export Error:', err);
-alert('匯出失敗');
-}
-}
-function exportJSON() {
-if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
-const content = JSON.stringify(shifts, null, 2);
-shareOrDownloadFile(`part_time_backup_${getLocalDateStr()}.json`, 'application/json', content);
-}
-function importJSON() { document.getElementById('import-file').click(); }
-function handleFileSelect(event) {
-const file = event.target.files[0];
-if (!file) return;
-const reader = new FileReader();
-reader.onload = function(e) {
-try {
-const importedData = JSON.parse(e.target.result);
-if (Array.isArray(importedData)) {
-shifts = importedData;
-autoUpdatePastPlannedShifts();
-saveData();
-renderCurrentView();
-alert('匯入成功！');
-} else { alert('無效的備份檔案'); }
-} catch (err) { alert('解析檔案失敗'); }
-};
-reader.readAsText(file);
-event.target.value = '';
-}
-function exportCSV() {
-if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
-let csvContent = "\uFEFF";
-csvContent += "日期,狀態,公司,工作備註,時薪($),開始時間,結束時間,扣除(分鐘),總時數(小時),薪金($)\n";
-shifts.forEach(s => {
-const pay = s.rate * s.duration;
-const status = s.type === 'planned' ? '排班' : '已完成';
-csvContent += `"${s.date}","${status}","${s.company}","${s.eventName}",${s.rate},"${s.startTime}","${s.endTime}",${s.deductMins},${s.duration},${pay}\n`;
-});
-shareOrDownloadFile(`part_time_records_${getLocalDateStr()}.csv`, 'text/csv;charset=utf-8;', csvContent);
-}
-function confirmClearAll() {
-if (shifts.length === 0) { alert('目前沒有紀錄'); return; }
-const ok = confirm('確定要清空所有資料嗎？此動作無法復原！\n建議先匯出 JSON 備份檔。');
-if (ok) {
-shifts = [];
-saveData();
-renderCurrentView();
-alert('已清空所有紀錄');
-}
-}
-function changeMonth(delta) {
-currentMonth += delta;
-if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-autoUpdatePastPlannedShifts();
-renderCurrentView();
-}
-document.getElementById('prev-month').addEventListener('click', () => changeMonth(-1));
-document.getElementById('next-month').addEventListener('click', () => changeMonth(1));
-document.getElementById('prev-month-a').addEventListener('click', () => changeMonth(-1));
-document.getElementById('next-month-a').addEventListener('click', () => changeMonth(1));
-function updateMonthSalaryCard() {
-let mPayCompleted = 0;
-let mPayTotal = 0;
-const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-shifts.filter(s => s.date && s.date.startsWith(monthPrefix)).forEach(s => {
-const pay = s.rate * s.duration;
-mPayTotal += pay;
-if (s.type === 'completed' || !s.type) mPayCompleted += pay;
-});
-document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;
-document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;
-}
-/* Render Calendar */
-function renderCalendar() {
-autoUpdatePastPlannedShifts();
-document.getElementById('calendar-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
-const daysContainer = document.getElementById('calendar-days');
-daysContainer.innerHTML = '';
-let rawFirstDay = new Date(currentYear, currentMonth, 1).getDay();
-let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;
-const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
-const today = new Date();
-for (let i = firstDay - 1; i >= 0; i--) {
-const cell = document.createElement('div');
-cell.className = 'day-cell other-month';
-cell.innerHTML = `<span class="day-number">${prevLastDay - i}</span>`;
-daysContainer.appendChild(cell);
-}
-let mPayCompleted = 0;
-let mPayTotal = 0;
-for (let day = 1; day <= totalDays; day++) {
-const cell = document.createElement('div');
-cell.className = 'day-cell';
-const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-const dateObj = new Date(currentYear, currentMonth, day);
-const holidayInfo = getHolidayInfo(dateStr, dateObj);
-cell.onclick = () => {
-openModal(dateStr);
-};
-if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
-cell.classList.add('today');
-}
-if (holidayInfo.isHoliday) {
-cell.classList.add('is-holiday');
-}
-let html = `<span class="day-number">${day}</span>`;
-if (holidayInfo.isHoliday && holidayInfo.label) {
-html += `<div class="holiday-label">${holidayInfo.label}</div>`;
-}
-const dayShifts = shifts.filter(s => s.date === dateStr);
-let shiftsHtml = '';
-dayShifts.forEach(s => {
-const pay = s.rate * s.duration;
-mPayTotal += pay;
-if (s.type === 'completed' || !s.type) {
-mPayCompleted += pay;
-}
-const isPlanned = s.type === 'planned';
-const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;
-shiftsHtml += `
-<div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); openShiftDetail(${s.id})" title="${s.company} (${timeTag}) $${pay}">
-<div class="comp-name">${s.company}</div>
-<div class="shift-time">${timeTag}</div>
-<div class="shift-money">$${Math.round(pay)}</div>
-</div>
-`;
-});
-html += `<div class="shift-items-wrap">${shiftsHtml}</div>`;
-cell.innerHTML = html;
-daysContainer.appendChild(cell);
-}
-const totalRendered = firstDay + totalDays;
-const nextDays = (7 - (totalRendered % 7)) % 7;
-for (let i = 1; i <= nextDays; i++) {
-const cell = document.createElement('div');
-cell.className = 'day-cell other-month';
-cell.innerHTML = `<span class="day-number">${i}</span>`;
-daysContainer.appendChild(cell);
-}
-document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;
-document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;
-}
-/* Render List View */
-function renderListView() {
-autoUpdatePastPlannedShifts();
-updateMonthSalaryCard();
-const filterTabsContainer = document.getElementById('company-filter-tabs');
-const listContainer = document.getElementById('shift-list-container');
-const companies = [...new Set(shifts.map(s => s.company))];
-filterTabsContainer.innerHTML = `
-<button class="filter-btn ${selectedCompanyFilter === 'ALL' ? 'active' : ''}" onclick="filterListCompany('ALL')">全部</button>
-` + companies.map((comp, idx) => {
-const color = companyColorPalette[idx % companyColorPalette.length];
-const isActive = selectedCompanyFilter === comp;
-const inlineStyle = isActive
-? `background-color: ${color.text}; color: #ffffff; border-color: ${color.text};`
-: `background-color: ${color.bg}; color: ${color.text}; border-color: ${color.border};`;
-return `
-<button class="filter-btn ${isActive ? 'active' : ''}" style="${inlineStyle}" onclick="filterListCompany('${comp}')">${comp}</button>
-`;
-}).join('');
-let filteredShifts = selectedCompanyFilter === 'ALL' ? shifts : shifts.filter(s => s.company === selectedCompanyFilter);
-filteredShifts.sort((a,b) => new Date(b.date) - new Date(a.date));
-if (filteredShifts.length === 0) {
-listContainer.innerHTML = `<div class="empty-msg">沒有相關工時紀錄</div>`;
-return;
-}
-listContainer.innerHTML = filteredShifts.map(s => {
-const pay = s.rate * s.duration;
-const isPlanned = s.type === 'planned';
-return `
-<div class="shift-list-item" onclick="openShiftDetail(${s.id})">
-<div class="shift-info">
-<h4>${s.company} ${isPlanned ? '<span style="color:#1976d2; font-size:0.75rem;">(排班)</span>' : ''}</h4>
-<p>${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}</p>
-</div>
-<div class="shift-amount">
-<div class="price">$${Math.round(pay).toLocaleString()}</div>
-<div class="hrs">${s.duration}小時 ($${s.rate}/hr)</div>
-</div>
-</div>
-`;
-}).join('');
-}
-function filterListCompany(comp) {
-selectedCompanyFilter = comp;
-renderListView();
-}
-/* Render Analytics View */
-function renderAnalytics() {
-autoUpdatePastPlannedShifts();
-updateMonthSalaryCard();
-document.getElementById('analytics-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
-const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-// 計入該月份所有紀錄 (包含已完成及預計/排班)
-const monthShifts = shifts.filter(s => s.date && s.date.startsWith(monthPrefix));
-let totalHours = 0;
-let totalPay = 0;
-const companyMap = {};
-monthShifts.forEach(s => {
-const pay = s.rate * s.duration;
-if (s.type === 'completed' || !s.type) {
-totalHours += s.duration;
-totalPay += pay;
-}
-if (!companyMap[s.company]) {
-companyMap[s.company] = { hours: 0, pay: 0, totalEstPay: 0, count: 0 };
-}
-companyMap[s.company].totalEstPay += pay;
-if (s.type === 'completed' || !s.type) {
-companyMap[s.company].hours += s.duration;
-companyMap[s.company].pay += pay;
-companyMap[s.company].count += 1;
-}
-});
-const avgRate = totalHours > 0 ? (totalPay / totalHours) : 0;
-document.getElementById('stat-hours').textContent = `${Math.round(totalHours * 10) / 10}h`;
-document.getElementById('stat-total-pay').textContent = `$${Math.round(totalPay).toLocaleString()}`;
-const companyBreakdownContainer = document.getElementById('company-breakdown-container');
-const companyEntries = Object.entries(companyMap).sort((a, b) => b[1].totalEstPay - a[1].totalEstPay);
-const allCompanyNames = [...new Set(shifts.map(s => s.company))];
-const today = new Date();
-const currentDayNum = today.getDate();
-const isCurrentViewingMonth = (today.getFullYear() === currentYear && today.getMonth() === currentMonth);
-if (companyEntries.length === 0) {
-companyBreakdownContainer.innerHTML = `<div class="empty-msg">本月沒有工時紀錄</div>`;
-} else {
-companyBreakdownContainer.innerHTML = companyEntries.map(([name, data]) => {
-const idx = allCompanyNames.indexOf(name);
-const color = companyColorPalette[idx % companyColorPalette.length];
-const pct = totalPay > 0 ? Math.round((data.pay / totalPay) * 100) : 0;
-const avgCompRate = data.hours > 0 ? Math.round(data.pay / data.hours) : 0;
-const pDay = companyPaydays[name] || 7; // 預設 7 號出糧
-let paydayStatusHtml = '';
-return `
-<div class="company-stat-item">
-<div class="company-stat-name">
-<span class="company-stat-dot" style="background:${color.text};"></span>
-${name}
-</div>
-<div class="company-stat-pay">$${Math.round(data.totalEstPay).toLocaleString()}</div>
-<div class="company-stat-meta">
-<span>${data.count} job • ${Math.round(data.hours * 10) / 10}h ($${avgCompRate}/hr)</span>
-${paydayStatusHtml}
-</div>
-</div>
-`;
-}).join('');
-}
-// Render 全局歷史統計
-const allCompleted = shifts.filter(s => s.type === 'completed' || !s.type);
-let allHours = 0, allPay = 0;
-allCompleted.forEach(s => {
-allHours += s.duration;
-allPay += s.rate * s.duration;
-});
-const allCompanies = new Set(allCompleted.map(s => s.company));
-document.getElementById('stat-all-hours').textContent = `${Math.round(allHours * 10) / 10}h`;
-document.getElementById('stat-all-pay').textContent = `$${Math.round(allPay).toLocaleString()}`;
-}
-</script>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="zh-HK"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;title&gt;兼職工時及薪酬管理&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</span></p>
+<p class="p1"><span class="s1">&lt;link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;style&gt;</span></p>
+<p class="p1"><span class="s1">:root {</span></p>
+<p class="p1"><span class="s1">--bg-color: #f5f8fc;</span></p>
+<p class="p1"><span class="s1">--card-bg: #ffffff;</span></p>
+<p class="p1"><span class="s1">--primary: #6d90c4;</span></p>
+<p class="p1"><span class="s1">--primary-dark: #3f5f8f;</span></p>
+<p class="p1"><span class="s1">--primary-hover: #3f5f8f;</span></p>
+<p class="p1"><span class="s1">--primary-light: #eaf1fb;</span></p>
+<p class="p1"><span class="s1">--text-main: #212529;</span></p>
+<p class="p1"><span class="s1">--text-sub: #6c757d;</span></p>
+<p class="p1"><span class="s1">--border-color: #f5f8fa;</span></p>
+<p class="p1"><span class="s1">--accent-price: #2e7d32;</span></p>
+<p class="p1"><span class="s1">--plan-bg: #eaf1fb;</span></p>
+<p class="p1"><span class="s1">--plan-border: #90b8e0;</span></p>
+<p class="p1"><span class="s1">--danger: #e53935;</span></p>
+<p class="p1"><span class="s1">--holiday-red: #e53935;</span></p>
+<p class="p1"><span class="s1">--nav-height: 50px;</span></p>
+<p class="p1"><span class="s1">--safe-bottom: env(safe-area-inset-bottom, 0px);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">* {</span></p>
+<p class="p1"><span class="s1">box-sizing: border-box;</span></p>
+<p class="p1"><span class="s1">margin: 0;</span></p>
+<p class="p1"><span class="s1">padding: 0;</span></p>
+<p class="p1"><span class="s1">font-family: 'Nunito', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;</span></p>
+<p class="p1"><span class="s1">-webkit-tap-highlight-color: transparent;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">html, body {</span></p>
+<p class="p1"><span class="s1">height: 100%;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">body {</span></p>
+<p class="p1"><span class="s1">background-color: var(--bg-color);</span></p>
+<p class="p1"><span class="s1">padding: 4px 10px calc(var(--nav-height) + var(--safe-bottom) + 20px) 10px;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">align-items: flex-start;</span></p>
+<p class="p1"><span class="s1">min-height: 100dvh;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.container {</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">max-width: 600px;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">gap: 13px;</span></p>
+<p class="p1"><span class="s1">min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom) - 24px);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.top-header {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">padding: 2px 5px;</span></p>
+<p class="p1"><span class="s1">position: relative;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.top-header h1 {</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">font-size: 1.35rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.card {</span></p>
+<p class="p1"><span class="s1">background-color: var(--card-bg);</span></p>
+<p class="p1"><span class="s1">border-radius: 20px;</span></p>
+<p class="p1"><span class="s1">box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);</span></p>
+<p class="p1"><span class="s1">overflow: hidden;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.cardTitle {</span></p>
+<p class="p1"><span class="s1">padding: 18px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.month-salary-card {</span></p>
+<p class="p1"><span class="s1">background: linear-gradient(135deg, #8fb1e0, var(--primary-dark));</span></p>
+<p class="p1"><span class="s1">border-radius: 18px;</span></p>
+<p class="p1"><span class="s1">padding: 18px 20px;</span></p>
+<p class="p1"><span class="s1">color: white;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">box-shadow: 0 6px 15px rgba(63, 95, 143, 0.28);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.salary-box {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.salary-box span {</span></p>
+<p class="p1"><span class="s1">font-size: 0.76rem;</span></p>
+<p class="p1"><span class="s1">color: rgba(255, 255, 255, 0.85);</span></p>
+<p class="p1"><span class="s1">font-weight: 600;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.salary-box strong {</span></p>
+<p class="p1"><span class="s1">font-size: 1.35rem;</span></p>
+<p class="p1"><span class="s1">color: #ffffff;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">margin-top: 2px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.salary-divider {</span></p>
+<p class="p1"><span class="s1">width: 1px;</span></p>
+<p class="p1"><span class="s1">height: 35px;</span></p>
+<p class="p1"><span class="s1">background-color: rgba(255, 255, 255, 0.25);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.calendar-header {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 15px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.calendar-header h2 {</span></p>
+<p class="p1"><span class="s1">font-size: 1.1rem;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.month-nav {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">gap: 8px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.btn-nav {</span></p>
+<p class="p1"><span class="s1">background-color: var(--primary-light);</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">border: none;</span></p>
+<p class="p1"><span class="s1">width: 32px;</span></p>
+<p class="p1"><span class="s1">height: 32px;</span></p>
+<p class="p1"><span class="s1">border-radius: 50%;</span></p>
+<p class="p1"><span class="s1">font-size: 1rem;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.calendar-weekdays {</span></p>
+<p class="p1"><span class="s1">display: grid;</span></p>
+<p class="p1"><span class="s1">grid-template-columns: repeat(7, 1fr);</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">color: var(--text-main);</span></p>
+<p class="p1"><span class="s1">margin-bottom: 0;</span></p>
+<p class="p1"><span class="s1">padding-bottom: 8px;</span></p>
+<p class="p1"><span class="s1">font-size: 0.78rem;</span></p>
+<p class="p1"><span class="s1">border-bottom: 1px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.calendar-weekdays .sun-label {</span></p>
+<p class="p1"><span class="s1">color: var(--holiday-red);</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.calendar-days {</span></p>
+<p class="p1"><span class="s1">display: grid;</span></p>
+<p class="p1"><span class="s1">grid-template-columns: repeat(7, 1fr);</span></p>
+<p class="p1"><span class="s1">grid-auto-rows: minmax(64px, auto);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-cell {</span></p>
+<p class="p1"><span class="s1">min-height: 64px;</span></p>
+<p class="p1"><span class="s1">max-height: 100px;</span></p>
+<p class="p1"><span class="s1">padding: 3px 0;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">background-color: #ffffff;</span></p>
+<p class="p1"><span class="s1">transition: all 0.15s;</span></p>
+<p class="p1"><span class="s1">overflow: hidden;</span></p>
+<p class="p1"><span class="s1">border-bottom: 1px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">border-right: 1px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-cell:hover {</span></p>
+<p class="p1"><span class="s1">background-color: #eef3f9;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-cell.other-month {</span></p>
+<p class="p1"><span class="s1">opacity: 0.25;</span></p>
+<p class="p1"><span class="s1">background-color: transparent;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-number {</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">font-size: 0.72rem;</span></p>
+<p class="p1"><span class="s1">line-height: 1;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 3px;</span></p>
+<p class="p1"><span class="s1">flex-shrink: 0;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-cell.today {</span></p>
+<p class="p1"><span class="s1">background-color: #F2F6FC;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-cell.today .day-number {</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">background: var(--primary-light);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-cell.is-holiday .day-number,</span></p>
+<p class="p1"><span class="s1">.day-cell.is-holiday.today .day-number {</span></p>
+<p class="p1"><span class="s1">color: var(--holiday-red);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.day-cell.is-holiday.today .day-number {</span></p>
+<p class="p1"><span class="s1">background: #fdecea;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.holiday-label {</span></p>
+<p class="p1"><span class="s1">font-size: 0.5rem;</span></p>
+<p class="p1"><span class="s1">line-height: 1.05;</span></p>
+<p class="p1"><span class="s1">color: var(--holiday-red);</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">max-width: 100%;</span></p>
+<p class="p1"><span class="s1">overflow: hidden;</span></p>
+<p class="p1"><span class="s1">display: -webkit-box;</span></p>
+<p class="p1"><span class="s1">-webkit-line-clamp: 2;</span></p>
+<p class="p1"><span class="s1">-webkit-box-orient: vertical;</span></p>
+<p class="p1"><span class="s1">flex-shrink: 0;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 1px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-items-wrap {</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">gap: 1px;</span></p>
+<p class="p1"><span class="s1">overflow-y: auto;</span></p>
+<p class="p1"><span class="s1">flex: 1;</span></p>
+<p class="p1"><span class="s1">min-height: 0;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-dot-item {</span></p>
+<p class="p1"><span class="s1">background-color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">padding: 1px 0;</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">transition: background-color 0.2s;</span></p>
+<p class="p1"><span class="s1">font-size: 0.56rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">line-height: 1.3;</span></p>
+<p class="p1"><span class="s1">flex-shrink: 0;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-dot-item .comp-name {</span></p>
+<p class="p1"><span class="s1">color: #ffffff;</span></p>
+<p class="p1"><span class="s1">overflow: hidden;</span></p>
+<p class="p1"><span class="s1">text-overflow: ellipsis;</span></p>
+<p class="p1"><span class="s1">white-space: nowrap;</span></p>
+<p class="p1"><span class="s1">font-size: 0.6rem;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-dot-item .shift-time {</span></p>
+<p class="p1"><span class="s1">color: #ffffff;</span></p>
+<p class="p1"><span class="s1">font-size: 0.6rem;</span></p>
+<p class="p1"><span class="s1">white-space: nowrap;</span></p>
+<p class="p1"><span class="s1">overflow: hidden;</span></p>
+<p class="p1"><span class="s1">text-overflow: ellipsis;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-dot-item .shift-money {</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">font-size: 0.55rem;</span></p>
+<p class="p1"><span class="s1">color: #ffffff;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-dot-item:hover {</span></p>
+<p class="p1"><span class="s1">filter: brightness(0.95);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">#list-view {</span></p>
+<p class="p1"><span class="s1">margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">#analytics-view{</span></p>
+<p class="p1"><span class="s1">margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.list-filter-bar {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">gap: 8px;</span></p>
+<p class="p1"><span class="s1">overflow-x: auto;</span></p>
+<p class="p1"><span class="s1">padding-bottom: 8px;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 12px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.filter-btn {</span></p>
+<p class="p1"><span class="s1">background-color: #edf2f7;</span></p>
+<p class="p1"><span class="s1">border: 1.5px solid transparent;</span></p>
+<p class="p1"><span class="s1">padding: 6px 14px;</span></p>
+<p class="p1"><span class="s1">border-radius: 20px;</span></p>
+<p class="p1"><span class="s1">font-size: 0.8rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">white-space: nowrap;</span></p>
+<p class="p1"><span class="s1">transition: all 0.2s ease;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.filter-btn.active {</span></p>
+<p class="p1"><span class="s1">background-color: var(--primary);</span></p>
+<p class="p1"><span class="s1">color: white;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-list-item {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">padding: 12px;</span></p>
+<p class="p1"><span class="s1">border-bottom: 1px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-list-item:hover {</span></p>
+<p class="p1"><span class="s1">background-color: #fcfdfc;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-list-item:last-child {</span></p>
+<p class="p1"><span class="s1">border-bottom: none;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-info h4 {</span></p>
+<p class="p1"><span class="s1">font-size: 0.95rem;</span></p>
+<p class="p1"><span class="s1">color: var(--text-main);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-info p {</span></p>
+<p class="p1"><span class="s1">font-size: 0.78rem;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">margin-top: 2px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-amount {</span></p>
+<p class="p1"><span class="s1">text-align: right;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-amount .price {</span></p>
+<p class="p1"><span class="s1">font-size: 1rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">color: var(--accent-price);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.shift-amount .hrs {</span></p>
+<p class="p1"><span class="s1">font-size: 0.75rem;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* Analytics Styles */</span></p>
+<p class="p1"><span class="s1">.analytics-summary-grid {</span></p>
+<p class="p1"><span class="s1">display: grid;</span></p>
+<p class="p1"><span class="s1">grid-template-columns: repeat(2, 1fr);</span></p>
+<p class="p1"><span class="s1">gap: 8px;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 16px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.stat-box {</span></p>
+<p class="p1"><span class="s1">background: var(--primary-light);</span></p>
+<p class="p1"><span class="s1">border-radius: 14px;</span></p>
+<p class="p1"><span class="s1">padding: 12px 8px;</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">gap: 4px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.stat-box span {</span></p>
+<p class="p1"><span class="s1">font-size: 0.68rem;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.stat-box strong {</span></p>
+<p class="p1"><span class="s1">font-size: 1.05rem;</span></p>
+<p class="p1"><span class="s1">color: var(--text-main);</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.analytics-section-title {</span></p>
+<p class="p1"><span class="s1">font-size: 0.88rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">margin: 16px 0 8px 0;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-stat-item {</span></p>
+<p class="p1"><span class="s1">padding: 12px;</span></p>
+<p class="p1"><span class="s1">border-bottom: 1px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">background: #fafbfc;</span></p>
+<p class="p1"><span class="s1">border-radius: 12px;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 8px;</span></p>
+<p class="p1"><span class="s1">/* 改用 Grid 布局 */</span></p>
+<p class="p1"><span class="s1">display: grid;</span></p>
+<p class="p1"><span class="s1">grid-template-columns: 1fr auto; /* 左欄自適應，右欄依內容寬度 */</span></p>
+<p class="p1"><span class="s1">grid-template-rows: auto auto; /* 上下兩行 */</span></p>
+<p class="p1"><span class="s1">align-items: center; /* 垂直居中對齊 */</span></p>
+<p class="p1"><span class="s1">column-gap: 12px; /* 左右欄間距 */</span></p>
+<p class="p1"><span class="s1">row-gap: 4px; /* 左欄上下列間距 */</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-stat-item:last-child {</span></p>
+<p class="p1"><span class="s1">margin-bottom: 0;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-stat-top {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 6px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* 左欄 Row 1 */</span></p>
+<p class="p1"><span class="s1">.company-stat-name {</span></p>
+<p class="p1"><span class="s1">grid-column: 1;</span></p>
+<p class="p1"><span class="s1">grid-row: 1;</span></p>
+<p class="p1"><span class="s1">font-size: 0.88rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">gap: 6px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-stat-dot {</span></p>
+<p class="p1"><span class="s1">width: 9px;</span></p>
+<p class="p1"><span class="s1">height: 9px;</span></p>
+<p class="p1"><span class="s1">border-radius: 50%;</span></p>
+<p class="p1"><span class="s1">display: inline-block;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* 右欄 佔據 2 Rows */</span></p>
+<p class="p1"><span class="s1">.company-stat-pay {</span></p>
+<p class="p1"><span class="s1">grid-column: 2;</span></p>
+<p class="p1"><span class="s1">grid-row: 1 / span 2; /* 縱跨第一與第二列 */</span></p>
+<p class="p1"><span class="s1">font-size: 1.1rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">color: var(--accent-price);</span></p>
+<p class="p1"><span class="s1">text-align: right;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* 左欄 Row 2 */</span></p>
+<p class="p1"><span class="s1">.company-stat-meta {</span></p>
+<p class="p1"><span class="s1">grid-column: 1;</span></p>
+<p class="p1"><span class="s1">grid-row: 2;</span></p>
+<p class="p1"><span class="s1">font-size: 0.74rem;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.payday-tag {</span></p>
+<p class="p1"><span class="s1">font-size: 0.7rem;</span></p>
+<p class="p1"><span class="s1">padding: 2px 8px;</span></p>
+<p class="p1"><span class="s1">border-radius: 6px;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.payday-tag.due {</span></p>
+<p class="p1"><span class="s1">background: #e8f5e9;</span></p>
+<p class="p1"><span class="s1">color: #2e7d32;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.payday-tag.pending {</span></p>
+<p class="p1"><span class="s1">background: #fff3e0;</span></p>
+<p class="p1"><span class="s1">color: #e65100;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-stat-bar-bg {</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">height: 6px;</span></p>
+<p class="p1"><span class="s1">background: var(--border-color);</span></p>
+<p class="p1"><span class="s1">border-radius: 4px;</span></p>
+<p class="p1"><span class="s1">margin-top: 8px;</span></p>
+<p class="p1"><span class="s1">overflow: hidden;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-stat-bar-fill {</span></p>
+<p class="p1"><span class="s1">height: 100%;</span></p>
+<p class="p1"><span class="s1">border-radius: 4px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* Payday Settings Block */</span></p>
+<p class="p1"><span class="s1">.payday-setting-row {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">padding: 8px 4px;</span></p>
+<p class="p1"><span class="s1">font-size: 0.82rem;</span></p>
+<p class="p1"><span class="s1">border-bottom: 1px dashed var(--border-color);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.payday-setting-row select {</span></p>
+<p class="p1"><span class="s1">padding: 4px 8px;</span></p>
+<p class="p1"><span class="s1">border-radius: 8px;</span></p>
+<p class="p1"><span class="s1">border: 1px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">background: #f8f9fa;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.fixed-bottom-nav {</span></p>
+<p class="p1"><span class="s1">position: fixed;</span></p>
+<p class="p1"><span class="s1">bottom: 0;</span></p>
+<p class="p1"><span class="s1">left: 0;</span></p>
+<p class="p1"><span class="s1">right: 0;</span></p>
+<p class="p1"><span class="s1">height: calc(var(--nav-height) + var(--safe-bottom));</span></p>
+<p class="p1"><span class="s1">padding-bottom: var(--safe-bottom);</span></p>
+<p class="p1"><span class="s1">background-color: #ffffff;</span></p>
+<p class="p1"><span class="s1">border-top: 1px solid #e9ecef;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-around;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">z-index: 999;</span></p>
+<p class="p1"><span class="s1">box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);</span></p>
+<p class="p1"><span class="s1">padding-left: 4px;</span></p>
+<p class="p1"><span class="s1">padding-right: 4px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.nav-item {</span></p>
+<p class="p1"><span class="s1">flex: 1;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">background: none;</span></p>
+<p class="p1"><span class="s1">border: none;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">font-size: 0.62rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">gap: 2px;</span></p>
+<p class="p1"><span class="s1">height: 100%;</span></p>
+<p class="p1"><span class="s1">min-width: 0;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.nav-item svg {</span></p>
+<p class="p1"><span class="s1">width: 25px;</span></p>
+<p class="p1"><span class="s1">height: 25x;</span></p>
+<p class="p1"><span class="s1">fill: currentColor;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.nav-item.active {</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.nav-item-add-container {</span></p>
+<p class="p1"><span class="s1">flex: 1;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">position: relative;</span></p>
+<p class="p1"><span class="s1">max-width: 70px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.btn-add-highlight {</span></p>
+<p class="p1"><span class="s1">width: 42px;</span></p>
+<p class="p1"><span class="s1">height: 42px;</span></p>
+<p class="p1"><span class="s1">border-radius: 50%;</span></p>
+<p class="p1"><span class="s1">background: linear-gradient(135deg, #8fb1e0, var(--primary-dark));</span></p>
+<p class="p1"><span class="s1">color: white;</span></p>
+<p class="p1"><span class="s1">border: 4px solid #ffffff;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">font-size: 1.7rem;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">transition: transform 0.2s;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.btn-add-highlight:active {</span></p>
+<p class="p1"><span class="s1">transform: scale(0.92);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.modal-overlay {</span></p>
+<p class="p1"><span class="s1">position: fixed;</span></p>
+<p class="p1"><span class="s1">top: 0;</span></p>
+<p class="p1"><span class="s1">left: 0;</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">height: 100%;</span></p>
+<p class="p1"><span class="s1">background: rgba(0, 0, 0, 0.4);</span></p>
+<p class="p1"><span class="s1">backdrop-filter: blur(4px);</span></p>
+<p class="p1"><span class="s1">display: none;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">align-items: flex-start;</span></p>
+<p class="p1"><span class="s1">z-index: 1000;</span></p>
+<p class="p1"><span class="s1">padding: 15px;</span></p>
+<p class="p1"><span class="s1">overflow-y: auto;</span></p>
+<p class="p1"><span class="s1">-webkit-overflow-scrolling: touch;</span></p>
+<p class="p1"><span class="s1">overscroll-behavior: contain;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.modal-overlay.active {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.modal-content {</span></p>
+<p class="p1"><span class="s1">background-color: var(--card-bg);</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">max-width: 480px;</span></p>
+<p class="p1"><span class="s1">border-radius: 20px;</span></p>
+<p class="p1"><span class="s1">padding: 22px;</span></p>
+<p class="p1"><span class="s1">box-shadow: 0 10px 30px rgba(0,0,0,0.15);</span></p>
+<p class="p1"><span class="s1">margin: 15px auto 40px auto;</span></p>
+<p class="p1"><span class="s1">-webkit-overflow-scrolling: touch;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.modal-header {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 15px;</span></p>
+<p class="p1"><span class="s1">position: relative;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.modal-header h2 {</span></p>
+<p class="p1"><span class="s1">font-size: 1.2rem;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.close-btn {</span></p>
+<p class="p1"><span class="s1">background: none;</span></p>
+<p class="p1"><span class="s1">border: none;</span></p>
+<p class="p1"><span class="s1">font-size: 1.4rem;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">position: absolute;</span></p>
+<p class="p1"><span class="s1">right: 0;</span></p>
+<p class="p1"><span class="s1">top: 50%;</span></p>
+<p class="p1"><span class="s1">transform: translateY(-50%);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.date-tag-badge {</span></p>
+<p class="p1"><span class="s1">display: inline-block;</span></p>
+<p class="p1"><span class="s1">background: var(--primary-light);</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">font-size: 0.98rem;</span></p>
+<p class="p1"><span class="s1">padding: 9px 14px;</span></p>
+<p class="p1"><span class="s1">border-radius: 10px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-input-wrapper {</span></p>
+<p class="p1"><span class="s1">position: relative;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-input-wrapper input {</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">padding-right: 34px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.company-input-wrapper::after {</span></p>
+<p class="p1"><span class="s1">content: '';</span></p>
+<p class="p1"><span class="s1">position: absolute;</span></p>
+<p class="p1"><span class="s1">right: 14px;</span></p>
+<p class="p1"><span class="s1">top: 50%;</span></p>
+<p class="p1"><span class="s1">width: 8px;</span></p>
+<p class="p1"><span class="s1">height: 8px;</span></p>
+<p class="p1"><span class="s1">border-right: 2px solid var(--text-sub);</span></p>
+<p class="p1"><span class="s1">border-bottom: 2px solid var(--text-sub);</span></p>
+<p class="p1"><span class="s1">transform: translateY(-65%) rotate(45deg);</span></p>
+<p class="p1"><span class="s1">pointer-events: none;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.analytics-summary-grid.grid-3 {</span></p>
+<p class="p1"><span class="s1">grid-template-columns: repeat(3, 1fr);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.date-range-box {</span></p>
+<p class="p1"><span class="s1">background: #f0f5fa;</span></p>
+<p class="p1"><span class="s1">border: 1px solid #d4e2f2;</span></p>
+<p class="p1"><span class="s1">border-radius: 12px;</span></p>
+<p class="p1"><span class="s1">padding: 10px 12px 12px 12px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-header {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">justify-content: space-between;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 8px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-header span {</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">font-size: 0.88rem;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-header .btn-nav {</span></p>
+<p class="p1"><span class="s1">width: 26px;</span></p>
+<p class="p1"><span class="s1">height: 26px;</span></p>
+<p class="p1"><span class="s1">font-size: 0.85rem;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-weekdays {</span></p>
+<p class="p1"><span class="s1">display: grid;</span></p>
+<p class="p1"><span class="s1">grid-template-columns: repeat(7, 1fr);</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">font-size: 0.68rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">margin-bottom: 4px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-days {</span></p>
+<p class="p1"><span class="s1">display: grid;</span></p>
+<p class="p1"><span class="s1">grid-template-columns: repeat(7, 1fr);</span></p>
+<p class="p1"><span class="s1">row-gap: 2px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell {</span></p>
+<p class="p1"><span class="s1">position: relative;</span></p>
+<p class="p1"><span class="s1">height: 34px;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.other-month {</span></p>
+<p class="p1"><span class="s1">visibility: hidden;</span></p>
+<p class="p1"><span class="s1">pointer-events: none;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.in-range::before {</span></p>
+<p class="p1"><span class="s1">content: '';</span></p>
+<p class="p1"><span class="s1">position: absolute;</span></p>
+<p class="p1"><span class="s1">top: 0;</span></p>
+<p class="p1"><span class="s1">bottom: 0;</span></p>
+<p class="p1"><span class="s1">left: 0;</span></p>
+<p class="p1"><span class="s1">right: 0;</span></p>
+<p class="p1"><span class="s1">background: var(--primary-light);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.in-range.range-start::before {</span></p>
+<p class="p1"><span class="s1">left: 50%;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.in-range.range-end::before {</span></p>
+<p class="p1"><span class="s1">right: 50%;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-num {</span></p>
+<p class="p1"><span class="s1">position: relative;</span></p>
+<p class="p1"><span class="s1">z-index: 1;</span></p>
+<p class="p1"><span class="s1">width: 27px;</span></p>
+<p class="p1"><span class="s1">height: 27px;</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">border-radius: 50%;</span></p>
+<p class="p1"><span class="s1">font-size: 0.76rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">border: 1.5px solid transparent;</span></p>
+<p class="p1"><span class="s1">box-sizing: border-box;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.today .mini-cal-num {</span></p>
+<p class="p1"><span class="s1">border-color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.is-holiday .mini-cal-num {</span></p>
+<p class="p1"><span class="s1">color: var(--holiday-red);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.range-start .mini-cal-num,</span></p>
+<p class="p1"><span class="s1">.mini-cal-cell.range-end .mini-cal-num {</span></p>
+<p class="p1"><span class="s1">background: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">border-color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">color: #fff !important;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.date-summary-text {</span></p>
+<p class="p1"><span class="s1">font-size: 0.78rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">margin-top: 6px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.form-grid {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">gap: 12px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.input-group {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">gap: 4px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.input-group label {</span></p>
+<p class="p1"><span class="s1">font-size: 0.82rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.input-group input {</span></p>
+<p class="p1"><span class="s1">padding: 9px 12px;</span></p>
+<p class="p1"><span class="s1">border: 1.5px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">border-radius: 10px;</span></p>
+<p class="p1"><span class="s1">font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1">outline: none;</span></p>
+<p class="p1"><span class="s1">background-color: #fdfdfc;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.time-range-group {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">gap: 8px;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.time-range-group input {</span></p>
+<p class="p1"><span class="s1">flex: 1;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.checkbox-group {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">gap: 6px;</span></p>
+<p class="p1"><span class="s1">margin-top: 2px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.checkbox-group input[type="checkbox"] {</span></p>
+<p class="p1"><span class="s1">width: 16px;</span></p>
+<p class="p1"><span class="s1">height: 16px;</span></p>
+<p class="p1"><span class="s1">accent-color: var(--primary);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.checkbox-group label {</span></p>
+<p class="p1"><span class="s1">font-size: 0.85rem;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">font-weight: 600;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.deduct-input-wrapper {</span></p>
+<p class="p1"><span class="s1">display: none;</span></p>
+<p class="p1"><span class="s1">margin-top: 4px;</span></p>
+<p class="p1"><span class="s1">padding: 8px 10px;</span></p>
+<p class="p1"><span class="s1">background-color: #f0f5fa;</span></p>
+<p class="p1"><span class="s1">border-radius: 8px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.deduct-input-wrapper.active {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">align-items: center;</span></p>
+<p class="p1"><span class="s1">gap: 8px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.calculated-duration {</span></p>
+<p class="p1"><span class="s1">font-size: 0.82rem;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.modal-btn-group {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">gap: 10px;</span></p>
+<p class="p1"><span class="s1">margin-top: 8px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.btn-submit {</span></p>
+<p class="p1"><span class="s1">flex: 1;</span></p>
+<p class="p1"><span class="s1">background-color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">color: white;</span></p>
+<p class="p1"><span class="s1">border: none;</span></p>
+<p class="p1"><span class="s1">padding: 12px;</span></p>
+<p class="p1"><span class="s1">border-radius: 12px;</span></p>
+<p class="p1"><span class="s1">font-size: 0.95rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.btn-delete-item {</span></p>
+<p class="p1"><span class="s1">background-color: #ffebee;</span></p>
+<p class="p1"><span class="s1">color: var(--danger);</span></p>
+<p class="p1"><span class="s1">border: 1px solid #ffcdd2;</span></p>
+<p class="p1"><span class="s1">padding: 12px;</span></p>
+<p class="p1"><span class="s1">border-radius: 12px;</span></p>
+<p class="p1"><span class="s1">font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.action-menu-overlay {</span></p>
+<p class="p1"><span class="s1">position: fixed;</span></p>
+<p class="p1"><span class="s1">top: 0; left: 0; width: 100%; height: 100%;</span></p>
+<p class="p1"><span class="s1">background: rgba(0,0,0,0.3);</span></p>
+<p class="p1"><span class="s1">display: none;</span></p>
+<p class="p1"><span class="s1">justify-content: center;</span></p>
+<p class="p1"><span class="s1">align-items: flex-end;</span></p>
+<p class="p1"><span class="s1">z-index: 1001;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.action-menu-overlay.active {</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.action-sheet {</span></p>
+<p class="p1"><span class="s1">background: white;</span></p>
+<p class="p1"><span class="s1">width: 100%;</span></p>
+<p class="p1"><span class="s1">max-width: 600px;</span></p>
+<p class="p1"><span class="s1">border-radius: 20px 20px 0 0;</span></p>
+<p class="p1"><span class="s1">padding: 20px;</span></p>
+<p class="p1"><span class="s1">padding-bottom: calc(20px + var(--safe-bottom));</span></p>
+<p class="p1"><span class="s1">display: flex;</span></p>
+<p class="p1"><span class="s1">flex-direction: column;</span></p>
+<p class="p1"><span class="s1">gap: 10px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.action-sheet-title {</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">font-weight: 800;</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">font-size: 0.95rem;</span></p>
+<p class="p1"><span class="s1">margin-bottom: 4px;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.action-sheet-btn {</span></p>
+<p class="p1"><span class="s1">padding: 12px;</span></p>
+<p class="p1"><span class="s1">border: 1px solid var(--border-color);</span></p>
+<p class="p1"><span class="s1">background: #f8f9fa;</span></p>
+<p class="p1"><span class="s1">border-radius: 12px;</span></p>
+<p class="p1"><span class="s1">font-weight: 700;</span></p>
+<p class="p1"><span class="s1">font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1">cursor: pointer;</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.action-sheet-btn.primary {</span></p>
+<p class="p1"><span class="s1">background: var(--primary-light);</span></p>
+<p class="p1"><span class="s1">color: var(--primary-dark);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.action-sheet-btn.danger {</span></p>
+<p class="p1"><span class="s1">background: #ffebee;</span></p>
+<p class="p1"><span class="s1">color: var(--danger);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">.empty-msg {</span></p>
+<p class="p1"><span class="s1">text-align: center;</span></p>
+<p class="p1"><span class="s1">padding: 30px;</span></p>
+<p class="p1"><span class="s1">color: var(--text-sub);</span></p>
+<p class="p1"><span class="s1">font-size: 0.88rem;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="top-header"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h1&gt;🔥打工狗請努力🔥&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="month-salary-card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="salary-box"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;血汗已換取&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;strong id="month-pay"&gt;$ 0&lt;/strong&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="salary-divider"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="salary-box"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span style="text-align:right;"&gt;本月努力指數&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;strong id="month-total-est" style="text-align:right;"&gt;$ 0&lt;/strong&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- VIEW 1: Calendar View --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div id="calendar-view" class="card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="calendar-header cardTitle"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2 id="calendar-month-year"&gt;&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="month-nav"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="btn-nav" id="prev-month"&gt;&amp;lt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="btn-nav" id="next-month"&gt;&amp;gt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="calendar-weekdays"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div&gt;一&lt;/div&gt;&lt;div&gt;二&lt;/div&gt;&lt;div&gt;三&lt;/div&gt;&lt;div&gt;四&lt;/div&gt;&lt;div&gt;五&lt;/div&gt;&lt;div&gt;六&lt;/div&gt;&lt;div class="sun-label"&gt;日&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="calendar-days" id="calendar-days"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- VIEW 2: List View --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div id="list-view" class="card" style="display: none;"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="list-filter-bar cardTitle" id="company-filter-tabs"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div id="shift-list-container"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- VIEW 3: Analytics View --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div id="analytics-view" class="card cardTitle" style="display: none;"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="calendar-header"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2 id="analytics-month-year"&gt;&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="month-nav"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="btn-nav" id="prev-month-a"&gt;&amp;lt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="btn-nav" id="next-month-a"&gt;&amp;gt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="analytics-summary-grid"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="stat-box"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;本月做狗總時數&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;strong id="stat-hours"&gt;0h&lt;/strong&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="stat-box"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;本月已賺取&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;strong id="stat-total-pay"&gt;$0&lt;/strong&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- 每月公司應收人工分析 --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="analytics-section-title"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;🏢 追糧報表&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div id="company-breakdown-container"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="analytics-section-title" style="margin-top: 20px;"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;📊 累積血汗指數&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="analytics-summary-grid"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="stat-box"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;累積血汗&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;strong id="stat-all-hours"&gt;0h&lt;/strong&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="stat-box"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;累積錢錢&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;strong id="stat-all-pay"&gt;$0&lt;/strong&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- FIXED BOTTOM MENU BAR --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;nav class="fixed-bottom-nav"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="nav-item active" id="nav-calendar" onclick="switchNav('calendar-view')"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;svg viewBox="0 0 24 24"&gt;&lt;path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/&gt;&lt;/svg&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="nav-item" id="nav-list" onclick="switchNav('list-view')"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;svg viewBox="0 0 24 24"&gt;&lt;path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/&gt;&lt;/svg&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="nav-item-add-container"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="btn-add-highlight" onclick="openModal()"&gt;+&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="nav-item" id="nav-analytics" onclick="switchNav('analytics-view')"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;svg viewBox="0 0 24 24"&gt;&lt;path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/&gt;&lt;/svg&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="nav-item" id="nav-backup" onclick="openActionMenu()"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;svg viewBox="0 0 24 24"&gt;&lt;path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/&gt;&lt;/svg&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/nav&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- Action Sheet --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="action-menu-overlay" id="action-menu-overlay" onclick="closeActionMenu()"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="action-sheet" onclick="event.stopPropagation()"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="action-sheet-title"&gt;備份與數據管理&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="action-sheet-btn primary" onclick="exportJSON(); closeActionMenu();"&gt;匯出 JSON 備份檔 (iCloud)&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="action-sheet-btn primary" onclick="exportCSV(); closeActionMenu();"&gt;匯出 CSV (Google Sheet / Excel)&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="action-sheet-btn" onclick="importJSON(); closeActionMenu();"&gt;匯入 JSON 備份檔&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="action-sheet-btn danger" onclick="confirmClearAll(); closeActionMenu();"&gt;清空所有紀錄&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="action-sheet-btn" style="color:var(--text-sub);" onclick="closeActionMenu()"&gt;取消&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- Modal Form --&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="modal-overlay" id="modal-overlay"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="modal-content"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="modal-header"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2 id="modal-title"&gt;有工番啦🤑&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button class="close-btn" onclick="closeModal()"&gt;✕&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;form id="shift-form" class="form-grid"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;input type="hidden" id="editing-shift-id" value=""&gt;</span></p>
+<p class="p1"><span class="s1">&lt;input type="hidden" id="shift-type" value="planned"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="input-group" id="date-range-container"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="date-range-box" id="date-range-box"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="mini-cal-header"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button type="button" class="btn-nav" id="mini-cal-prev"&gt;&amp;lt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span id="mini-cal-month-year"&gt;&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button type="button" class="btn-nav" id="mini-cal-next"&gt;&amp;gt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="mini-cal-weekdays"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div&gt;一&lt;/div&gt;&lt;div&gt;二&lt;/div&gt;&lt;div&gt;三&lt;/div&gt;&lt;div&gt;四&lt;/div&gt;&lt;div&gt;五&lt;/div&gt;&lt;div&gt;六&lt;/div&gt;&lt;div style="color:var(--holiday-red);"&gt;日&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="mini-cal-days" id="mini-cal-days"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="date-summary-text" id="date-summary-text"&gt;已選 1 天&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="date-tag-badge" id="date-tag-badge" style="display:none;"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="input-group"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;label for="company"&gt;公司名稱&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="company-input-wrapper"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;input type="text" id="company" list="company-list" required autocomplete="off"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;datalist id="company-list"&gt;&lt;/datalist&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="input-group"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;label for="event-name"&gt;Event&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1">&lt;input type="text" id="event-name"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="input-group"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;label for="rate"&gt;💰 錢錢 ($/hr)&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1">&lt;input type="number" id="rate" min="0" required&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="input-group"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;label&gt;工作時間 (開始 - 結束)&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="time-range-group"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;select id="start-time" required onchange="calcDuration()" style="padding: 9px; border-radius: 10px; border: 1.5px solid var(--border-color); flex: 1; font-weight: 700;"&gt;&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;至&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">&lt;select id="end-time" required onchange="calcDuration()" style="padding: 9px; border-radius: 10px; border: 1.5px solid var(--border-color); flex: 1; font-weight: 700;"&gt;&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="checkbox-group"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;input type="checkbox" id="no-lunch-check" onchange="toggleDeductInput()"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;label for="no-lunch-check"&gt;扣飯鐘&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="deduct-input-wrapper" id="deduct-wrapper"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;label style="font-size:0.8rem;"&gt;扣除時間：&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1">&lt;select id="deduct-minutes" onchange="calcDuration()" style="padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.85rem; background: white; outline: none; font-weight: 700;"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;option value="30" selected&gt;30 分鐘 &lt;/option&gt;</span></p>
+<p class="p1"><span class="s1">&lt;option value="60"&gt;60 分鐘 &lt;/option&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="calculated-duration" id="duration-display"&gt;共 9 小時&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="modal-btn-group"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button type="button" class="btn-delete-item" id="btn-delete-modal" style="display:none;" onclick="deleteCurrentEditingShift()"&gt;刪除紀錄&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;button type="submit" class="btn-submit" id="btn-submit-text"&gt;儲存紀錄&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/form&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p1"><span class="s1">let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];</span></p>
+<p class="p1"><span class="s1">let companyPaydays = JSON.parse(localStorage.getItem('companyPaydays')) || {};</span></p>
+<p class="p1"><span class="s1">let currentDate = new Date();</span></p>
+<p class="p1"><span class="s1">let currentYear = currentDate.getFullYear();</span></p>
+<p class="p1"><span class="s1">let currentMonth = currentDate.getMonth();</span></p>
+<p class="p1"><span class="s1">let selectedCompanyFilter = "ALL";</span></p>
+<p class="p1"><span class="s1">let selectedDatesList = [];</span></p>
+<p class="p1"><span class="s1">let currentView = 'calendar-view';</span></p>
+<p class="p1"><span class="s1">let modalRangeStart = null;</span></p>
+<p class="p1"><span class="s1">let modalRangeEnd = null;</span></p>
+<p class="p1"><span class="s1">let miniCalYear = new Date().getFullYear();</span></p>
+<p class="p1"><span class="s1">let miniCalMonth = new Date().getMonth();</span></p>
+<p class="p1"><span class="s1">let allowRangeSelection = true;</span></p>
+<p class="p1"><span class="s1">const companyColorPalette = [</span></p>
+<p class="p1"><span class="s1">{ bg: '#e3f2fd', border: '#90caf9', text: '#1976d2' },</span></p>
+<p class="p1"><span class="s1">{ bg: '#f3e5f5', border: '#ce93d8', text: '#7b1fa2' },</span></p>
+<p class="p1"><span class="s1">{ bg: '#fff3e0', border: '#ffcc80', text: '#e65100' },</span></p>
+<p class="p1"><span class="s1">{ bg: '#e8f5e9', border: '#a5d6a7', text: '#2e7d32' },</span></p>
+<p class="p1"><span class="s1">{ bg: '#fbe9e7', border: '#ffab91', text: '#d84315' },</span></p>
+<p class="p1"><span class="s1">{ bg: '#e0f7fa', border: '#80deea', text: '#00838f' },</span></p>
+<p class="p1"><span class="s1">{ bg: '#fffde7', border: '#fff59d', text: '#f57f17' },</span></p>
+<p class="p1"><span class="s1">{ bg: '#f3e5f5', border: '#b39ddb', text: '#4527a0' }</span></p>
+<p class="p1"><span class="s1">];</span></p>
+<p class="p1"><span class="s1">let hkHolidays = {</span></p>
+<p class="p1"><span class="s1">"2025-01-01": "元旦", "2025-01-29": "農曆年初一", "2025-01-30": "農曆年初二",</span></p>
+<p class="p1"><span class="s1">"2025-01-31": "農曆年初三", "2025-04-04": "清明節", "2025-04-18": "耶穌受難節",</span></p>
+<p class="p1"><span class="s1">"2025-04-19": "耶穌受難節翌日", "2025-04-21": "復活節星期一", "2025-05-01": "勞動節",</span></p>
+<p class="p1"><span class="s1">"2025-05-05": "佛誕", "2025-05-31": "端午節", "2025-07-01": "香港特別行政區成立紀念日",</span></p>
+<p class="p1"><span class="s1">"2025-10-01": "國慶日", "2025-10-07": "重陽節", "2025-10-29": "中秋節翌日",</span></p>
+<p class="p1"><span class="s1">"2025-12-25": "聖誕節", "2025-12-26": "聖誕節後第一個周日",</span></p>
+<p class="p1"><span class="s1">"2026-01-01": "元旦", "2026-02-17": "農曆年初一", "2026-02-18": "農曆年初二",</span></p>
+<p class="p1"><span class="s1">"2026-02-19": "農曆年初三", "2026-04-03": "耶穌受難節", "2026-04-04": "清明節",</span></p>
+<p class="p1"><span class="s1">"2026-04-06": "復活節星期一", "2026-04-07": "復活節星期一翌日", "2026-05-01": "勞動節",</span></p>
+<p class="p1"><span class="s1">"2026-05-25": "佛誕", "2026-06-19": "端午節", "2026-07-01": "特區成立紀念日",</span></p>
+<p class="p1"><span class="s1">"2026-09-26": "中秋節翌日", "2026-10-01": "國慶日", "2026-10-19": "重陽節",</span></p>
+<p class="p1"><span class="s1">"2026-12-25": "聖誕節", "2026-12-26": "聖誕節後第一個周日"</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p1"><span class="s1">(function fetchLiveHolidays() {</span></p>
+<p class="p1"><span class="s1">fetch('https://www.1823.gov.hk/common/ical/tc.json')</span></p>
+<p class="p1"><span class="s1">.then(res =&gt; res.json())</span></p>
+<p class="p1"><span class="s1">.then(data =&gt; {</span></p>
+<p class="p1"><span class="s1">const events = data &amp;&amp; data.vcalendar &amp;&amp; data.vcalendar[0] &amp;&amp; data.vcalendar[0].vevent;</span></p>
+<p class="p1"><span class="s1">if (!Array.isArray(events)) return;</span></p>
+<p class="p1"><span class="s1">events.forEach(ev =&gt; {</span></p>
+<p class="p1"><span class="s1">const raw = ev.dtstart &amp;&amp; ev.dtstart[0];</span></p>
+<p class="p1"><span class="s1">if (!raw || raw.length !== 8) return;</span></p>
+<p class="p1"><span class="s1">const dateStr = `${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`;</span></p>
+<p class="p1"><span class="s1">hkHolidays[dateStr] = ev.summary || hkHolidays[dateStr] || '';</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">renderCalendar();</span></p>
+<p class="p1"><span class="s1">})</span></p>
+<p class="p1"><span class="s1">.catch(() =&gt; {});</span></p>
+<p class="p1"><span class="s1">})();</span></p>
+<p class="p1"><span class="s1">function getHolidayInfo(dateStr, dateObj) {</span></p>
+<p class="p1"><span class="s1">const isSun = dateObj.getDay() === 0;</span></p>
+<p class="p1"><span class="s1">const holidayName = hkHolidays[dateStr];</span></p>
+<p class="p1"><span class="s1">if (holidayName) return { isHoliday: true, label: holidayName };</span></p>
+<p class="p1"><span class="s1">if (isSun) return { isHoliday: true, label: '' };</span></p>
+<p class="p1"><span class="s1">return { isHoliday: false, label: '' };</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">const modalOverlay = document.getElementById('modal-overlay');</span></p>
+<p class="p1"><span class="s1">const shiftForm = document.getElementById('shift-form');</span></p>
+<p class="p1"><span class="s1">document.getElementById('start-time').value = "09:00";</span></p>
+<p class="p1"><span class="s1">document.getElementById('end-time').value = "12:00";</span></p>
+<p class="p1"><span class="s1">function formatShortTime(timeStr) {</span></p>
+<p class="p1"><span class="s1">if (!timeStr) return '';</span></p>
+<p class="p1"><span class="s1">const [h, m] = timeStr.split(':');</span></p>
+<p class="p1"><span class="s1">const hourNum = parseInt(h, 10);</span></p>
+<p class="p1"><span class="s1">return m === '00' ? `${hourNum}` : `${hourNum}:${m}`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function getLocalDateStr(dateObj = new Date()) {</span></p>
+<p class="p1"><span class="s1">const year = dateObj.getFullYear();</span></p>
+<p class="p1"><span class="s1">const month = String(dateObj.getMonth() + 1).padStart(2, '0');</span></p>
+<p class="p1"><span class="s1">const day = String(dateObj.getDate()).padStart(2, '0');</span></p>
+<p class="p1"><span class="s1">return `${year}-${month}-${day}`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">autoUpdatePastPlannedShifts();</span></p>
+<p class="p1"><span class="s1">renderCalendar();</span></p>
+<p class="p1"><span class="s1">function autoUpdatePastPlannedShifts() {</span></p>
+<p class="p1"><span class="s1">const now = new Date();</span></p>
+<p class="p1"><span class="s1">const todayStr = getLocalDateStr(now);</span></p>
+<p class="p1"><span class="s1">let updated = false;</span></p>
+<p class="p1"><span class="s1">shifts.forEach(s =&gt; {</span></p>
+<p class="p1"><span class="s1">if (s.type === 'planned') {</span></p>
+<p class="p1"><span class="s1">if (s.date &lt; todayStr) {</span></p>
+<p class="p1"><span class="s1">s.type = 'completed';</span></p>
+<p class="p1"><span class="s1">updated = true;</span></p>
+<p class="p1"><span class="s1">} else if (s.date === todayStr) {</span></p>
+<p class="p1"><span class="s1">const endTimeStr = s.endTime || "23:59";</span></p>
+<p class="p1"><span class="s1">const [eHours, eMins] = endTimeStr.split(':').map(Number);</span></p>
+<p class="p1"><span class="s1">const shiftEndDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eHours, eMins);</span></p>
+<p class="p1"><span class="s1">if (now &gt;= shiftEndDateTime) {</span></p>
+<p class="p1"><span class="s1">s.type = 'completed';</span></p>
+<p class="p1"><span class="s1">updated = true;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">if (updated) {</span></p>
+<p class="p1"><span class="s1">saveData();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function switchNav(viewId) {</span></p>
+<p class="p1"><span class="s1">autoUpdatePastPlannedShifts();</span></p>
+<p class="p1"><span class="s1">currentView = viewId;</span></p>
+<p class="p1"><span class="s1">document.getElementById('calendar-view').style.display = 'none';</span></p>
+<p class="p1"><span class="s1">document.getElementById('list-view').style.display = 'none';</span></p>
+<p class="p1"><span class="s1">document.getElementById('analytics-view').style.display = 'none';</span></p>
+<p class="p1"><span class="s1">document.getElementById('nav-calendar').classList.remove('active');</span></p>
+<p class="p1"><span class="s1">document.getElementById('nav-list').classList.remove('active');</span></p>
+<p class="p1"><span class="s1">document.getElementById('nav-analytics').classList.remove('active');</span></p>
+<p class="p1"><span class="s1">document.getElementById(viewId).style.display = 'block';</span></p>
+<p class="p1"><span class="s1">if (viewId === 'calendar-view') {</span></p>
+<p class="p1"><span class="s1">document.getElementById('nav-calendar').classList.add('active');</span></p>
+<p class="p1"><span class="s1">renderCalendar();</span></p>
+<p class="p1"><span class="s1">} else if (viewId === 'list-view') {</span></p>
+<p class="p1"><span class="s1">document.getElementById('nav-list').classList.add('active');</span></p>
+<p class="p1"><span class="s1">renderListView();</span></p>
+<p class="p1"><span class="s1">} else if (viewId === 'analytics-view') {</span></p>
+<p class="p1"><span class="s1">document.getElementById('nav-analytics').classList.add('active');</span></p>
+<p class="p1"><span class="s1">renderAnalytics();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">// 1. 動態生成 00:00 - 23:30 (每 30 分鐘一格) 的下拉選單選項</span></p>
+<p class="p1"><span class="s1">function populateTimeOptions() {</span></p>
+<p class="p1"><span class="s1">const startSelect = document.getElementById('start-time');</span></p>
+<p class="p1"><span class="s1">const endSelect = document.getElementById('end-time');</span></p>
+<p class="p1"><span class="s1">if (!startSelect || !endSelect) return;</span></p>
+<p class="p1"><span class="s1">let optionsHtml = '';</span></p>
+<p class="p1"><span class="s1">for (let h = 7; h &lt; 23; h++) {</span></p>
+<p class="p1"><span class="s1">const hourStr = String(h).padStart(2, '0');</span></p>
+<p class="p1"><span class="s1">optionsHtml += `&lt;option value="${hourStr}:00"&gt;${hourStr}:00&lt;/option&gt;`;</span></p>
+<p class="p1"><span class="s1">optionsHtml += `&lt;option value="${hourStr}:30"&gt;${hourStr}:30&lt;/option&gt;`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">startSelect.innerHTML = optionsHtml;</span></p>
+<p class="p1"><span class="s1">endSelect.innerHTML = optionsHtml;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">// 2. 更新公司名稱歷史選單 (自動提取歷史紀錄)</span></p>
+<p class="p1"><span class="s1">function updateCompanyDatalist() {</span></p>
+<p class="p1"><span class="s1">const companyList = document.getElementById('company-list');</span></p>
+<p class="p1"><span class="s1">if (!companyList) return;</span></p>
+<p class="p1"><span class="s1">const savedCompanies = [...new Set(shifts.map(s =&gt; s.company).filter(Boolean))];</span></p>
+<p class="p1"><span class="s1">companyList.innerHTML = savedCompanies.map(c =&gt; `&lt;option value="${c}"&gt;&lt;/option&gt;`).join('');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">// 頁面初始化時執行</span></p>
+<p class="p1"><span class="s1">populateTimeOptions();</span></p>
+<p class="p1"><span class="s1">updateCompanyDatalist();</span></p>
+<p class="p1"><span class="s1">// 修改 openModal 函數，加入預設時間與更新選單</span></p>
+<p class="p1"><span class="s1">function openModal(selectedDateStr = null) {</span></p>
+<p class="p1"><span class="s1">modalOverlay.classList.add('active');</span></p>
+<p class="p1"><span class="s1">const todayStr = getLocalDateStr();</span></p>
+<p class="p1"><span class="s1">const targetDate = selectedDateStr || todayStr;</span></p>
+<p class="p1"><span class="s1">document.getElementById('modal-title').textContent = "有工番啦🤑";</span></p>
+<p class="p1"><span class="s1">document.getElementById('editing-shift-id').value = "";</span></p>
+<p class="p1"><span class="s1">document.getElementById('btn-delete-modal').style.display = "none";</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-range-container').style.display = "block";</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-range-box').style.display = "block";</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-tag-badge').style.display = "none";</span></p>
+<p class="p1"><span class="s1">// 自動更新公司下拉歷史清單</span></p>
+<p class="p1"><span class="s1">updateCompanyDatalist();</span></p>
+<p class="p1"><span class="s1">// 預設時間 (例如 09:00 至 18:00)</span></p>
+<p class="p1"><span class="s1">document.getElementById('start-time').value = "09:00";</span></p>
+<p class="p1"><span class="s1">document.getElementById('end-time').value = "18:00";</span></p>
+<p class="p1"><span class="s1">initMiniCalendar(targetDate, true);</span></p>
+<p class="p1"><span class="s1">setShiftType('planned');</span></p>
+<p class="p1"><span class="s1">calcDuration();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">// 修改 openShiftDetail 函數，打開編輯時同步更新清單</span></p>
+<p class="p1"><span class="s1">function openShiftDetail(shiftId) {</span></p>
+<p class="p1"><span class="s1">const shift = shifts.find(s =&gt; s.id === shiftId);</span></p>
+<p class="p1"><span class="s1">if (!shift) return;</span></p>
+<p class="p1"><span class="s1">modalOverlay.classList.add('active');</span></p>
+<p class="p1"><span class="s1">document.getElementById('modal-title').textContent = "傻仔打錯野？";</span></p>
+<p class="p1"><span class="s1">document.getElementById('editing-shift-id').value = shift.id;</span></p>
+<p class="p1"><span class="s1">document.getElementById('btn-delete-modal').style.display = "block";</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-range-container').style.display = "block";</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-range-box').style.display = "none";</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-tag-badge').style.display = "inline-block";</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-tag-badge').textContent = `已選 ${shift.date}`;</span></p>
+<p class="p1"><span class="s1">updateCompanyDatalist();</span></p>
+<p class="p1"><span class="s1">initMiniCalendar(shift.date, false);</span></p>
+<p class="p1"><span class="s1">setShiftType(shift.type || 'completed');</span></p>
+<p class="p1"><span class="s1">document.getElementById('company').value = shift.company;</span></p>
+<p class="p1"><span class="s1">document.getElementById('event-name').value = shift.eventName === '-' ? '' : shift.eventName;</span></p>
+<p class="p1"><span class="s1">document.getElementById('rate').value = shift.rate;</span></p>
+<p class="p1"><span class="s1">document.getElementById('start-time').value = shift.startTime;</span></p>
+<p class="p1"><span class="s1">document.getElementById('end-time').value = shift.endTime;</span></p>
+<p class="p1"><span class="s1">if (shift.deductMins &amp;&amp; shift.deductMins &gt; 0) {</span></p>
+<p class="p1"><span class="s1">document.getElementById('no-lunch-check').checked = true;</span></p>
+<p class="p1"><span class="s1">document.getElementById('deduct-minutes').value = shift.deductMins;</span></p>
+<p class="p1"><span class="s1">document.getElementById('deduct-wrapper').classList.add('active');</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">document.getElementById('no-lunch-check').checked = false;</span></p>
+<p class="p1"><span class="s1">document.getElementById('deduct-wrapper').classList.remove('active');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">calcDuration();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function closeModal() { modalOverlay.classList.remove('active'); }</span></p>
+<p class="p1"><span class="s1">function initMiniCalendar(dateStr, canSelectRange) {</span></p>
+<p class="p1"><span class="s1">const d = new Date(dateStr);</span></p>
+<p class="p1"><span class="s1">miniCalYear = d.getFullYear();</span></p>
+<p class="p1"><span class="s1">miniCalMonth = d.getMonth();</span></p>
+<p class="p1"><span class="s1">modalRangeStart = dateStr;</span></p>
+<p class="p1"><span class="s1">modalRangeEnd = null;</span></p>
+<p class="p1"><span class="s1">allowRangeSelection = canSelectRange;</span></p>
+<p class="p1"><span class="s1">selectedDatesList = [dateStr];</span></p>
+<p class="p1"><span class="s1">renderMiniCalendar();</span></p>
+<p class="p1"><span class="s1">updateDateSummary();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function renderMiniCalendar() {</span></p>
+<p class="p1"><span class="s1">document.getElementById('mini-cal-month-year').textContent = `${miniCalYear} 年 ${miniCalMonth + 1} 月`;</span></p>
+<p class="p1"><span class="s1">const daysContainer = document.getElementById('mini-cal-days');</span></p>
+<p class="p1"><span class="s1">daysContainer.innerHTML = '';</span></p>
+<p class="p1"><span class="s1">let rawFirstDay = new Date(miniCalYear, miniCalMonth, 1).getDay();</span></p>
+<p class="p1"><span class="s1">let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;</span></p>
+<p class="p1"><span class="s1">const totalDays = new Date(miniCalYear, miniCalMonth + 1, 0).getDate();</span></p>
+<p class="p1"><span class="s1">const today = new Date();</span></p>
+<p class="p1"><span class="s1">for (let i = 0; i &lt; firstDay; i++) {</span></p>
+<p class="p1"><span class="s1">const cell = document.createElement('div');</span></p>
+<p class="p1"><span class="s1">cell.className = 'mini-cal-cell other-month';</span></p>
+<p class="p1"><span class="s1">daysContainer.appendChild(cell);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">for (let day = 1; day &lt;= totalDays; day++) {</span></p>
+<p class="p1"><span class="s1">const dateStr = `${miniCalYear}-${String(miniCalMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;</span></p>
+<p class="p1"><span class="s1">const dateObj = new Date(miniCalYear, miniCalMonth, day);</span></p>
+<p class="p1"><span class="s1">const cell = document.createElement('div');</span></p>
+<p class="p1"><span class="s1">cell.className = 'mini-cal-cell';</span></p>
+<p class="p1"><span class="s1">if (day === today.getDate() &amp;&amp; miniCalMonth === today.getMonth() &amp;&amp; miniCalYear === today.getFullYear()) {</span></p>
+<p class="p1"><span class="s1">cell.classList.add('today');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">const holidayInfo = getHolidayInfo(dateStr, dateObj);</span></p>
+<p class="p1"><span class="s1">if (holidayInfo.isHoliday) cell.classList.add('is-holiday');</span></p>
+<p class="p1"><span class="s1">const isStart = dateStr === modalRangeStart;</span></p>
+<p class="p1"><span class="s1">const isEnd = modalRangeEnd ? dateStr === modalRangeEnd : isStart;</span></p>
+<p class="p1"><span class="s1">const inRange = isDateInSelectedRange(dateStr);</span></p>
+<p class="p1"><span class="s1">if (inRange) cell.classList.add('in-range');</span></p>
+<p class="p1"><span class="s1">if (isStart) cell.classList.add('range-start');</span></p>
+<p class="p1"><span class="s1">if (isEnd) cell.classList.add('range-end');</span></p>
+<p class="p1"><span class="s1">cell.innerHTML = `&lt;span class="mini-cal-num"&gt;${day}&lt;/span&gt;`;</span></p>
+<p class="p1"><span class="s1">cell.onclick = () =&gt; handleMiniCalClick(dateStr);</span></p>
+<p class="p1"><span class="s1">daysContainer.appendChild(cell);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function isDateInSelectedRange(dateStr) {</span></p>
+<p class="p1"><span class="s1">if (!modalRangeStart) return false;</span></p>
+<p class="p1"><span class="s1">if (!modalRangeEnd) return dateStr === modalRangeStart;</span></p>
+<p class="p1"><span class="s1">return dateStr &gt;= modalRangeStart &amp;&amp; dateStr &lt;= modalRangeEnd;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function handleMiniCalClick(dateStr) {</span></p>
+<p class="p1"><span class="s1">if (!allowRangeSelection) {</span></p>
+<p class="p1"><span class="s1">modalRangeStart = dateStr;</span></p>
+<p class="p1"><span class="s1">modalRangeEnd = null;</span></p>
+<p class="p1"><span class="s1">selectedDatesList = [dateStr];</span></p>
+<p class="p1"><span class="s1">renderMiniCalendar();</span></p>
+<p class="p1"><span class="s1">updateDateSummary();</span></p>
+<p class="p1"><span class="s1">return;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">if (!modalRangeStart || modalRangeEnd) {</span></p>
+<p class="p1"><span class="s1">modalRangeStart = dateStr;</span></p>
+<p class="p1"><span class="s1">modalRangeEnd = null;</span></p>
+<p class="p1"><span class="s1">} else if (dateStr === modalRangeStart) {</span></p>
+<p class="p1"><span class="s1">modalRangeEnd = null;</span></p>
+<p class="p1"><span class="s1">} else if (dateStr &lt; modalRangeStart) {</span></p>
+<p class="p1"><span class="s1">modalRangeEnd = modalRangeStart;</span></p>
+<p class="p1"><span class="s1">modalRangeStart = dateStr;</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">modalRangeEnd = dateStr;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">if (modalRangeEnd) {</span></p>
+<p class="p1"><span class="s1">selectedDatesList = [];</span></p>
+<p class="p1"><span class="s1">let cur = new Date(modalRangeStart);</span></p>
+<p class="p1"><span class="s1">const end = new Date(modalRangeEnd);</span></p>
+<p class="p1"><span class="s1">while (cur &lt;= end) {</span></p>
+<p class="p1"><span class="s1">selectedDatesList.push(getLocalDateStr(cur));</span></p>
+<p class="p1"><span class="s1">cur.setDate(cur.getDate() + 1);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">selectedDatesList = [modalRangeStart];</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">renderMiniCalendar();</span></p>
+<p class="p1"><span class="s1">updateDateSummary();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function updateDateSummary() {</span></p>
+<p class="p1"><span class="s1">document.getElementById('date-summary-text').textContent = `已選 ${selectedDatesList.length} 天`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">document.getElementById('mini-cal-prev').addEventListener('click', () =&gt; {</span></p>
+<p class="p1"><span class="s1">miniCalMonth--;</span></p>
+<p class="p1"><span class="s1">if (miniCalMonth &lt; 0) { miniCalMonth = 11; miniCalYear--; }</span></p>
+<p class="p1"><span class="s1">renderMiniCalendar();</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">document.getElementById('mini-cal-next').addEventListener('click', () =&gt; {</span></p>
+<p class="p1"><span class="s1">miniCalMonth++;</span></p>
+<p class="p1"><span class="s1">if (miniCalMonth &gt; 11) { miniCalMonth = 0; miniCalYear++; }</span></p>
+<p class="p1"><span class="s1">renderMiniCalendar();</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">function openActionMenu() { document.getElementById('action-menu-overlay').classList.add('active'); }</span></p>
+<p class="p1"><span class="s1">function closeActionMenu() { document.getElementById('action-menu-overlay').classList.remove('active'); }</span></p>
+<p class="p1"><span class="s1">function setShiftType(type) {</span></p>
+<p class="p1"><span class="s1">document.getElementById('shift-type').value = type;</span></p>
+<p class="p1"><span class="s1">document.getElementById('btn-submit-text').textContent = (type === 'completed') ? '儲存已完成工時' : '儲存排班';</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function toggleDeductInput() {</span></p>
+<p class="p1"><span class="s1">const isChecked = document.getElementById('no-lunch-check').checked;</span></p>
+<p class="p1"><span class="s1">const wrapper = document.getElementById('deduct-wrapper');</span></p>
+<p class="p1"><span class="s1">if (isChecked) {</span></p>
+<p class="p1"><span class="s1">wrapper.classList.add('active');</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">wrapper.classList.remove('active');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">calcDuration();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function getCalculatedDuration() {</span></p>
+<p class="p1"><span class="s1">const startTime = document.getElementById('start-time').value;</span></p>
+<p class="p1"><span class="s1">const endTime = document.getElementById('end-time').value;</span></p>
+<p class="p1"><span class="s1">if (!startTime || !endTime) return 0;</span></p>
+<p class="p1"><span class="s1">const [sHours, sMins] = startTime.split(':').map(Number);</span></p>
+<p class="p1"><span class="s1">const [eHours, eMins] = endTime.split(':').map(Number);</span></p>
+<p class="p1"><span class="s1">let startTotalMins = sHours * 60 + sMins;</span></p>
+<p class="p1"><span class="s1">let endTotalMins = eHours * 60 + eMins;</span></p>
+<p class="p1"><span class="s1">if (endTotalMins &lt; startTotalMins) {</span></p>
+<p class="p1"><span class="s1">endTotalMins += 24 * 60;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">let diffMins = endTotalMins - startTotalMins;</span></p>
+<p class="p1"><span class="s1">if (document.getElementById('no-lunch-check').checked) {</span></p>
+<p class="p1"><span class="s1">const deductMins = parseFloat(document.getElementById('deduct-minutes').value) || 0;</span></p>
+<p class="p1"><span class="s1">diffMins = Math.max(0, diffMins - deductMins);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">return Math.round((diffMins / 60) * 100) / 100;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function calcDuration() {</span></p>
+<p class="p1"><span class="s1">const dur = getCalculatedDuration();</span></p>
+<p class="p1"><span class="s1">document.getElementById('duration-display').textContent = `共 ${dur} 小時`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">shiftForm.addEventListener('submit', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1">e.preventDefault();</span></p>
+<p class="p1"><span class="s1">const editingId = document.getElementById('editing-shift-id').value;</span></p>
+<p class="p1"><span class="s1">const duration = getCalculatedDuration();</span></p>
+<p class="p1"><span class="s1">const isDeduct = document.getElementById('no-lunch-check').checked;</span></p>
+<p class="p1"><span class="s1">const deductMins = isDeduct ? (parseFloat(document.getElementById('deduct-minutes').value) || 0) : 0;</span></p>
+<p class="p1"><span class="s1">let type = document.getElementById('shift-type').value;</span></p>
+<p class="p1"><span class="s1">const company = document.getElementById('company').value.trim();</span></p>
+<p class="p1"><span class="s1">const eventName = document.getElementById('event-name').value.trim() || "-";</span></p>
+<p class="p1"><span class="s1">const rate = parseFloat(document.getElementById('rate').value);</span></p>
+<p class="p1"><span class="s1">const startTime = document.getElementById('start-time').value;</span></p>
+<p class="p1"><span class="s1">const endTime = document.getElementById('end-time').value;</span></p>
+<p class="p1"><span class="s1">const now = new Date();</span></p>
+<p class="p1"><span class="s1">const todayStr = getLocalDateStr(now);</span></p>
+<p class="p1"><span class="s1">if (editingId) {</span></p>
+<p class="p1"><span class="s1">const targetIndex = shifts.findIndex(s =&gt; s.id == editingId);</span></p>
+<p class="p1"><span class="s1">if (targetIndex !== -1) {</span></p>
+<p class="p1"><span class="s1">let finalType = type;</span></p>
+<p class="p1"><span class="s1">if (finalType === 'planned') {</span></p>
+<p class="p1"><span class="s1">if (modalRangeStart &lt; todayStr) {</span></p>
+<p class="p1"><span class="s1">finalType = 'completed';</span></p>
+<p class="p1"><span class="s1">} else if (modalRangeStart === todayStr) {</span></p>
+<p class="p1"><span class="s1">const [eH, eM] = endTime.split(':').map(Number);</span></p>
+<p class="p1"><span class="s1">const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);</span></p>
+<p class="p1"><span class="s1">if (now &gt;= endDt) finalType = 'completed';</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">shifts[targetIndex] = {</span></p>
+<p class="p1"><span class="s1">id: Number(editingId),</span></p>
+<p class="p1"><span class="s1">type: finalType,</span></p>
+<p class="p1"><span class="s1">date: modalRangeStart,</span></p>
+<p class="p1"><span class="s1">company: company,</span></p>
+<p class="p1"><span class="s1">eventName: eventName,</span></p>
+<p class="p1"><span class="s1">rate: rate,</span></p>
+<p class="p1"><span class="s1">startTime: startTime,</span></p>
+<p class="p1"><span class="s1">endTime: endTime,</span></p>
+<p class="p1"><span class="s1">deductMins: deductMins,</span></p>
+<p class="p1"><span class="s1">duration: duration</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">if (selectedDatesList.length === 0) {</span></p>
+<p class="p1"><span class="s1">alert('請選擇日期');</span></p>
+<p class="p1"><span class="s1">return;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">selectedDatesList.forEach((dateStr, index) =&gt; {</span></p>
+<p class="p1"><span class="s1">let finalType = type;</span></p>
+<p class="p1"><span class="s1">if (finalType === 'planned') {</span></p>
+<p class="p1"><span class="s1">if (dateStr &lt; todayStr) {</span></p>
+<p class="p1"><span class="s1">finalType = 'completed';</span></p>
+<p class="p1"><span class="s1">} else if (dateStr === todayStr) {</span></p>
+<p class="p1"><span class="s1">const [eH, eM] = endTime.split(':').map(Number);</span></p>
+<p class="p1"><span class="s1">const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);</span></p>
+<p class="p1"><span class="s1">if (now &gt;= endDt) finalType = 'completed';</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">const newShift = {</span></p>
+<p class="p1"><span class="s1">id: Date.now() + index,</span></p>
+<p class="p1"><span class="s1">type: finalType,</span></p>
+<p class="p1"><span class="s1">date: dateStr,</span></p>
+<p class="p1"><span class="s1">company: company,</span></p>
+<p class="p1"><span class="s1">eventName: eventName,</span></p>
+<p class="p1"><span class="s1">rate: rate,</span></p>
+<p class="p1"><span class="s1">startTime: startTime,</span></p>
+<p class="p1"><span class="s1">endTime: endTime,</span></p>
+<p class="p1"><span class="s1">deductMins: deductMins,</span></p>
+<p class="p1"><span class="s1">duration: duration</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p1"><span class="s1">shifts.push(newShift);</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">saveData();</span></p>
+<p class="p1"><span class="s1">const refDate = new Date(modalRangeStart);</span></p>
+<p class="p1"><span class="s1">currentYear = refDate.getFullYear();</span></p>
+<p class="p1"><span class="s1">currentMonth = refDate.getMonth();</span></p>
+<p class="p1"><span class="s1">renderCurrentView();</span></p>
+<p class="p1"><span class="s1">closeModal();</span></p>
+<p class="p1"><span class="s1">document.getElementById('event-name').value = '';</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">function deleteCurrentEditingShift() {</span></p>
+<p class="p1"><span class="s1">const editingId = document.getElementById('editing-shift-id').value;</span></p>
+<p class="p1"><span class="s1">if (editingId) {</span></p>
+<p class="p1"><span class="s1">deleteShift(Number(editingId));</span></p>
+<p class="p1"><span class="s1">closeModal();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function deleteShift(id) {</span></p>
+<p class="p1"><span class="s1">shifts = shifts.filter(s =&gt; s.id !== id);</span></p>
+<p class="p1"><span class="s1">saveData();</span></p>
+<p class="p1"><span class="s1">renderCurrentView();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function renderCurrentView() {</span></p>
+<p class="p1"><span class="s1">if (currentView === 'calendar-view') { renderCalendar(); }</span></p>
+<p class="p1"><span class="s1">else if (currentView === 'list-view') { renderListView(); }</span></p>
+<p class="p1"><span class="s1">else if (currentView === 'analytics-view') { renderAnalytics(); }</span></p>
+<p class="p1"><span class="s1">else { renderCalendar(); }</span></p>
+<p class="p1"><span class="s1">if (currentView !== 'calendar-view') { updateMonthSalaryCard(); }</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function saveData() {</span></p>
+<p class="p1"><span class="s1">localStorage.setItem('partTimeShifts', JSON.stringify(shifts));</span></p>
+<p class="p1"><span class="s1">localStorage.setItem('companyPaydays', JSON.stringify(companyPaydays));</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">async function shareOrDownloadFile(filename, mimeType, content) {</span></p>
+<p class="p1"><span class="s1">try {</span></p>
+<p class="p1"><span class="s1">const blob = new Blob([content], { type: mimeType });</span></p>
+<p class="p1"><span class="s1">const file = new File([blob], filename, { type: mimeType });</span></p>
+<p class="p1"><span class="s1">if (navigator.canShare &amp;&amp; navigator.canShare({ files: [file] })) {</span></p>
+<p class="p1"><span class="s1">await navigator.share({</span></p>
+<p class="p1"><span class="s1">files: [file],</span></p>
+<p class="p1"><span class="s1">title: filename,</span></p>
+<p class="p1"><span class="s1">text: '兼職紀錄備份'</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">return;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">const url = URL.createObjectURL(blob);</span></p>
+<p class="p1"><span class="s1">const link = document.createElement('a');</span></p>
+<p class="p1"><span class="s1">link.href = url;</span></p>
+<p class="p1"><span class="s1">link.download = filename;</span></p>
+<p class="p1"><span class="s1">document.body.appendChild(link);</span></p>
+<p class="p1"><span class="s1">link.click();</span></p>
+<p class="p1"><span class="s1">document.body.removeChild(link);</span></p>
+<p class="p1"><span class="s1">setTimeout(() =&gt; URL.revokeObjectURL(url), 2000);</span></p>
+<p class="p1"><span class="s1">} catch (err) {</span></p>
+<p class="p1"><span class="s1">if (err &amp;&amp; err.name === 'AbortError') return;</span></p>
+<p class="p1"><span class="s1">console.error('Export Error:', err);</span></p>
+<p class="p1"><span class="s1">alert('匯出失敗');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function exportJSON() {</span></p>
+<p class="p1"><span class="s1">if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }</span></p>
+<p class="p1"><span class="s1">const content = JSON.stringify(shifts, null, 2);</span></p>
+<p class="p1"><span class="s1">shareOrDownloadFile(`part_time_backup_${getLocalDateStr()}.json`, 'application/json', content);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function importJSON() { document.getElementById('import-file').click(); }</span></p>
+<p class="p1"><span class="s1">function handleFileSelect(event) {</span></p>
+<p class="p1"><span class="s1">const file = event.target.files[0];</span></p>
+<p class="p1"><span class="s1">if (!file) return;</span></p>
+<p class="p1"><span class="s1">const reader = new FileReader();</span></p>
+<p class="p1"><span class="s1">reader.onload = function(e) {</span></p>
+<p class="p1"><span class="s1">try {</span></p>
+<p class="p1"><span class="s1">const importedData = JSON.parse(e.target.result);</span></p>
+<p class="p1"><span class="s1">if (Array.isArray(importedData)) {</span></p>
+<p class="p1"><span class="s1">shifts = importedData;</span></p>
+<p class="p1"><span class="s1">autoUpdatePastPlannedShifts();</span></p>
+<p class="p1"><span class="s1">saveData();</span></p>
+<p class="p1"><span class="s1">renderCurrentView();</span></p>
+<p class="p1"><span class="s1">alert('匯入成功！');</span></p>
+<p class="p1"><span class="s1">} else { alert('無效的備份檔案'); }</span></p>
+<p class="p1"><span class="s1">} catch (err) { alert('解析檔案失敗'); }</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p1"><span class="s1">reader.readAsText(file);</span></p>
+<p class="p1"><span class="s1">event.target.value = '';</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function exportCSV() {</span></p>
+<p class="p1"><span class="s1">if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }</span></p>
+<p class="p1"><span class="s1">let csvContent = "\uFEFF";</span></p>
+<p class="p1"><span class="s1">csvContent += "日期,狀態,公司,工作備註,時薪($),開始時間,結束時間,扣除(分鐘),總時數(小時),薪金($)\n";</span></p>
+<p class="p1"><span class="s1">shifts.forEach(s =&gt; {</span></p>
+<p class="p1"><span class="s1">const pay = s.rate * s.duration;</span></p>
+<p class="p1"><span class="s1">const status = s.type === 'planned' ? '排班' : '已完成';</span></p>
+<p class="p1"><span class="s1">csvContent += `"${s.date}","${status}","${s.company}","${s.eventName}",${s.rate},"${s.startTime}","${s.endTime}",${s.deductMins},${s.duration},${pay}\n`;</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">shareOrDownloadFile(`part_time_records_${getLocalDateStr()}.csv`, 'text/csv;charset=utf-8;', csvContent);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function confirmClearAll() {</span></p>
+<p class="p1"><span class="s1">if (shifts.length === 0) { alert('目前沒有紀錄'); return; }</span></p>
+<p class="p1"><span class="s1">const ok = confirm('確定要清空所有資料嗎？此動作無法復原！\n建議先匯出 JSON 備份檔。');</span></p>
+<p class="p1"><span class="s1">if (ok) {</span></p>
+<p class="p1"><span class="s1">shifts = [];</span></p>
+<p class="p1"><span class="s1">saveData();</span></p>
+<p class="p1"><span class="s1">renderCurrentView();</span></p>
+<p class="p1"><span class="s1">alert('已清空所有紀錄');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function changeMonth(delta) {</span></p>
+<p class="p1"><span class="s1">currentMonth += delta;</span></p>
+<p class="p1"><span class="s1">if (currentMonth &lt; 0) { currentMonth = 11; currentYear--; }</span></p>
+<p class="p1"><span class="s1">if (currentMonth &gt; 11) { currentMonth = 0; currentYear++; }</span></p>
+<p class="p1"><span class="s1">autoUpdatePastPlannedShifts();</span></p>
+<p class="p1"><span class="s1">renderCurrentView();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">document.getElementById('prev-month').addEventListener('click', () =&gt; changeMonth(-1));</span></p>
+<p class="p1"><span class="s1">document.getElementById('next-month').addEventListener('click', () =&gt; changeMonth(1));</span></p>
+<p class="p1"><span class="s1">document.getElementById('prev-month-a').addEventListener('click', () =&gt; changeMonth(-1));</span></p>
+<p class="p1"><span class="s1">document.getElementById('next-month-a').addEventListener('click', () =&gt; changeMonth(1));</span></p>
+<p class="p1"><span class="s1">function updateMonthSalaryCard() {</span></p>
+<p class="p1"><span class="s1">let mPayCompleted = 0;</span></p>
+<p class="p1"><span class="s1">let mPayTotal = 0;</span></p>
+<p class="p1"><span class="s1">const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;</span></p>
+<p class="p1"><span class="s1">shifts.filter(s =&gt; s.date &amp;&amp; s.date.startsWith(monthPrefix)).forEach(s =&gt; {</span></p>
+<p class="p1"><span class="s1">const pay = s.rate * s.duration;</span></p>
+<p class="p1"><span class="s1">mPayTotal += pay;</span></p>
+<p class="p1"><span class="s1">if (s.type === 'completed' || !s.type) mPayCompleted += pay;</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;</span></p>
+<p class="p1"><span class="s1">document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* Render Calendar */</span></p>
+<p class="p1"><span class="s1">function renderCalendar() {</span></p>
+<p class="p1"><span class="s1">autoUpdatePastPlannedShifts();</span></p>
+<p class="p1"><span class="s1">document.getElementById('calendar-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;</span></p>
+<p class="p1"><span class="s1">const daysContainer = document.getElementById('calendar-days');</span></p>
+<p class="p1"><span class="s1">daysContainer.innerHTML = '';</span></p>
+<p class="p1"><span class="s1">let rawFirstDay = new Date(currentYear, currentMonth, 1).getDay();</span></p>
+<p class="p1"><span class="s1">let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;</span></p>
+<p class="p1"><span class="s1">const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();</span></p>
+<p class="p1"><span class="s1">const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();</span></p>
+<p class="p1"><span class="s1">const today = new Date();</span></p>
+<p class="p1"><span class="s1">for (let i = firstDay - 1; i &gt;= 0; i--) {</span></p>
+<p class="p1"><span class="s1">const cell = document.createElement('div');</span></p>
+<p class="p1"><span class="s1">cell.className = 'day-cell other-month';</span></p>
+<p class="p1"><span class="s1">cell.innerHTML = `&lt;span class="day-number"&gt;${prevLastDay - i}&lt;/span&gt;`;</span></p>
+<p class="p1"><span class="s1">daysContainer.appendChild(cell);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">let mPayCompleted = 0;</span></p>
+<p class="p1"><span class="s1">let mPayTotal = 0;</span></p>
+<p class="p1"><span class="s1">for (let day = 1; day &lt;= totalDays; day++) {</span></p>
+<p class="p1"><span class="s1">const cell = document.createElement('div');</span></p>
+<p class="p1"><span class="s1">cell.className = 'day-cell';</span></p>
+<p class="p1"><span class="s1">const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;</span></p>
+<p class="p1"><span class="s1">const dateObj = new Date(currentYear, currentMonth, day);</span></p>
+<p class="p1"><span class="s1">const holidayInfo = getHolidayInfo(dateStr, dateObj);</span></p>
+<p class="p1"><span class="s1">cell.onclick = () =&gt; {</span></p>
+<p class="p1"><span class="s1">openModal(dateStr);</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p1"><span class="s1">if (day === today.getDate() &amp;&amp; currentMonth === today.getMonth() &amp;&amp; currentYear === today.getFullYear()) {</span></p>
+<p class="p1"><span class="s1">cell.classList.add('today');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">if (holidayInfo.isHoliday) {</span></p>
+<p class="p1"><span class="s1">cell.classList.add('is-holiday');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">let html = `&lt;span class="day-number"&gt;${day}&lt;/span&gt;`;</span></p>
+<p class="p1"><span class="s1">if (holidayInfo.isHoliday &amp;&amp; holidayInfo.label) {</span></p>
+<p class="p1"><span class="s1">html += `&lt;div class="holiday-label"&gt;${holidayInfo.label}&lt;/div&gt;`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">const dayShifts = shifts.filter(s =&gt; s.date === dateStr);</span></p>
+<p class="p1"><span class="s1">let shiftsHtml = '';</span></p>
+<p class="p1"><span class="s1">dayShifts.forEach(s =&gt; {</span></p>
+<p class="p1"><span class="s1">const pay = s.rate * s.duration;</span></p>
+<p class="p1"><span class="s1">mPayTotal += pay;</span></p>
+<p class="p1"><span class="s1">if (s.type === 'completed' || !s.type) {</span></p>
+<p class="p1"><span class="s1">mPayCompleted += pay;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">const isPlanned = s.type === 'planned';</span></p>
+<p class="p1"><span class="s1">const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;</span></p>
+<p class="p1"><span class="s1">shiftsHtml += `</span></p>
+<p class="p1"><span class="s1">&lt;div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); openShiftDetail(${s.id})" title="${s.company} (${timeTag}) $${pay}"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="comp-name"&gt;${s.company}&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="shift-time"&gt;${timeTag}&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="shift-money"&gt;$${Math.round(pay)}&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">`;</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">html += `&lt;div class="shift-items-wrap"&gt;${shiftsHtml}&lt;/div&gt;`;</span></p>
+<p class="p1"><span class="s1">cell.innerHTML = html;</span></p>
+<p class="p1"><span class="s1">daysContainer.appendChild(cell);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">const totalRendered = firstDay + totalDays;</span></p>
+<p class="p1"><span class="s1">const nextDays = (7 - (totalRendered % 7)) % 7;</span></p>
+<p class="p1"><span class="s1">for (let i = 1; i &lt;= nextDays; i++) {</span></p>
+<p class="p1"><span class="s1">const cell = document.createElement('div');</span></p>
+<p class="p1"><span class="s1">cell.className = 'day-cell other-month';</span></p>
+<p class="p1"><span class="s1">cell.innerHTML = `&lt;span class="day-number"&gt;${i}&lt;/span&gt;`;</span></p>
+<p class="p1"><span class="s1">daysContainer.appendChild(cell);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;</span></p>
+<p class="p1"><span class="s1">document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* Render List View */</span></p>
+<p class="p1"><span class="s1">function renderListView() {</span></p>
+<p class="p1"><span class="s1">autoUpdatePastPlannedShifts();</span></p>
+<p class="p1"><span class="s1">updateMonthSalaryCard();</span></p>
+<p class="p1"><span class="s1">const filterTabsContainer = document.getElementById('company-filter-tabs');</span></p>
+<p class="p1"><span class="s1">const listContainer = document.getElementById('shift-list-container');</span></p>
+<p class="p1"><span class="s1">const companies = [...new Set(shifts.map(s =&gt; s.company))];</span></p>
+<p class="p1"><span class="s1">filterTabsContainer.innerHTML = `</span></p>
+<p class="p1"><span class="s1">&lt;button class="filter-btn ${selectedCompanyFilter === 'ALL' ? 'active' : ''}" onclick="filterListCompany('ALL')"&gt;全部&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">` + companies.map((comp, idx) =&gt; {</span></p>
+<p class="p1"><span class="s1">const color = companyColorPalette[idx % companyColorPalette.length];</span></p>
+<p class="p1"><span class="s1">const isActive = selectedCompanyFilter === comp;</span></p>
+<p class="p1"><span class="s1">const inlineStyle = isActive</span></p>
+<p class="p1"><span class="s1">? `background-color: ${color.text}; color: #ffffff; border-color: ${color.text};`</span></p>
+<p class="p1"><span class="s1">: `background-color: ${color.bg}; color: ${color.text}; border-color: ${color.border};`;</span></p>
+<p class="p1"><span class="s1">return `</span></p>
+<p class="p1"><span class="s1">&lt;button class="filter-btn ${isActive ? 'active' : ''}" style="${inlineStyle}" onclick="filterListCompany('${comp}')"&gt;${comp}&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">`;</span></p>
+<p class="p1"><span class="s1">}).join('');</span></p>
+<p class="p1"><span class="s1">let filteredShifts = selectedCompanyFilter === 'ALL' ? shifts : shifts.filter(s =&gt; s.company === selectedCompanyFilter);</span></p>
+<p class="p1"><span class="s1">filteredShifts.sort((a,b) =&gt; new Date(b.date) - new Date(a.date));</span></p>
+<p class="p1"><span class="s1">if (filteredShifts.length === 0) {</span></p>
+<p class="p1"><span class="s1">listContainer.innerHTML = `&lt;div class="empty-msg"&gt;沒有相關工時紀錄&lt;/div&gt;`;</span></p>
+<p class="p1"><span class="s1">return;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">listContainer.innerHTML = filteredShifts.map(s =&gt; {</span></p>
+<p class="p1"><span class="s1">const pay = s.rate * s.duration;</span></p>
+<p class="p1"><span class="s1">const isPlanned = s.type === 'planned';</span></p>
+<p class="p1"><span class="s1">return `</span></p>
+<p class="p1"><span class="s1">&lt;div class="shift-list-item" onclick="openShiftDetail(${s.id})"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="shift-info"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h4&gt;${s.company} ${isPlanned ? '&lt;span style="color:#1976d2; font-size:0.75rem;"&gt;(排班)&lt;/span&gt;' : ''}&lt;/h4&gt;</span></p>
+<p class="p1"><span class="s1">&lt;p&gt;${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="shift-amount"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="price"&gt;$${Math.round(pay).toLocaleString()}&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="hrs"&gt;${s.duration}小時 ($${s.rate}/hr)&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">`;</span></p>
+<p class="p1"><span class="s1">}).join('');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">function filterListCompany(comp) {</span></p>
+<p class="p1"><span class="s1">selectedCompanyFilter = comp;</span></p>
+<p class="p1"><span class="s1">renderListView();</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">/* Render Analytics View */</span></p>
+<p class="p1"><span class="s1">function renderAnalytics() {</span></p>
+<p class="p1"><span class="s1">autoUpdatePastPlannedShifts();</span></p>
+<p class="p1"><span class="s1">updateMonthSalaryCard();</span></p>
+<p class="p1"><span class="s1">document.getElementById('analytics-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;</span></p>
+<p class="p1"><span class="s1">const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;</span></p>
+<p class="p1"><span class="s1">// 計入該月份所有紀錄 (包含已完成及預計/排班)</span></p>
+<p class="p1"><span class="s1">const monthShifts = shifts.filter(s =&gt; s.date &amp;&amp; s.date.startsWith(monthPrefix));</span></p>
+<p class="p1"><span class="s1">let totalHours = 0;</span></p>
+<p class="p1"><span class="s1">let totalPay = 0;</span></p>
+<p class="p1"><span class="s1">const companyMap = {};</span></p>
+<p class="p1"><span class="s1">monthShifts.forEach(s =&gt; {</span></p>
+<p class="p1"><span class="s1">const pay = s.rate * s.duration;</span></p>
+<p class="p1"><span class="s1">if (s.type === 'completed' || !s.type) {</span></p>
+<p class="p1"><span class="s1">totalHours += s.duration;</span></p>
+<p class="p1"><span class="s1">totalPay += pay;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">if (!companyMap[s.company]) {</span></p>
+<p class="p1"><span class="s1">companyMap[s.company] = { hours: 0, pay: 0, totalEstPay: 0, count: 0 };</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">companyMap[s.company].totalEstPay += pay;</span></p>
+<p class="p1"><span class="s1">if (s.type === 'completed' || !s.type) {</span></p>
+<p class="p1"><span class="s1">companyMap[s.company].hours += s.duration;</span></p>
+<p class="p1"><span class="s1">companyMap[s.company].pay += pay;</span></p>
+<p class="p1"><span class="s1">companyMap[s.company].count += 1;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">const avgRate = totalHours &gt; 0 ? (totalPay / totalHours) : 0;</span></p>
+<p class="p1"><span class="s1">document.getElementById('stat-hours').textContent = `${Math.round(totalHours * 10) / 10}h`;</span></p>
+<p class="p1"><span class="s1">document.getElementById('stat-total-pay').textContent = `$${Math.round(totalPay).toLocaleString()}`;</span></p>
+<p class="p1"><span class="s1">const companyBreakdownContainer = document.getElementById('company-breakdown-container');</span></p>
+<p class="p1"><span class="s1">const companyEntries = Object.entries(companyMap).sort((a, b) =&gt; b[1].totalEstPay - a[1].totalEstPay);</span></p>
+<p class="p1"><span class="s1">const allCompanyNames = [...new Set(shifts.map(s =&gt; s.company))];</span></p>
+<p class="p1"><span class="s1">const today = new Date();</span></p>
+<p class="p1"><span class="s1">const currentDayNum = today.getDate();</span></p>
+<p class="p1"><span class="s1">const isCurrentViewingMonth = (today.getFullYear() === currentYear &amp;&amp; today.getMonth() === currentMonth);</span></p>
+<p class="p1"><span class="s1">if (companyEntries.length === 0) {</span></p>
+<p class="p1"><span class="s1">companyBreakdownContainer.innerHTML = `&lt;div class="empty-msg"&gt;本月沒有工時紀錄&lt;/div&gt;`;</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">companyBreakdownContainer.innerHTML = companyEntries.map(([name, data]) =&gt; {</span></p>
+<p class="p1"><span class="s1">const idx = allCompanyNames.indexOf(name);</span></p>
+<p class="p1"><span class="s1">const color = companyColorPalette[idx % companyColorPalette.length];</span></p>
+<p class="p1"><span class="s1">const pct = totalPay &gt; 0 ? Math.round((data.pay / totalPay) * 100) : 0;</span></p>
+<p class="p1"><span class="s1">const avgCompRate = data.hours &gt; 0 ? Math.round(data.pay / data.hours) : 0;</span></p>
+<p class="p1"><span class="s1">const pDay = companyPaydays[name] || 7; // 預設 7 號出糧</span></p>
+<p class="p1"><span class="s1">let paydayStatusHtml = '';</span></p>
+<p class="p1"><span class="s1">return `</span></p>
+<p class="p1"><span class="s1">&lt;div class="company-stat-item"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="company-stat-name"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span class="company-stat-dot" style="background:${color.text};"&gt;&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">${name}</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="company-stat-pay"&gt;$${Math.round(data.totalEstPay).toLocaleString()}&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="company-stat-meta"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;span&gt;${data.count} job • ${Math.round(data.hours * 10) / 10}h ($${avgCompRate}/hr)&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1">${paydayStatusHtml}</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">`;</span></p>
+<p class="p1"><span class="s1">}).join('');</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">// Render 全局歷史統計</span></p>
+<p class="p1"><span class="s1">const allCompleted = shifts.filter(s =&gt; s.type === 'completed' || !s.type);</span></p>
+<p class="p1"><span class="s1">let allHours = 0, allPay = 0;</span></p>
+<p class="p1"><span class="s1">allCompleted.forEach(s =&gt; {</span></p>
+<p class="p1"><span class="s1">allHours += s.duration;</span></p>
+<p class="p1"><span class="s1">allPay += s.rate * s.duration;</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p1"><span class="s1">const allCompanies = new Set(allCompleted.map(s =&gt; s.company));</span></p>
+<p class="p1"><span class="s1">document.getElementById('stat-all-hours').textContent = `${Math.round(allHours * 10) / 10}h`;</span></p>
+<p class="p1"><span class="s1">document.getElementById('stat-all-pay').textContent = `$${Math.round(allPay).toLocaleString()}`;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p2"><span class="s1"></span><br></p>
 </body>
 </html>
