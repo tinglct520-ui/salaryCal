@@ -1922,7 +1922,7 @@ companyBreakdownContainer.innerHTML = companyEntries.map(([name, data]) => {
 const idx = allCompanyNames.indexOf(name);
 const color = companyColorPalette[idx % companyColorPalette.length];
 const pct = totalPay > 0 ? Math.round((data.pay / totalPay) * 100) : 0;
-const avgCompRate = data.hours > 0 ? Math.round(data.pay / data.hours) : 0;
+const avgCompRate = data.hours > 0 ? (data.pay / data.hours) : 0;
 const pDay = companyPaydays[name] || 7; // 預設 7 號出糧
 let paydayStatusHtml = '';
 return `
@@ -1931,9 +1931,9 @@ return `
 <span class="company-stat-dot" style="background:${color.text};"></span>
 ${name}
 </div>
-<div class="company-stat-pay">$${Math.round(data.totalEstPay).toLocaleString()}</div>
+<div class="company-stat-pay">$${formatMoney(data.totalEstPay)}</div>
 <div class="company-stat-meta">
-<span>${data.count} job • ${Math.round(data.hours * 10) / 10}h ($${avgCompRate}/hr)</span>
+<span>${data.count} job • ${Math.round(data.hours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
 ${paydayStatusHtml}
 </div>
 </div>
