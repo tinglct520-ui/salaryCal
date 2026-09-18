@@ -545,7 +545,7 @@ background: rgba(0, 0, 0, 0.4);
 backdrop-filter: blur(4px);
 display: none;
 justify-content: center;
-align-items: flex-start;
+align-items: center;
 z-index: 1000;
 padding: 15px;
 overflow-y: auto;
@@ -562,7 +562,9 @@ max-width: 480px;
 border-radius: 20px;
 padding: 22px;
 box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-margin: 15px auto 40px auto;
+margin: auto;
+max-height: calc(100vh - 30px);
+overflow-y: auto;
 -webkit-overflow-scrolling: touch;
 }
 .modal-header {
