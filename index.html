@@ -1043,7 +1043,7 @@ font-size: 0.88rem;
 </div>
 <div class="input-group">
 <label for="allowance">🎁 津貼 ($)</label>
-<input type="number" id="allowance" min="0" step="1">
+<input type="number" id="allowance" min="0" step="1" placeholder="0">
 </div>
 <div class="input-group">
 <label>工作時間 (開始 - 結束)</label>
@@ -1429,6 +1429,10 @@ function calcDuration() {
 const dur = getCalculatedDuration();
 document.getElementById('duration-display').textContent = `共 ${dur} 小時`;
 }
+// 金額顯示：保留小數，不四捨五入
+function formatMoney(value) {
+return (Math.floor((Number(value) + Number.EPSILON) * 100) / 100).toLocaleString();
+}
 // 計算單一更份的日薪 (時薪 x 時數 + 津貼)
 function getShiftPay(s) {
 return (s.rate || 0) * (s.duration || 0) + (Number(s.allowance) || 0);
@@ -1628,8 +1632,8 @@ const pay = getShiftPay(s);
 mPayTotal += pay;
 if (s.type === 'completed' || !s.type) mPayCompleted += pay;
 });
-document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;
-document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;
+document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
+document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
 }
 let longPressTimer = null;
 let longPressShiftId = null;
@@ -1784,7 +1788,7 @@ shiftsHtml += `
 <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false;" onpointerdown="startShiftLongPress(event, ${s.id})" onpointercancel="cancelShiftLongPress()" title="${s.company} (${timeTag}) $${pay}">
 <div class="comp-name">${s.company}</div>
 <div class="shift-time">${timeTag}</div>
-<div class="shift-money">$${Math.round(pay)}</div>
+<div class="shift-money">$${formatMoney(pay)}</div>
 </div>
 `;
 });
@@ -1803,8 +1807,8 @@ cell.dataset.date = nextDateStr;
 cell.innerHTML = `<span class="day-number">${i}</span>`;
 daysContainer.appendChild(cell);
 }
-document.getElementById('month-pay').textContent = `$ ${Math.round(mPayCompleted).toLocaleString()}`;
-document.getElementById('month-total-est').textContent = `$ ${Math.round(mPayTotal).toLocaleString()}`;
+document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
+document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
 }
 /* Swipe calendar to change month */
 (function setupCalendarSwipe() {
@@ -1864,7 +1868,7 @@ return `
 <p>${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}</p>
 </div>
 <div class="shift-amount">
-<div class="price">$${Math.round(pay).toLocaleString()}</div>
+<div class="price">$${formatMoney(pay)}</div>
 <div class="hrs">${s.duration}小時 ($${s.rate}/hr)</div>
 </div>
 </div>
@@ -1904,7 +1908,7 @@ companyMap[s.company].count += 1;
 });
 const avgRate = totalHours > 0 ? (totalPay / totalHours) : 0;
 document.getElementById('stat-hours').textContent = `${Math.round(totalHours * 10) / 10}h`;
-document.getElementById('stat-total-pay').textContent = `$${Math.round(totalPay).toLocaleString()}`;
+document.getElementById('stat-total-pay').textContent = `$${formatMoney(totalPay)}`;
 const companyBreakdownContainer = document.getElementById('company-breakdown-container');
 const companyEntries = Object.entries(companyMap).sort((a, b) => b[1].totalEstPay - a[1].totalEstPay);
 const allCompanyNames = [...new Set(shifts.map(s => s.company))];
@@ -1945,7 +1949,7 @@ allPay += getShiftPay(s);
 });
 const allCompanies = new Set(allCompleted.map(s => s.company));
 document.getElementById('stat-all-hours').textContent = `${Math.round(allHours * 10) / 10}h`;
-document.getElementById('stat-all-pay').textContent = `$${Math.round(allPay).toLocaleString()}`;
+document.getElementById('stat-all-pay').textContent = `$${formatMoney(allPay)}`;
 }
 </script>
 </body>
