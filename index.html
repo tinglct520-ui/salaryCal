@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f5f8fc">
 <title>兼職工時及薪酬管理</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1016,6 +1020,10 @@ font-size: 0.88rem;
 <input type="number" id="rate" min="0" required>
 </div>
 <div class="input-group">
+<label for="allowance">🎁 津貼 ($)</label>
+<input type="number" id="allowance" min="0" step="1" placeholder="0">
+</div>
+<div class="input-group">
 <label>工作時間 (開始 - 結束)</label>
 <div class="time-range-group">
 <select id="start-time" required onchange="calcDuration()" style="padding: 9px; border-radius: 10px; border: 1.5px solid var(--border-color); flex: 1; font-weight: 700;"></select>
@@ -1166,7 +1174,7 @@ document.getElementById('nav-analytics').classList.add('active');
 renderAnalytics();
 }
 }
-// 1. 動態生成 00:00 - 23:30 (每 30 分鐘一格) 的下拉選單選項
+// 1. 動態生成 07:00 - 22:45 (每 15 分鐘一格) 的下拉選單選項
 function populateTimeOptions() {
 const startSelect = document.getElementById('start-time');
 const endSelect = document.getElementById('end-time');
@@ -1175,7 +1183,9 @@ let optionsHtml = '';
 for (let h = 7; h < 23; h++) {
 const hourStr = String(h).padStart(2, '0');
 optionsHtml += `<option value="${hourStr}:00">${hourStr}:00</option>`;
+optionsHtml += `<option value="${hourStr}:15">${hourStr}:15</option>`;
 optionsHtml += `<option value="${hourStr}:30">${hourStr}:30</option>`;
+optionsHtml += `<option value="${hourStr}:45">${hourStr}:45</option>`;
 }
 startSelect.innerHTML = optionsHtml;
 endSelect.innerHTML = optionsHtml;
@@ -1206,6 +1216,7 @@ updateCompanyDatalist();
 // 預設時間 (例如 09:00 至 18:00)
 document.getElementById('start-time').value = "09:00";
 document.getElementById('end-time').value = "18:00";
+document.getElementById('allowance').value = "";
 initMiniCalendar(targetDate, true);
 setShiftType('planned');
 calcDuration();
@@ -1228,6 +1239,7 @@ setShiftType(shift.type || 'completed');
 document.getElementById('company').value = shift.company;
 document.getElementById('event-name').value = shift.eventName === '-' ? '' : shift.eventName;
 document.getElementById('rate').value = shift.rate;
+document.getElementById('allowance').value = shift.allowance || "";
 document.getElementById('start-time').value = shift.startTime;
 document.getElementById('end-time').value = shift.endTime;
 if (shift.deductMins && shift.deductMins > 0) {
@@ -1376,6 +1388,10 @@ function calcDuration() {
 const dur = getCalculatedDuration();
 document.getElementById('duration-display').textContent = `共 ${dur} 小時`;
 }
+// 計算單一更份的日薪 (時薪 x 時數 + 津貼)
+function getShiftPay(s) {
+return (s.rate || 0) * (s.duration || 0) + (Number(s.allowance) || 0);
+}
 shiftForm.addEventListener('submit', (e) => {
 e.preventDefault();
 const editingId = document.getElementById('editing-shift-id').value;
@@ -1386,6 +1402,7 @@ let type = document.getElementById('shift-type').value;
 const company = document.getElementById('company').value.trim();
 const eventName = document.getElementById('event-name').value.trim() || "-";
 const rate = parseFloat(document.getElementById('rate').value);
+const allowance = parseFloat(document.getElementById('allowance').value) || 0;
 const startTime = document.getElementById('start-time').value;
 const endTime = document.getElementById('end-time').value;
 const now = new Date();
@@ -1410,6 +1427,7 @@ date: modalRangeStart,
 company: company,
 eventName: eventName,
 rate: rate,
+allowance: allowance,
 startTime: startTime,
 endTime: endTime,
 deductMins: deductMins,
@@ -1439,6 +1457,7 @@ date: dateStr,
 company: company,
 eventName: eventName,
 rate: rate,
+allowance: allowance,
 startTime: startTime,
 endTime: endTime,
 deductMins: deductMins,
@@ -1532,11 +1551,11 @@ event.target.value = '';
 function exportCSV() {
 if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
 let csvContent = "\uFEFF";
-csvContent += "日期,狀態,公司,工作備註,時薪($),開始時間,結束時間,扣除(分鐘),總時數(小時),薪金($)\n";
+csvContent += "日期,狀態,公司,工作備註,時薪($),開始時間,結束時間,扣除(分鐘),總時數(小時),津貼($),薪金($)\n";
 shifts.forEach(s => {
-const pay = s.rate * s.duration;
+const pay = getShiftPay(s);
 const status = s.type === 'planned' ? '排班' : '已完成';
-csvContent += `"${s.date}","${status}","${s.company}","${s.eventName}",${s.rate},"${s.startTime}","${s.endTime}",${s.deductMins},${s.duration},${pay}\n`;
+csvContent += `"${s.date}","${status}","${s.company}","${s.eventName}",${s.rate},"${s.startTime}","${s.endTime}",${s.deductMins},${s.duration},${s.allowance || 0},${pay}\n`;
 });
 shareOrDownloadFile(`part_time_records_${getLocalDateStr()}.csv`, 'text/csv;charset=utf-8;', csvContent);
 }
@@ -1564,7 +1583,7 @@ let mPayCompleted = 0;
 let mPayTotal = 0;
 const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
 shifts.filter(s => s.date && s.date.startsWith(monthPrefix)).forEach(s => {
-const pay = s.rate * s.duration;
+const pay = getShiftPay(s);
 mPayTotal += pay;
 if (s.type === 'completed' || !s.type) mPayCompleted += pay;
 });
@@ -1713,7 +1732,7 @@ html += `<div class="holiday-label">${holidayInfo.label}</div>`;
 const dayShifts = shifts.filter(s => s.date === dateStr);
 let shiftsHtml = '';
 dayShifts.forEach(s => {
-const pay = s.rate * s.duration;
+const pay = getShiftPay(s);
 mPayTotal += pay;
 if (s.type === 'completed' || !s.type) {
 mPayCompleted += pay;
@@ -1795,7 +1814,7 @@ listContainer.innerHTML = `<div class="empty-msg">沒有相關工時紀錄</div>
 return;
 }
 listContainer.innerHTML = filteredShifts.map(s => {
-const pay = s.rate * s.duration;
+const pay = getShiftPay(s);
 const isPlanned = s.type === 'planned';
 return `
 <div class="shift-list-item" onclick="openShiftDetail(${s.id})">
@@ -1827,7 +1846,7 @@ let totalHours = 0;
 let totalPay = 0;
 const companyMap = {};
 monthShifts.forEach(s => {
-const pay = s.rate * s.duration;
+const pay = getShiftPay(s);
 if (s.type === 'completed' || !s.type) {
 totalHours += s.duration;
 totalPay += pay;
@@ -1881,7 +1900,7 @@ const allCompleted = shifts.filter(s => s.type === 'completed' || !s.type);
 let allHours = 0, allPay = 0;
 allCompleted.forEach(s => {
 allHours += s.duration;
-allPay += s.rate * s.duration;
+allPay += getShiftPay(s);
 });
 const allCompanies = new Set(allCompleted.map(s => s.company));
 document.getElementById('stat-all-hours').textContent = `${Math.round(allHours * 10) / 10}h`;
@@ -1890,4 +1909,3 @@ document.getElementById('stat-all-pay').textContent = `$${Math.round(allPay).toL
 </script>
 </body>
 </html>
-
