@@ -6,10 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="努力賺錢錢💰">
+<meta name="apple-mobile-web-app-title" content="兼職工時">
 <meta name="theme-color" content="#f5f8fc">
 <link rel="apple-touch-icon" href="icon.png">
-<title>努力賺錢錢</title>
+<title>兼職工時及薪酬管理</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -621,6 +621,21 @@ pointer-events: none;
 .analytics-summary-grid.grid-3 {
 grid-template-columns: repeat(3, 1fr);
 }
+.date-picker-trigger {
+display: flex;
+align-items: center;
+justify-content: space-between;
+background: var(--primary-light);
+color: var(--primary-dark);
+border: 1px solid #d4e2f2;
+border-radius: 10px;
+padding: 10px 12px;
+font-size: 0.85rem;
+font-weight: 800;
+cursor: pointer;
+margin-bottom: 8px;
+}
+.date-picker-trigger::after { content: "▾"; font-size: 0.9rem; }
 .date-range-box {
 background: #f0f5fa;
 border: 1px solid #d4e2f2;
@@ -993,7 +1008,8 @@ font-size: 0.88rem;
 <input type="hidden" id="editing-shift-id" value="">
 <input type="hidden" id="shift-type" value="planned">
 <div class="input-group" id="date-range-container">
-<div class="date-range-box" id="date-range-box">
+<div class="date-picker-trigger" id="date-picker-trigger" role="button" tabindex="0" onclick="toggleDatePicker()">📅 <span id="date-picker-label">已選 1 天</span></div>
+<div class="date-range-box" id="date-range-box" style="display:none;">
 <div class="mini-cal-header">
 <button type="button" class="btn-nav" id="mini-cal-prev">&lt;</button>
 <span id="mini-cal-month-year"></span>
@@ -1024,7 +1040,7 @@ font-size: 0.88rem;
 </div>
 <div class="input-group">
 <label for="allowance">🎁 津貼 ($)</label>
-<input type="number" id="allowance" min="0" step="1" >
+<input type="number" id="allowance" min="0" step="1" placeholder="0">
 </div>
 <div class="input-group">
 <label>工作時間 (開始 - 結束)</label>
@@ -1212,10 +1228,20 @@ document.getElementById('modal-title').textContent = "有工番啦🤑";
 document.getElementById('editing-shift-id').value = "";
 document.getElementById('btn-delete-modal').style.display = "none";
 document.getElementById('date-range-container').style.display = "block";
-document.getElementById('date-range-box').style.display = "block";
+document.getElementById('date-range-box').style.display = "none";
+document.getElementById('date-picker-trigger').style.display = "flex";
 document.getElementById('date-tag-badge').style.display = "none";
-// 自動更新公司下拉歷史清單
+// 自動更新公司下拉歷史清單（保留歷史公司名稱供選擇）
 updateCompanyDatalist();
+
+// 新增紀錄時，所有輸入欄位保持空白，避免沿用上一次輸入
+document.getElementById('company').value = "";
+document.getElementById('event-name').value = "";
+document.getElementById('rate').value = "";
+document.getElementById('no-lunch-check').checked = false;
+document.getElementById('deduct-minutes').value = "30";
+document.getElementById('deduct-wrapper').classList.remove('active');
+
 // 預設時間 (例如 09:00 至 18:00)
 document.getElementById('start-time').value = "09:00";
 document.getElementById('end-time').value = "18:00";
@@ -1234,6 +1260,7 @@ document.getElementById('editing-shift-id').value = shift.id;
 document.getElementById('btn-delete-modal').style.display = "block";
 document.getElementById('date-range-container').style.display = "block";
 document.getElementById('date-range-box').style.display = "none";
+document.getElementById('date-picker-trigger').style.display = "none";
 document.getElementById('date-tag-badge').style.display = "inline-block";
 document.getElementById('date-tag-badge').textContent = `已選 ${shift.date}`;
 updateCompanyDatalist();
@@ -1341,7 +1368,15 @@ renderMiniCalendar();
 updateDateSummary();
 }
 function updateDateSummary() {
-document.getElementById('date-summary-text').textContent = `已選 ${selectedDatesList.length} 天`;
+const summary = `已選 ${selectedDatesList.length} 天`;
+const label = modalRangeEnd ? `${modalRangeStart} 至 ${modalRangeEnd}` : modalRangeStart;
+document.getElementById('date-summary-text').textContent = summary;
+document.getElementById('date-picker-label').textContent = label || summary;
+}
+function toggleDatePicker() {
+const box = document.getElementById('date-range-box');
+const isOpen = box.style.display !== "none";
+box.style.display = isOpen ? "none" : "block";
 }
 document.getElementById('mini-cal-prev').addEventListener('click', () => {
 miniCalMonth--;
@@ -1912,6 +1947,4 @@ document.getElementById('stat-all-pay').textContent = `$${Math.round(allPay).toL
 </script>
 </body>
 </html>
-
-
 
