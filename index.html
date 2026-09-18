@@ -29,6 +29,7 @@
 --holiday-red: #e53935;
 --nav-height: 50px;
 --safe-bottom: env(safe-area-inset-bottom, 0px);
+--safe-top: env(safe-area-inset-top, 0px);
 }
 * {
 box-sizing: border-box;
@@ -42,7 +43,7 @@ height: 100%;
 }
 body {
 background-color: var(--bg-color);
-padding: 4px 10px calc(var(--nav-height) + var(--safe-bottom) + 42px) 10px;
+padding: calc(4px + var(--safe-top)) 10px calc(var(--nav-height) + var(--safe-bottom) + 42px) 10px;
 display: flex;
 justify-content: center;
 align-items: flex-start;
@@ -54,7 +55,7 @@ max-width: 600px;
 display: flex;
 flex-direction: column;
 gap: 13px;
-min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom) - 24px);
+min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom) - var(--safe-top) - 24px);
 }
 .top-header {
 display: flex;
@@ -1021,7 +1022,7 @@ font-size: 0.88rem;
 </div>
 <div class="input-group">
 <label for="allowance">🎁 津貼 ($)</label>
-<input type="number" id="allowance" min="0" step="1" placeholder="0">
+<input type="number" id="allowance" min="0" step="1">
 </div>
 <div class="input-group">
 <label>工作時間 (開始 - 結束)</label>
