@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="努力賺錢錢">
-<meta name="theme-color" content="#f5f8fc">
+<meta name="theme-color" content="#f5f8fc" id="theme-color-meta">
 <link rel="apple-touch-icon" href="icon.png">
 <title>努力賺錢錢</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,28 @@
 --nav-height: 50px;
 --safe-bottom: env(safe-area-inset-bottom, 0px);
 --safe-top: env(safe-area-inset-top, 0px);
+--input-bg: #fdfdfc;
 }
+
+/* Night Mode Colors */
+body.dark-mode {
+--bg-color: #121824;
+--card-bg: #1e2638;
+--primary: #8fb1e0;
+--primary-dark: #8fb1e0;
+--primary-hover: #a3c2ee;
+--primary-light: #2a364f;
+--text-main: #f0f4f9;
+--text-sub: #9ca3af;
+--border-color: #2a3447;
+--accent-price: #81c784;
+--plan-bg: #2a364f;
+--plan-border: #4a5d7e;
+--danger: #ef5350;
+--holiday-red: #ef5350;
+--input-bg: #2a364f;
+}
+
 * {
 box-sizing: border-box;
 margin: 0;
@@ -50,6 +71,7 @@ display: flex;
 justify-content: center;
 align-items: flex-start;
 min-height: 100dvh;
+transition: background-color 0.3s, color 0.3s;
 }
 .container {
 width: 100%;
@@ -61,7 +83,7 @@ min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom) - var(--safe-to
 }
 .top-header {
 display: flex;
-justify-content: center;
+justify-content: space-between;
 align-items: center;
 padding: 2px 5px;
 position: relative;
@@ -73,24 +95,41 @@ font-weight: 800;
 text-align: center;
 width: 100%;
 }
+.theme-toggle-btn {
+position: absolute;
+right: 5px;
+background: var(--primary-light);
+border: none;
+color: var(--text-main);
+width: 34px;
+height: 34px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+font-size: 1.1rem;
+transition: background-color 0.3s;
+}
 .card {
 background-color: var(--card-bg);
 border-radius: 20px;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 overflow: hidden;
+transition: background-color 0.3s;
 }
 .cardTitle {
 padding: 18px;
 }
 .month-salary-card {
-background: linear-gradient(135deg, #8fb1e0, var(--primary-dark));
+background: linear-gradient(135deg, #4a6fa5, #2c4366);
 border-radius: 18px;
 padding: 18px 20px;
 color: white;
 display: flex;
 justify-content: space-between;
 align-items: center;
-box-shadow: 0 6px 15px rgba(63, 95, 143, 0.28);
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 .salary-box {
 display: flex;
@@ -169,20 +208,21 @@ display: flex;
 flex-direction: column;
 align-items: center;
 cursor: pointer;
-background-color: #ffffff;
+background-color: var(--card-bg);
 transition: all 0.15s;
 overflow: hidden;
 border-bottom: 1px solid var(--border-color);
 border-right: 1px solid var(--border-color);
 }
 .day-cell:hover {
-background-color: #eef3f9;
+filter: brightness(0.95);
 }
 .day-cell.other-month {
-opacity: 0.25;
+opacity: 0.3;
 background-color: transparent;
 }
 .day-number {
+color: var(--text-main);
 font-weight: 700;
 font-size: 0.72rem;
 line-height: 1;
@@ -190,18 +230,14 @@ margin-bottom: 3px;
 flex-shrink: 0;
 }
 .day-cell.today {
-background-color: #F2F6FC;
+background-color: var(--primary-light);
 }
 .day-cell.today .day-number {
 color: var(--primary-dark);
-background: var(--primary-light);
 }
 .day-cell.is-holiday .day-number,
 .day-cell.is-holiday.today .day-number {
 color: var(--holiday-red);
-}
-.day-cell.is-holiday.today .day-number {
-background: #fdecea;
 }
 .holiday-label {
 font-size: 0.5rem;
@@ -231,7 +267,7 @@ user-select: none;
 -webkit-user-select: none;
 -webkit-touch-callout: none;
 touch-action: none;
-background-color: var(--primary-dark);
+background-color: #3f5f8f;
 padding: 1px 0;
 width: 100%;
 text-align: center;
@@ -241,6 +277,9 @@ font-size: 0.56rem;
 font-weight: 700;
 line-height: 1.3;
 flex-shrink: 0;
+}
+body.dark-mode .shift-dot-item {
+background-color: #2c4366;
 }
 .shift-dot-item .comp-name {
 color: #ffffff;
@@ -262,17 +301,11 @@ font-size: 0.55rem;
 color: #ffffff;
 }
 .shift-dot-item:hover {
-filter: brightness(0.95);
+filter: brightness(0.9);
 }
 .shift-dot-item.long-press-dragging { opacity: 0.55; transform: scale(0.98); }
-.day-cell.drop-target { outline: 2px dashed var(--primary-dark); outline-offset: -3px; background: #E7F0FF !important; }
-#calendar-view {
-margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
-}
-#list-view {
-margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
-}
-#analytics-view{
+.day-cell.drop-target { outline: 2px dashed var(--primary); outline-offset: -3px; background: var(--primary-light) !important; }
+#calendar-view, #list-view, #analytics-view {
 margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
 }
 .list-filter-bar {
@@ -283,7 +316,7 @@ padding-bottom: 8px;
 margin-bottom: 12px;
 }
 .filter-btn {
-background-color: #edf2f7;
+background-color: var(--primary-light);
 border: 1.5px solid transparent;
 padding: 6px 14px;
 border-radius: 20px;
@@ -307,7 +340,7 @@ border-bottom: 1px solid var(--border-color);
 cursor: pointer;
 }
 .shift-list-item:hover {
-background-color: #fcfdfc;
+filter: brightness(0.97);
 }
 .shift-list-item:last-child {
 border-bottom: none;
@@ -371,32 +404,25 @@ align-items: center;
 .company-stat-item {
 padding: 12px;
 border-bottom: 1px solid var(--border-color);
-background: #fafbfc;
+background: var(--primary-light);
 border-radius: 12px;
 margin-bottom: 8px;
-/* 改用 Grid 布局 */
 display: grid;
-grid-template-columns: 1fr auto; /* 左欄自適應，右欄依內容寬度 */
-grid-template-rows: auto auto; /* 上下兩行 */
-align-items: center; /* 垂直居中對齊 */
-column-gap: 12px; /* 左右欄間距 */
-row-gap: 4px; /* 左欄上下列間距 */
+grid-template-columns: 1fr auto;
+grid-template-rows: auto auto;
+align-items: center;
+column-gap: 12px;
+row-gap: 4px;
 }
 .company-stat-item:last-child {
 margin-bottom: 0;
 }
-.company-stat-top {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 6px;
-}
-/* 左欄 Row 1 */
 .company-stat-name {
 grid-column: 1;
 grid-row: 1;
 font-size: 0.88rem;
 font-weight: 800;
+color: var(--text-main);
 display: flex;
 align-items: center;
 gap: 6px;
@@ -407,16 +433,14 @@ height: 9px;
 border-radius: 50%;
 display: inline-block;
 }
-/* 右欄 佔據 2 Rows */
 .company-stat-pay {
 grid-column: 2;
-grid-row: 1 / span 2; /* 縱跨第一與第二列 */
+grid-row: 1 / span 2;
 font-size: 1.1rem;
 font-weight: 800;
 color: var(--accent-price);
 text-align: right;
 }
-/* 左欄 Row 2 */
 .company-stat-meta {
 grid-column: 1;
 grid-row: 2;
@@ -426,49 +450,7 @@ display: flex;
 justify-content: space-between;
 align-items: center;
 }
-.payday-tag {
-font-size: 0.7rem;
-padding: 2px 8px;
-border-radius: 6px;
-font-weight: 700;
-}
-.payday-tag.due {
-background: #e8f5e9;
-color: #2e7d32;
-}
-.payday-tag.pending {
-background: #fff3e0;
-color: #e65100;
-}
-.company-stat-bar-bg {
-width: 100%;
-height: 6px;
-background: var(--border-color);
-border-radius: 4px;
-margin-top: 8px;
-overflow: hidden;
-}
-.company-stat-bar-fill {
-height: 100%;
-border-radius: 4px;
-}
-/* Payday Settings Block */
-.payday-setting-row {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 8px 4px;
-font-size: 0.82rem;
-border-bottom: 1px dashed var(--border-color);
-}
-.payday-setting-row select {
-padding: 4px 8px;
-border-radius: 8px;
-border: 1px solid var(--border-color);
-font-weight: 700;
-color: var(--primary-dark);
-background: #f8f9fa;
-}
+
 .fixed-bottom-nav {
 position: fixed;
 bottom: 0;
@@ -476,15 +458,16 @@ left: 0;
 right: 0;
 height: calc(var(--nav-height) + var(--safe-bottom));
 padding-bottom: var(--safe-bottom);
-background-color: #ffffff;
-border-top: 1px solid #e9ecef;
+background-color: var(--card-bg);
+border-top: 1px solid var(--border-color);
 display: flex;
 justify-content: space-around;
 align-items: center;
 z-index: 999;
-box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
 padding-left: 4px;
 padding-right: 4px;
+transition: background-color 0.3s;
 }
 .nav-item {
 flex: 1;
@@ -504,7 +487,7 @@ min-width: 0;
 }
 .nav-item svg {
 width: 25px;
-height: 25x;
+height: 25px;
 fill: currentColor;
 }
 .nav-item.active {
@@ -522,15 +505,15 @@ max-width: 70px;
 width: 42px;
 height: 42px;
 border-radius: 50%;
-background: linear-gradient(135deg, #8fb1e0, var(--primary-dark));
+background: linear-gradient(135deg, #4a6fa5, #2c4366);
 color: white;
-border: 4px solid #ffffff;
+border: 4px solid var(--card-bg);
 display: flex;
 justify-content: center;
 align-items: center;
 font-size: 1.7rem;
 cursor: pointer;
-transition: transform 0.2s;
+transition: transform 0.2s, border-color 0.3s;
 }
 .btn-add-highlight:active {
 transform: scale(0.92);
@@ -541,7 +524,7 @@ top: 0;
 left: 0;
 width: 100%;
 height: 100%;
-background: rgba(0, 0, 0, 0.4);
+background: rgba(0, 0, 0, 0.6);
 backdrop-filter: blur(4px);
 display: none;
 justify-content: center;
@@ -557,11 +540,12 @@ display: flex;
 }
 .modal-content {
 background-color: var(--card-bg);
+color: var(--text-main);
 width: 100%;
 max-width: 480px;
 border-radius: 20px;
 padding: 22px;
-box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 margin: auto;
 max-height: calc(100vh - 30px);
 overflow-y: auto;
@@ -600,7 +584,7 @@ font-weight: 700;
 font-size: 0.98rem;
 padding: 9px 14px;
 border-radius: 10px;
-  text-align:center;
+text-align:center;
 }
 .company-input-wrapper {
 position: relative;
@@ -621,16 +605,13 @@ border-bottom: 2px solid var(--text-sub);
 transform: translateY(-65%) rotate(45deg);
 pointer-events: none;
 }
-.analytics-summary-grid.grid-3 {
-grid-template-columns: repeat(3, 1fr);
-}
 .date-picker-trigger {
 display: flex;
 align-items: center;
 justify-content: space-between;
 background: var(--primary-light);
 color: var(--primary-dark);
-border: 1px solid #d4e2f2;
+border: 1px solid var(--border-color);
 border-radius: 10px;
 padding: 10px 12px;
 font-size: 0.85rem;
@@ -640,8 +621,8 @@ margin-bottom: 8px;
 }
 .date-picker-trigger::after { content: "▾"; font-size: 0.9rem; }
 .date-range-box {
-background: #f0f5fa;
-border: 1px solid #d4e2f2;
+background: var(--primary-light);
+border: 1px solid var(--border-color);
 border-radius: 12px;
 padding: 10px 12px 12px 12px;
 }
@@ -694,14 +675,10 @@ top: 0;
 bottom: 0;
 left: 0;
 right: 0;
-background: var(--primary-light);
+background: var(--border-color);
 }
-.mini-cal-cell.in-range.range-start::before {
-left: 50%;
-}
-.mini-cal-cell.in-range.range-end::before {
-right: 50%;
-}
+.mini-cal-cell.in-range.range-start::before { left: 50%; }
+.mini-cal-cell.in-range.range-end::before { right: 50%; }
 .mini-cal-num {
 position: relative;
 z-index: 1;
@@ -713,6 +690,7 @@ justify-content: center;
 border-radius: 50%;
 font-size: 0.76rem;
 font-weight: 700;
+color: var(--text-main);
 border: 1.5px solid transparent;
 box-sizing: border-box;
 }
@@ -749,20 +727,21 @@ font-size: 0.82rem;
 font-weight: 700;
 color: var(--primary-dark);
 }
-.input-group input {
+.input-group input, .input-group select {
 padding: 9px 12px;
 border: 1.5px solid var(--border-color);
 border-radius: 10px;
 font-size: 0.9rem;
 outline: none;
-background-color: #fdfdfc;
+background-color: var(--input-bg);
+color: var(--text-main);
 }
 .time-range-group {
 display: flex;
 gap: 8px;
 align-items: center;
 }
-.time-range-group input {
+.time-range-group select {
 flex: 1;
 }
 .checkbox-group {
@@ -780,12 +759,13 @@ accent-color: var(--primary);
 font-size: 0.85rem;
 cursor: pointer;
 font-weight: 600;
+color: var(--text-main);
 }
 .deduct-input-wrapper {
 display: none;
 margin-top: 4px;
 padding: 8px 10px;
-background-color: #f0f5fa;
+background-color: var(--primary-light);
 border-radius: 8px;
 }
 .deduct-input-wrapper.active {
@@ -806,7 +786,7 @@ margin-top: 8px;
 .btn-submit {
 flex: 1;
 background-color: var(--primary-dark);
-color: white;
+color: #ffffff;
 border: none;
 padding: 12px;
 border-radius: 12px;
@@ -814,10 +794,13 @@ font-size: 0.95rem;
 font-weight: 800;
 cursor: pointer;
 }
+body.dark-mode .btn-submit {
+color: #121824;
+}
 .btn-delete-item {
-background-color: #ffebee;
+background-color: rgba(229, 57, 53, 0.15);
 color: var(--danger);
-border: 1px solid #ffcdd2;
+border: 1px solid var(--danger);
 padding: 12px;
 border-radius: 12px;
 font-size: 0.9rem;
@@ -827,7 +810,7 @@ cursor: pointer;
 .action-menu-overlay {
 position: fixed;
 top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(0,0,0,0.3);
+background: rgba(0,0,0,0.5);
 display: none;
 justify-content: center;
 align-items: flex-end;
@@ -837,7 +820,7 @@ z-index: 1001;
 display: flex;
 }
 .action-sheet {
-background: white;
+background: var(--card-bg);
 width: 100%;
 max-width: 600px;
 border-radius: 20px 20px 0 0;
@@ -857,7 +840,8 @@ margin-bottom: 4px;
 .action-sheet-btn {
 padding: 12px;
 border: 1px solid var(--border-color);
-background: #f8f9fa;
+background: var(--primary-light);
+color: var(--text-main);
 border-radius: 12px;
 font-weight: 700;
 font-size: 0.9rem;
@@ -865,15 +849,19 @@ cursor: pointer;
 text-align: center;
 }
 .action-sheet-btn.primary {
-background: var(--primary-light);
-color: var(--primary-dark);
+background: var(--primary-dark);
+color: #ffffff;
+}
+body.dark-mode .action-sheet-btn.primary {
+color: #121824;
 }
 .action-sheet-btn.danger {
-background: #ffebee;
+background: rgba(229, 57, 53, 0.15);
 color: var(--danger);
+border-color: var(--danger);
 }
 #move-copy-overlay { background: transparent; justify-content: flex-start; align-items: flex-start; }
-#move-copy-overlay .action-sheet { width: auto; min-width: 142px; max-width: 210px; border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; padding-bottom: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.16); gap: 4px; }
+#move-copy-overlay .action-sheet { width: auto; min-width: 142px; max-width: 210px; border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; padding-bottom: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); gap: 4px; }
 #move-copy-overlay .action-sheet-title { text-align: left; font-size: 0.72rem; padding: 4px 7px; margin-bottom: 0; white-space: nowrap; max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
 #move-copy-overlay .action-sheet-btn { padding: 7px 9px; border: 0; border-radius: 8px; font-size: 0.76rem; text-align: left; white-space: nowrap; }
 
@@ -883,8 +871,6 @@ padding: 30px;
 color: var(--text-sub);
 font-size: 0.88rem;
 }
-
-/* Calendar swipe navigation */
 #calendar-days { touch-action: pan-y; }
 </style>
 </head>
@@ -892,6 +878,7 @@ font-size: 0.88rem;
 <div class="container">
 <div class="top-header">
 <h1>🔥打工狗請努力🔥</h1>
+<button class="theme-toggle-btn" id="theme-toggle" onclick="toggleDarkMode()">🌙</button>
 </div>
 <div class="month-salary-card">
 <div class="salary-box">
@@ -908,9 +895,7 @@ font-size: 0.88rem;
 <div id="calendar-view" class="card">
 <div class="calendar-header cardTitle">
 <h2 id="calendar-month-year"></h2>
-<div class="month-nav">
-
-</div>
+<div class="month-nav"></div>
 </div>
 <div class="calendar-weekdays">
 <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div class="sun-label">日</div>
@@ -941,7 +926,6 @@ font-size: 0.88rem;
 <strong id="stat-total-pay">$0</strong>
 </div>
 </div>
-<!-- 每月公司應收人工分析 -->
 <div class="analytics-section-title">
 <span>🏢 追糧報表</span>
 </div>
@@ -961,6 +945,7 @@ font-size: 0.88rem;
 </div>
 </div>
 </div>
+
 <!-- FIXED BOTTOM MENU BAR -->
 <nav class="fixed-bottom-nav">
 <button class="nav-item active" id="nav-calendar" onclick="switchNav('calendar-view')">
@@ -979,6 +964,7 @@ font-size: 0.88rem;
 <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
 </button>
 </nav>
+
 <!-- Action Sheet -->
 <div class="action-menu-overlay" id="action-menu-overlay" onclick="closeActionMenu()">
 <div class="action-sheet" onclick="event.stopPropagation()">
@@ -991,6 +977,7 @@ font-size: 0.88rem;
 <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
 </div>
 </div>
+
 <!-- Move / Copy Action Sheet -->
 <div class="action-menu-overlay" id="move-copy-overlay" onclick="closeMoveCopyMenu()">
   <div class="action-sheet" onclick="event.stopPropagation()">
@@ -1000,6 +987,7 @@ font-size: 0.88rem;
     <button class="action-sheet-btn" onclick="closeMoveCopyMenu()">取消</button>
   </div>
 </div>
+
 <!-- Modal Form -->
 <div class="modal-overlay" id="modal-overlay">
 <div class="modal-content">
@@ -1048,9 +1036,9 @@ font-size: 0.88rem;
 <div class="input-group">
 <label>工作時間 (開始 - 結束)</label>
 <div class="time-range-group">
-<select id="start-time" required onchange="calcDuration()" style="padding: 9px; border-radius: 10px; border: 1.5px solid var(--border-color); flex: 1; font-weight: 700;"></select>
+<select id="start-time" required onchange="calcDuration()"></select>
 <span>至</span>
-<select id="end-time" required onchange="calcDuration()" style="padding: 9px; border-radius: 10px; border: 1.5px solid var(--border-color); flex: 1; font-weight: 700;"></select>
+<select id="end-time" required onchange="calcDuration()"></select>
 </div>
 </div>
 <div class="checkbox-group">
@@ -1059,7 +1047,7 @@ font-size: 0.88rem;
 </div>
 <div class="deduct-input-wrapper" id="deduct-wrapper">
 <label style="font-size:0.8rem;">扣除時間：</label>
-<select id="deduct-minutes" onchange="calcDuration()" style="padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.85rem; background: white; outline: none; font-weight: 700;">
+<select id="deduct-minutes" onchange="calcDuration()" style="padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.85rem; font-weight: 700;">
 <option value="30" selected>30 分鐘 </option>
 <option value="60">60 分鐘 </option>
 </select>
@@ -1072,6 +1060,7 @@ font-size: 0.88rem;
 </form>
 </div>
 </div>
+
 <script>
 let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];
 let companyPaydays = JSON.parse(localStorage.getItem('companyPaydays')) || {};
@@ -1086,6 +1075,7 @@ let modalRangeEnd = null;
 let miniCalYear = new Date().getFullYear();
 let miniCalMonth = new Date().getMonth();
 let allowRangeSelection = true;
+
 const companyColorPalette = [
 { bg: '#e3f2fd', border: '#90caf9', text: '#1976d2' },
 { bg: '#f3e5f5', border: '#ce93d8', text: '#7b1fa2' },
@@ -1096,6 +1086,7 @@ const companyColorPalette = [
 { bg: '#fffde7', border: '#fff59d', text: '#f57f17' },
 { bg: '#f3e5f5', border: '#b39ddb', text: '#4527a0' }
 ];
+
 let hkHolidays = {
 "2025-01-01": "元旦", "2025-01-29": "農曆年初一", "2025-01-30": "農曆年初二",
 "2025-01-31": "農曆年初三", "2025-04-04": "清明節", "2025-04-18": "耶穌受難節",
@@ -1110,6 +1101,24 @@ let hkHolidays = {
 "2026-09-26": "中秋節翌日", "2026-10-01": "國慶日", "2026-10-19": "重陽節",
 "2026-12-25": "聖誕節", "2026-12-26": "聖誕節後第一個周日"
 };
+
+// --- Night Mode Functions ---
+function initDarkMode() {
+  const isDark = localStorage.getItem('nightMode') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-mode');
+    document.getElementById('theme-toggle').textContent = '☀️';
+    document.getElementById('theme-color-meta').setAttribute('content', '#121824');
+  }
+}
+
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('nightMode', isDark);
+  document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#121824' : '#f5f8fc');
+}
+
 (function fetchLiveHolidays() {
 fetch('https://www.1823.gov.hk/common/ical/tc.json')
 .then(res => res.json())
@@ -1126,6 +1135,7 @@ renderCalendar();
 })
 .catch(() => {});
 })();
+
 function getHolidayInfo(dateStr, dateObj) {
 const isSun = dateObj.getDay() === 0;
 const holidayName = hkHolidays[dateStr];
@@ -1133,24 +1143,28 @@ if (holidayName) return { isHoliday: true, label: holidayName };
 if (isSun) return { isHoliday: true, label: '' };
 return { isHoliday: false, label: '' };
 }
+
 const modalOverlay = document.getElementById('modal-overlay');
 const shiftForm = document.getElementById('shift-form');
-document.getElementById('start-time').value = "09:00";
-document.getElementById('end-time').value = "12:00";
+
 function formatShortTime(timeStr) {
 if (!timeStr) return '';
 const [h, m] = timeStr.split(':');
 const hourNum = parseInt(h, 10);
 return m === '00' ? `${hourNum}` : `${hourNum}:${m}`;
 }
+
 function getLocalDateStr(dateObj = new Date()) {
 const year = dateObj.getFullYear();
 const month = String(dateObj.getMonth() + 1).padStart(2, '0');
 const day = String(dateObj.getDate()).padStart(2, '0');
 return `${year}-${month}-${day}`;
 }
+
+initDarkMode();
 autoUpdatePastPlannedShifts();
 renderCalendar();
+
 function autoUpdatePastPlannedShifts() {
 const now = new Date();
 const todayStr = getLocalDateStr(now);
@@ -1171,10 +1185,9 @@ updated = true;
 }
 }
 });
-if (updated) {
-saveData();
+if (updated) saveData();
 }
-}
+
 function switchNav(viewId) {
 autoUpdatePastPlannedShifts();
 currentView = viewId;
@@ -1196,7 +1209,7 @@ document.getElementById('nav-analytics').classList.add('active');
 renderAnalytics();
 }
 }
-// 1. 動態生成 07:00 - 22:45 (每 15 分鐘一格) 的下拉選單選項
+
 function populateTimeOptions() {
 const startSelect = document.getElementById('start-time');
 const endSelect = document.getElementById('end-time');
@@ -1212,17 +1225,17 @@ optionsHtml += `<option value="${hourStr}:45">${hourStr}:45</option>`;
 startSelect.innerHTML = optionsHtml;
 endSelect.innerHTML = optionsHtml;
 }
-// 2. 更新公司名稱歷史選單 (自動提取歷史紀錄)
+
 function updateCompanyDatalist() {
 const companyList = document.getElementById('company-list');
 if (!companyList) return;
 const savedCompanies = [...new Set(shifts.map(s => s.company).filter(Boolean))];
 companyList.innerHTML = savedCompanies.map(c => `<option value="${c}"></option>`).join('');
 }
-// 頁面初始化時執行
+
 populateTimeOptions();
 updateCompanyDatalist();
-// 修改 openModal 函數，加入預設時間與更新選單
+
 function openModal(selectedDateStr = null) {
 modalOverlay.classList.add('active');
 const todayStr = getLocalDateStr();
@@ -1234,10 +1247,8 @@ document.getElementById('date-range-container').style.display = "block";
 document.getElementById('date-range-box').style.display = "none";
 document.getElementById('date-picker-trigger').style.display = "flex";
 document.getElementById('date-tag-badge').style.display = "none";
-// 自動更新公司下拉歷史清單（保留歷史公司名稱供選擇）
 updateCompanyDatalist();
 
-// 新增紀錄時，所有輸入欄位保持空白，避免沿用上一次輸入
 document.getElementById('company').value = "";
 document.getElementById('event-name').value = "";
 document.getElementById('rate').value = "";
@@ -1245,7 +1256,6 @@ document.getElementById('no-lunch-check').checked = false;
 document.getElementById('deduct-minutes').value = "30";
 document.getElementById('deduct-wrapper').classList.remove('active');
 
-// 預設時間 (例如 09:00 至 18:00)
 document.getElementById('start-time').value = "09:00";
 document.getElementById('end-time').value = "18:00";
 document.getElementById('allowance').value = "";
@@ -1253,7 +1263,7 @@ initMiniCalendar(targetDate, true);
 setShiftType('planned');
 calcDuration();
 }
-// 修改 openShiftDetail 函數，打開編輯時同步更新清單
+
 function openShiftDetail(shiftId) {
 const shift = shifts.find(s => s.id === shiftId);
 if (!shift) return;
@@ -1285,7 +1295,9 @@ document.getElementById('deduct-wrapper').classList.remove('active');
 }
 calcDuration();
 }
+
 function closeModal() { modalOverlay.classList.remove('active'); }
+
 function initMiniCalendar(dateStr, canSelectRange) {
 const d = new Date(dateStr);
 miniCalYear = d.getFullYear();
@@ -1297,6 +1309,7 @@ selectedDatesList = [dateStr];
 renderMiniCalendar();
 updateDateSummary();
 }
+
 function renderMiniCalendar() {
 document.getElementById('mini-cal-month-year').textContent = `${miniCalYear} 年 ${miniCalMonth + 1} 月`;
 const daysContainer = document.getElementById('mini-cal-days');
@@ -1331,11 +1344,13 @@ cell.onclick = () => handleMiniCalClick(dateStr);
 daysContainer.appendChild(cell);
 }
 }
+
 function isDateInSelectedRange(dateStr) {
 if (!modalRangeStart) return false;
 if (!modalRangeEnd) return dateStr === modalRangeStart;
 return dateStr >= modalRangeStart && dateStr <= modalRangeEnd;
 }
+
 function handleMiniCalClick(dateStr) {
 if (!allowRangeSelection) {
 modalRangeStart = dateStr;
@@ -1370,17 +1385,20 @@ selectedDatesList = [modalRangeStart];
 renderMiniCalendar();
 updateDateSummary();
 }
+
 function updateDateSummary() {
 const summary = `已選 ${selectedDatesList.length} 天`;
 const label = modalRangeEnd ? `${modalRangeStart} 至 ${modalRangeEnd}` : modalRangeStart;
 document.getElementById('date-summary-text').textContent = summary;
 document.getElementById('date-picker-label').textContent = label || summary;
 }
+
 function toggleDatePicker() {
 const box = document.getElementById('date-range-box');
 const isOpen = box.style.display !== "none";
 box.style.display = isOpen ? "none" : "block";
 }
+
 document.getElementById('mini-cal-prev').addEventListener('click', () => {
 miniCalMonth--;
 if (miniCalMonth < 0) { miniCalMonth = 11; miniCalYear--; }
@@ -1391,12 +1409,15 @@ miniCalMonth++;
 if (miniCalMonth > 11) { miniCalMonth = 0; miniCalYear++; }
 renderMiniCalendar();
 });
+
 function openActionMenu() { document.getElementById('action-menu-overlay').classList.add('active'); }
 function closeActionMenu() { document.getElementById('action-menu-overlay').classList.remove('active'); }
+
 function setShiftType(type) {
 document.getElementById('shift-type').value = type;
 document.getElementById('btn-submit-text').textContent = (type === 'completed') ? '儲存已完成工時' : '儲存排班';
 }
+
 function toggleDeductInput() {
 const isChecked = document.getElementById('no-lunch-check').checked;
 const wrapper = document.getElementById('deduct-wrapper');
@@ -1407,6 +1428,7 @@ wrapper.classList.remove('active');
 }
 calcDuration();
 }
+
 function getCalculatedDuration() {
 const startTime = document.getElementById('start-time').value;
 const endTime = document.getElementById('end-time').value;
@@ -1425,18 +1447,20 @@ diffMins = Math.max(0, diffMins - deductMins);
 }
 return Math.round((diffMins / 60) * 100) / 100;
 }
+
 function calcDuration() {
 const dur = getCalculatedDuration();
 document.getElementById('duration-display').textContent = `共 ${dur} 小時`;
 }
-// 金額顯示：保留小數，不四捨五入
+
 function formatMoney(value) {
 return (Math.floor((Number(value) + Number.EPSILON) * 100) / 100).toLocaleString();
 }
-// 計算單一更份的日薪 (時薪 x 時數 + 津貼)
+
 function getShiftPay(s) {
 return (s.rate || 0) * (s.duration || 0) + (Number(s.allowance) || 0);
 }
+
 shiftForm.addEventListener('submit', (e) => {
 e.preventDefault();
 const editingId = document.getElementById('editing-shift-id').value;
@@ -1452,6 +1476,7 @@ const startTime = document.getElementById('start-time').value;
 const endTime = document.getElementById('end-time').value;
 const now = new Date();
 const todayStr = getLocalDateStr(now);
+
 if (editingId) {
 const targetIndex = shifts.findIndex(s => s.id == editingId);
 if (targetIndex !== -1) {
@@ -1519,6 +1544,7 @@ renderCurrentView();
 closeModal();
 document.getElementById('event-name').value = '';
 });
+
 function deleteCurrentEditingShift() {
 const editingId = document.getElementById('editing-shift-id').value;
 if (editingId) {
@@ -1526,11 +1552,13 @@ deleteShift(Number(editingId));
 closeModal();
 }
 }
+
 function deleteShift(id) {
 shifts = shifts.filter(s => s.id !== id);
 saveData();
 renderCurrentView();
 }
+
 function renderCurrentView() {
 if (currentView === 'calendar-view') { renderCalendar(); }
 else if (currentView === 'list-view') { renderListView(); }
@@ -1538,10 +1566,12 @@ else if (currentView === 'analytics-view') { renderAnalytics(); }
 else { renderCalendar(); }
 if (currentView !== 'calendar-view') { updateMonthSalaryCard(); }
 }
+
 function saveData() {
 localStorage.setItem('partTimeShifts', JSON.stringify(shifts));
 localStorage.setItem('companyPaydays', JSON.stringify(companyPaydays));
 }
+
 async function shareOrDownloadFile(filename, mimeType, content) {
 try {
 const blob = new Blob([content], { type: mimeType });
@@ -1568,12 +1598,15 @@ console.error('Export Error:', err);
 alert('匯出失敗');
 }
 }
+
 function exportJSON() {
 if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
 const content = JSON.stringify(shifts, null, 2);
 shareOrDownloadFile(`part_time_backup_${getLocalDateStr()}.json`, 'application/json', content);
 }
+
 function importJSON() { document.getElementById('import-file').click(); }
+
 function handleFileSelect(event) {
 const file = event.target.files[0];
 if (!file) return;
@@ -1593,6 +1626,7 @@ alert('匯入成功！');
 reader.readAsText(file);
 event.target.value = '';
 }
+
 function exportCSV() {
 if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
 let csvContent = "\uFEFF";
@@ -1604,6 +1638,7 @@ csvContent += `"${s.date}","${status}","${s.company}","${s.eventName}",${s.rate}
 });
 shareOrDownloadFile(`part_time_records_${getLocalDateStr()}.csv`, 'text/csv;charset=utf-8;', csvContent);
 }
+
 function confirmClearAll() {
 if (shifts.length === 0) { alert('目前沒有紀錄'); return; }
 const ok = confirm('確定要清空所有資料嗎？此動作無法復原！\n建議先匯出 JSON 備份檔。');
@@ -1614,6 +1649,7 @@ renderCurrentView();
 alert('已清空所有紀錄');
 }
 }
+
 function changeMonth(delta) {
 currentMonth += delta;
 if (currentMonth < 0) { currentMonth = 11; currentYear--; }
@@ -1621,8 +1657,10 @@ if (currentMonth > 11) { currentMonth = 0; currentYear++; }
 autoUpdatePastPlannedShifts();
 renderCurrentView();
 }
+
 document.getElementById('prev-month-a').addEventListener('click', () => changeMonth(-1));
 document.getElementById('next-month-a').addEventListener('click', () => changeMonth(1));
+
 function updateMonthSalaryCard() {
 let mPayCompleted = 0;
 let mPayTotal = 0;
@@ -1635,6 +1673,7 @@ if (s.type === 'completed' || !s.type) mPayCompleted += pay;
 document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
 document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
 }
+
 let longPressTimer = null;
 let longPressShiftId = null;
 let longPressTriggered = false;
@@ -1732,85 +1771,109 @@ document.addEventListener('pointerup', () => {
     finishShiftDrag();
   } else cancelShiftLongPress();
 });
-/* Render Calendar */
+
+/* Render Calendar Function */
 function renderCalendar() {
-autoUpdatePastPlannedShifts();
-document.getElementById('calendar-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
-const daysContainer = document.getElementById('calendar-days');
-daysContainer.innerHTML = '';
-let rawFirstDay = new Date(currentYear, currentMonth, 1).getDay();
-let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;
-const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
-const today = new Date();
-for (let i = firstDay - 1; i >= 0; i--) {
-const cell = document.createElement('div');
-cell.className = 'day-cell other-month';
-const prevDate = new Date(currentYear, currentMonth, -(i));
-const prevDateStr = getLocalDateStr(prevDate);
-cell.dataset.date = prevDateStr;
-cell.innerHTML = `<span class="day-number">${prevLastDay - i}</span>`;
-daysContainer.appendChild(cell);
+  autoUpdatePastPlannedShifts();
+  document.getElementById('calendar-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
+  const daysContainer = document.getElementById('calendar-days');
+  daysContainer.innerHTML = '';
+  
+  let rawFirstDay = new Date(currentYear, currentMonth, 1).getDay();
+  let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;
+  const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
+  const today = new Date();
+  
+  let mPayCompleted = 0;
+  let mPayTotal = 0;
+
+  const createCellContent = (dayNum, dateStr, dateObj, isCurrentMonth) => {
+    const holidayInfo = getHolidayInfo(dateStr, dateObj);
+    let html = `<span class="day-number">${dayNum}</span>`;
+    
+    if (holidayInfo.isHoliday && holidayInfo.label) {
+      html += `<div class="holiday-label">${holidayInfo.label}</div>`;
+    }
+    
+    const dayShifts = shifts.filter(s => s.date === dateStr);
+    let shiftsHtml = '';
+    
+    dayShifts.forEach(s => {
+      const pay = getShiftPay(s);
+      if (isCurrentMonth) {
+        mPayTotal += pay;
+        if (s.type === 'completed' || !s.type) {
+          mPayCompleted += pay;
+        }
+      }
+      
+      const isPlanned = s.type === 'planned';
+      const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;
+      
+      shiftsHtml += `
+      <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false;" onpointerdown="startShiftLongPress(event, ${s.id})" onpointercancel="cancelShiftLongPress()" title="${s.company} (${timeTag}) $${pay}">
+        <div class="comp-name">${s.company}</div>
+        <div class="shift-time">${timeTag}</div>
+        <div class="shift-money">$${formatMoney(pay)}</div>
+      </div>
+      `;
+    });
+    
+    html += `<div class="shift-items-wrap">${shiftsHtml}</div>`;
+    return html;
+  };
+
+  // 1. 上個月 Preview
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const cell = document.createElement('div');
+    cell.className = 'day-cell other-month';
+    const prevDate = new Date(currentYear, currentMonth, -(i));
+    const prevDateStr = getLocalDateStr(prevDate);
+    cell.dataset.date = prevDateStr;
+    cell.onclick = () => openModal(prevDateStr);
+    cell.innerHTML = createCellContent(prevLastDay - i, prevDateStr, prevDate, false);
+    daysContainer.appendChild(cell);
+  }
+
+  // 2. 本月日子
+  for (let day = 1; day <= totalDays; day++) {
+    const cell = document.createElement('div');
+    cell.className = 'day-cell';
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dateObj = new Date(currentYear, currentMonth, day);
+    cell.dataset.date = dateStr;
+    cell.onclick = () => openModal(dateStr);
+    
+    if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+      cell.classList.add('today');
+    }
+    if (getHolidayInfo(dateStr, dateObj).isHoliday) {
+      cell.classList.add('is-holiday');
+    }
+    
+    cell.innerHTML = createCellContent(day, dateStr, dateObj, true);
+    daysContainer.appendChild(cell);
+  }
+
+  // 3. 下個月 Preview
+  const totalRendered = firstDay + totalDays;
+  const nextDays = (7 - (totalRendered % 7)) % 7;
+  for (let i = 1; i <= nextDays; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'day-cell other-month';
+    const nextDate = new Date(currentYear, currentMonth + 1, i);
+    const nextDateStr = getLocalDateStr(nextDate);
+    cell.dataset.date = nextDateStr;
+    cell.onclick = () => openModal(nextDateStr);
+    cell.innerHTML = createCellContent(i, nextDateStr, nextDate, false);
+    daysContainer.appendChild(cell);
+  }
+
+  document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
+  document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
 }
-let mPayCompleted = 0;
-let mPayTotal = 0;
-for (let day = 1; day <= totalDays; day++) {
-const cell = document.createElement('div');
-cell.className = 'day-cell';
-const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-cell.dataset.date = dateStr;
-const dateObj = new Date(currentYear, currentMonth, day);
-const holidayInfo = getHolidayInfo(dateStr, dateObj);
-cell.onclick = () => {
-openModal(dateStr);
-};
-if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
-cell.classList.add('today');
-}
-if (holidayInfo.isHoliday) {
-cell.classList.add('is-holiday');
-}
-let html = `<span class="day-number">${day}</span>`;
-if (holidayInfo.isHoliday && holidayInfo.label) {
-html += `<div class="holiday-label">${holidayInfo.label}</div>`;
-}
-const dayShifts = shifts.filter(s => s.date === dateStr);
-let shiftsHtml = '';
-dayShifts.forEach(s => {
-const pay = getShiftPay(s);
-mPayTotal += pay;
-if (s.type === 'completed' || !s.type) {
-mPayCompleted += pay;
-}
-const isPlanned = s.type === 'planned';
-const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;
-shiftsHtml += `
-<div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false;" onpointerdown="startShiftLongPress(event, ${s.id})" onpointercancel="cancelShiftLongPress()" title="${s.company} (${timeTag}) $${pay}">
-<div class="comp-name">${s.company}</div>
-<div class="shift-time">${timeTag}</div>
-<div class="shift-money">$${formatMoney(pay)}</div>
-</div>
-`;
-});
-html += `<div class="shift-items-wrap">${shiftsHtml}</div>`;
-cell.innerHTML = html;
-daysContainer.appendChild(cell);
-}
-const totalRendered = firstDay + totalDays;
-const nextDays = (7 - (totalRendered % 7)) % 7;
-for (let i = 1; i <= nextDays; i++) {
-const cell = document.createElement('div');
-cell.className = 'day-cell other-month';
-const nextDate = new Date(currentYear, currentMonth + 1, i);
-const nextDateStr = getLocalDateStr(nextDate);
-cell.dataset.date = nextDateStr;
-cell.innerHTML = `<span class="day-number">${i}</span>`;
-daysContainer.appendChild(cell);
-}
-document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
-document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
-}
-/* Swipe calendar to change month */
+
 (function setupCalendarSwipe() {
   const calendar = document.getElementById('calendar-days');
   if (!calendar || calendar.dataset.swipeReady) return;
@@ -1833,7 +1896,6 @@ document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTo
   }, { passive: true });
 })();
 
-/* Render List View */
 function renderListView() {
 autoUpdatePastPlannedShifts();
 updateMonthSalaryCard();
@@ -1875,17 +1937,17 @@ return `
 `;
 }).join('');
 }
+
 function filterListCompany(comp) {
 selectedCompanyFilter = comp;
 renderListView();
 }
-/* Render Analytics View */
+
 function renderAnalytics() {
 autoUpdatePastPlannedShifts();
 updateMonthSalaryCard();
 document.getElementById('analytics-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
 const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-// 計入該月份所有紀錄 (包含已完成及預計/排班)
 const monthShifts = shifts.filter(s => s.date && s.date.startsWith(monthPrefix));
 let totalHours = 0;
 let totalPay = 0;
@@ -1906,25 +1968,19 @@ companyMap[s.company].pay += pay;
 companyMap[s.company].count += 1;
 }
 });
-const avgRate = totalHours > 0 ? (totalPay / totalHours) : 0;
 document.getElementById('stat-hours').textContent = `${Math.round(totalHours * 10) / 10}h`;
 document.getElementById('stat-total-pay').textContent = `$${formatMoney(totalPay)}`;
 const companyBreakdownContainer = document.getElementById('company-breakdown-container');
 const companyEntries = Object.entries(companyMap).sort((a, b) => b[1].totalEstPay - a[1].totalEstPay);
 const allCompanyNames = [...new Set(shifts.map(s => s.company))];
-const today = new Date();
-const currentDayNum = today.getDate();
-const isCurrentViewingMonth = (today.getFullYear() === currentYear && today.getMonth() === currentMonth);
+
 if (companyEntries.length === 0) {
 companyBreakdownContainer.innerHTML = `<div class="empty-msg">本月沒有工時紀錄</div>`;
 } else {
 companyBreakdownContainer.innerHTML = companyEntries.map(([name, data]) => {
 const idx = allCompanyNames.indexOf(name);
 const color = companyColorPalette[idx % companyColorPalette.length];
-const pct = totalPay > 0 ? Math.round((data.pay / totalPay) * 100) : 0;
 const avgCompRate = data.hours > 0 ? (data.pay / data.hours) : 0;
-const pDay = companyPaydays[name] || 7; // 預設 7 號出糧
-let paydayStatusHtml = '';
 return `
 <div class="company-stat-item">
 <div class="company-stat-name">
@@ -1934,24 +1990,21 @@ ${name}
 <div class="company-stat-pay">$${formatMoney(data.totalEstPay)}</div>
 <div class="company-stat-meta">
 <span>${data.count} job • ${Math.round(data.hours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
-${paydayStatusHtml}
 </div>
 </div>
 `;
 }).join('');
 }
-// Render 全局歷史統計
+
 const allCompleted = shifts.filter(s => s.type === 'completed' || !s.type);
 let allHours = 0, allPay = 0;
 allCompleted.forEach(s => {
 allHours += s.duration;
 allPay += getShiftPay(s);
 });
-const allCompanies = new Set(allCompleted.map(s => s.company));
 document.getElementById('stat-all-hours').textContent = `${Math.round(allHours * 10) / 10}h`;
 document.getElementById('stat-all-pay').textContent = `$${formatMoney(allPay)}`;
 }
 </script>
 </body>
 </html>
-
