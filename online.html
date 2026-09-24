@@ -1712,6 +1712,7 @@ document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayComplete
 document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
 }
 
+// === 修復後的長按與拖拽邏輯 ===
 let longPressTimer = null;
 let longPressShiftId = null;
 let longPressTriggered = false;
@@ -1719,31 +1720,40 @@ let dragShiftId = null;
 let dragDestination = null;
 
 function startShiftLongPress(event, shiftId) {
-  event.preventDefault();
   if (event.pointerType === 'mouse' && event.button !== 0) return;
   cancelShiftLongPress();
   longPressShiftId = shiftId;
   longPressTriggered = false;
   const item = event.currentTarget;
+
   longPressTimer = setTimeout(() => {
     longPressTriggered = true;
     dragShiftId = shiftId;
     item.classList.add('long-press-dragging');
-    if (navigator.vibrate) navigator.vibrate(20);
+    if (navigator.vibrate) navigator.vibrate(25);
     document.body.classList.add('dragging-shift');
-  }, 550);
+
+    // 嘗試鎖定 Pointer，防止滾動干擾
+    if (item.setPointerCapture && event.pointerId) {
+      try { item.setPointerCapture(event.pointerId); } catch(e){}
+    }
+  }, 450);
 }
+
 function cancelShiftLongPress() {
   if (longPressTimer) clearTimeout(longPressTimer);
   longPressTimer = null;
 }
+
 function clearDropTarget() {
   document.querySelectorAll('.day-cell.drop-target').forEach(el => el.classList.remove('drop-target'));
 }
+
 function finishShiftDrag() {
   cancelShiftLongPress();
   document.querySelectorAll('.long-press-dragging').forEach(el => el.classList.remove('long-press-dragging'));
   document.body.classList.remove('dragging-shift');
+  
   if (dragShiftId && dragDestination) {
     const shift = shifts.find(s => s.id === dragShiftId);
     if (shift && dragDestination !== shift.date) {
@@ -1768,6 +1778,7 @@ function finishShiftDrag() {
   longPressShiftId = null;
   dragDestination = null;
 }
+
 function closeMoveCopyMenu() {
   document.getElementById('move-copy-overlay').classList.remove('active');
   const sheet = document.querySelector('#move-copy-overlay .action-sheet');
@@ -1776,6 +1787,7 @@ function closeMoveCopyMenu() {
   longPressShiftId = null;
   dragDestination = null;
 }
+
 function moveOrCopyShift(mode) {
   const destination = window.pendingShiftDestination;
   const shiftId = window.pendingShiftId;
@@ -1833,7 +1845,11 @@ function renderCalendar() {
       const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;
 
       shiftsHtml += `
-      <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); setTimeout(() => { if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false; }, 50);" onpointerdown="startShiftLongPress(event, ${s.id})" onpointercancel="cancelShiftLongPress()" title="${s.company} (${timeTag}) $${pay}">
+      <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" 
+           onclick="event.stopPropagation(); setTimeout(() => { if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false; }, 50);" 
+           onpointerdown="startShiftLongPress(event, ${s.id})" 
+           onpointercancel="cancelShiftLongPress()" 
+           title="${s.company} (${timeTag}) $${pay}">
         <div class="comp-name">${s.company}</div>
         <div class="shift-time">${timeTag}</div>
         <div class="shift-money">$${formatMoney(pay)}</div>
@@ -2113,23 +2129,28 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('event-name').value = '';
   });
 
+  // 全域 Pointer 移動與放開監聽
   document.addEventListener('pointermove', event => {
     if (!dragShiftId) return;
-    event.preventDefault();
+    if (longPressTriggered) {
+      event.preventDefault(); // 防止滾動
+    }
     const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
     clearDropTarget();
     if (target) {
       target.classList.add('drop-target');
       dragDestination = target.dataset.date;
     }
-  });
+  }, { passive: false });
 
   document.addEventListener('pointerup', () => {
     if (dragShiftId) {
       window.pendingShiftId = dragShiftId;
       window.pendingShiftDestination = dragDestination;
       finishShiftDrag();
-    } else cancelShiftLongPress();
+    } else {
+      cancelShiftLongPress();
+    }
   });
 
   (function setupCalendarSwipe() {
@@ -2139,12 +2160,12 @@ window.addEventListener('DOMContentLoaded', () => {
     let startX = 0;
     let startY = 0;
     calendar.addEventListener('touchstart', event => {
-      if (event.touches.length !== 1) return;
+      if (event.touches.length !== 1 || dragShiftId) return;
       startX = event.touches[0].clientX;
       startY = event.touches[0].clientY;
     }, { passive: true });
     calendar.addEventListener('touchend', event => {
-      if (!startX || !startY || event.changedTouches.length !== 1) return;
+      if (!startX || !startY || event.changedTouches.length !== 1 || dragShiftId) return;
       const dx = event.changedTouches[0].clientX - startX;
       const dy = event.changedTouches[0].clientY - startY;
       startX = 0;
