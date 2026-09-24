@@ -1,1253 +1,317 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-HK">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="努力賺錢錢">
-<meta name="theme-color" content="#f5f8fc" id="theme-color-meta">
-<link rel="apple-touch-icon" href="icon.png">
-<title>努力賺錢錢 (Cloud Sync)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- 引入 Supabase JS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root {
---bg-color: #f5f8fc;
---card-bg: #ffffff;
---primary: #6d90c4;
---primary-dark: #3f5f8f;
---primary-hover: #3f5f8f;
---primary-light: #eaf1fb;
---text-main: #212529;
---text-sub: #6c757d;
---border-color: #f5f8fa;
---accent-price: #2e7d32;
---plan-bg: #eaf1fb;
---plan-border: #90b8e0;
---danger: #e53935;
---holiday-red: #e53935;
---nav-height: 50px;
---safe-bottom: env(safe-area-inset-bottom, 0px);
---safe-top: env(safe-area-inset-top, 0px);
---input-bg: #fdfdfc;
-}
-
-/* Night Mode Colors */
-body.dark-mode {
---bg-color: #121824;
---card-bg: #1e2638;
---primary: #8fb1e0;
---primary-dark: #8fb1e0;
---primary-hover: #a3c2ee;
---primary-light: #2a364f;
---text-main: #f0f4f9;
---text-sub: #9ca3af;
---border-color: #2a3447;
---accent-price: #81c784;
---plan-bg: #2a364f;
---plan-border: #4a5d7e;
---danger: #ef5350;
---holiday-red: #ef5350;
---input-bg: #2a364f;
-}
-
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-font-family: 'Nunito', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
--webkit-tap-highlight-color: transparent;
-}
-html, body {
-height: 100%;
-}
-body {
-background-color: var(--bg-color);
-padding: calc(4px + var(--safe-top)) 10px calc(var(--nav-height) + var(--safe-bottom) + 42px) 10px;
-display: flex;
-justify-content: center;
-align-items: flex-start;
-min-height: 100dvh;
-transition: background-color 0.3s, color 0.3s;
-}
-.container {
-width: 100%;
-max-width: 600px;
-display: flex;
-flex-direction: column;
-gap: 13px;
-min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom) - var(--safe-top) - 24px);
-}
-.top-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 2px 5px;
-position: relative;
-}
-.top-header h1 {
-color: var(--primary-dark);
-font-size: 1.35rem;
-font-weight: 800;
-text-align: center;
-width: 100%;
-}
-.theme-toggle-btn {
-position: absolute;
-right: 5px;
-background: var(--primary-light);
-border: none;
-color: var(--text-main);
-width: 34px;
-height: 34px;
-border-radius: 50%;
-display: flex;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-font-size: 1.1rem;
-transition: background-color 0.3s;
-}
-.sync-status-bar {
-font-size: 0.72rem;
-text-align: center;
-color: var(--text-sub);
-margin-top: -8px;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 6px;
-}
-.sync-dot {
-width: 8px;
-height: 8px;
-border-radius: 50%;
-background-color: #ccc;
-display: inline-block;
-}
-.sync-dot.online { background-color: #4caf50; }
-.sync-dot.syncing { background-color: #ff9800; }
-.sync-dot.offline { background-color: #e53935; }
-
-.card {
-background-color: var(--card-bg);
-border-radius: 20px;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-overflow: hidden;
-transition: background-color 0.3s;
-}
-.cardTitle {
-padding: 18px;
-}
-.month-salary-card {
-background: linear-gradient(135deg, #4a6fa5, #2c4366);
-border-radius: 18px;
-padding: 18px 20px;
-color: white;
-display: flex;
-justify-content: space-between;
-align-items: center;
-box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-.salary-box {
-display: flex;
-flex-direction: column;
-}
-.salary-box span {
-font-size: 0.76rem;
-color: rgba(255, 255, 255, 0.85);
-font-weight: 600;
-}
-.salary-box strong {
-font-size: 1.35rem;
-color: #ffffff;
-font-weight: 800;
-margin-top: 2px;
-}
-.salary-divider {
-width: 1px;
-height: 35px;
-background-color: rgba(255, 255, 255, 0.25);
-}
-.calendar-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 15px;
-}
-.calendar-header h2 {
-font-size: 1.1rem;
-color: var(--primary-dark);
-font-weight: 800;
-}
-.month-nav {
-display: flex;
-gap: 8px;
-}
-.btn-nav {
-background-color: var(--primary-light);
-color: var(--primary-dark);
-border: none;
-width: 32px;
-height: 32px;
-border-radius: 50%;
-font-size: 1rem;
-cursor: pointer;
-font-weight: 700;
-}
-.calendar-weekdays {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-text-align: center;
-font-weight: 700;
-color: var(--text-main);
-margin-bottom: 0;
-padding-bottom: 8px;
-font-size: 0.78rem;
-border-bottom: 1px solid var(--border-color);
-}
-.calendar-weekdays .sun-label {
-color: var(--holiday-red);
-font-weight: 800;
-}
-.calendar-days {
-user-select: none;
--webkit-user-select: none;
--webkit-touch-callout: none;
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-grid-auto-rows: minmax(88px, auto);
-}
-.day-cell {
-min-height: 88px;
-max-height: 132px;
-padding: 3px 0;
-display: flex;
-flex-direction: column;
-align-items: center;
-cursor: pointer;
-background-color: var(--card-bg);
-transition: all 0.15s;
-overflow: hidden;
-border-bottom: 1px solid var(--border-color);
-border-right: 1px solid var(--border-color);
-touch-action: none !important;
-}
-.day-cell:hover {
-filter: brightness(0.95);
-}
-.day-cell.other-month {
-opacity: 0.3;
-background-color: transparent;
-}
-.day-number {
-color: var(--text-main);
-font-weight: 700;
-font-size: 0.72rem;
-line-height: 1;
-margin-bottom: 3px;
-flex-shrink: 0;
-}
-.day-cell.today {
-background-color: var(--primary-light);
-}
-.day-cell.today .day-number {
-color: var(--primary-dark);
-}
-.day-cell.is-holiday .day-number,
-.day-cell.is-holiday.today .day-number {
-color: var(--holiday-red);
-}
-.holiday-label {
-font-size: 0.5rem;
-line-height: 1.05;
-color: var(--holiday-red);
-font-weight: 700;
-text-align: center;
-max-width: 100%;
-overflow: hidden;
-display: -webkit-box;
--webkit-line-clamp: 2;
--webkit-box-orient: vertical;
-flex-shrink: 0;
-margin-bottom: 1px;
-}
-.shift-items-wrap {
-width: 100%;
-display: flex;
-flex-direction: column;
-gap: 1px;
-overflow-y: auto;
-flex: 1;
-min-height: 0;
-}
-.shift-dot-item {
-user-select: none !important;
--webkit-user-select: none !important;
--webkit-touch-callout: none !important;
-touch-action: none !important;
-background-color: #3f5f8f;
-padding: 1px 0;
-width: 100%;
-text-align: center;
-cursor: pointer;
-transition: background-color 0.2s;
-font-size: 0.56rem;
-font-weight: 700;
-line-height: 1.3;
-flex-shrink: 0;
-}
-body.dark-mode .shift-dot-item {
-background-color: #2c4366;
-}
-.shift-dot-item .comp-name {
-color: #ffffff;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
-font-size: 0.6rem;
-}
-.shift-dot-item .shift-time {
-color: #ffffff;
-font-size: 0.6rem;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-}
-.shift-dot-item .shift-money {
-font-weight: 800;
-font-size: 0.55rem;
-color: #ffffff;
-}
-.shift-dot-item:hover {
-filter: brightness(0.9);
-}
-.shift-dot-item.long-press-dragging {
-opacity: 0.7 !important;
-transform: scale(1.08) !important;
-z-index: 9999 !important;
-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
-pointer-events: none !important;
-}
-.day-cell.drop-target {
-outline: 2px dashed var(--primary);
-outline-offset: -3px;
-background: var(--primary-light) !important;
-}
-#calendar-view, #list-view, #analytics-view {
-margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
-}
-.list-filter-bar {
-display: flex;
-gap: 8px;
-overflow-x: auto;
-padding-bottom: 8px;
-margin-bottom: 12px;
-}
-.filter-btn {
-background-color: var(--primary-light);
-border: 1.5px solid transparent;
-padding: 6px 14px;
-border-radius: 20px;
-font-size: 0.8rem;
-font-weight: 700;
-color: var(--text-sub);
-cursor: pointer;
-white-space: nowrap;
-transition: all 0.2s ease;
-}
-.filter-btn.active {
-background-color: var(--primary);
-color: white;
-}
-.shift-list-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 12px;
-border-bottom: 1px solid var(--border-color);
-cursor: pointer;
-}
-.shift-list-item:hover {
-filter: brightness(0.97);
-}
-.shift-list-item:last-child {
-border-bottom: none;
-}
-.shift-info h4 {
-font-size: 0.95rem;
-color: var(--text-main);
-}
-.shift-info p {
-font-size: 0.78rem;
-color: var(--text-sub);
-margin-top: 2px;
-}
-.shift-amount {
-text-align: right;
-}
-.shift-amount .price {
-font-size: 1rem;
-font-weight: 800;
-color: var(--accent-price);
-}
-.shift-amount .hrs {
-font-size: 0.75rem;
-color: var(--text-sub);
-}
-/* Analytics Styles */
-.analytics-summary-grid {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 8px;
-margin-bottom: 16px;
-}
-.stat-box {
-background: var(--primary-light);
-border-radius: 14px;
-padding: 12px 8px;
-text-align: center;
-display: flex;
-flex-direction: column;
-gap: 4px;
-}
-.stat-box span {
-font-size: 0.68rem;
-color: var(--primary-dark);
-font-weight: 700;
-}
-.stat-box strong {
-font-size: 1.05rem;
-color: var(--text-main);
-font-weight: 800;
-}
-.analytics-section-title {
-font-size: 0.88rem;
-font-weight: 800;
-color: var(--primary-dark);
-margin: 16px 0 8px 0;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-.company-stat-item {
-padding: 12px;
-border-bottom: 1px solid var(--border-color);
-background: var(--primary-light);
-border-radius: 12px;
-margin-bottom: 8px;
-display: grid;
-grid-template-columns: 1fr auto;
-grid-template-rows: auto auto;
-align-items: center;
-column-gap: 12px;
-row-gap: 4px;
-}
-.company-stat-item:last-child {
-margin-bottom: 0;
-}
-.company-stat-name {
-grid-column: 1;
-grid-row: 1;
-font-size: 0.88rem;
-font-weight: 800;
-color: var(--text-main);
-display: flex;
-align-items: center;
-gap: 6px;
-}
-.company-stat-dot {
-width: 9px;
-height: 9px;
-border-radius: 50%;
-display: inline-block;
-}
-.company-stat-pay {
-grid-column: 2;
-grid-row: 1 / span 2;
-font-size: 1.1rem;
-font-weight: 800;
-color: var(--accent-price);
-text-align: right;
-}
-.company-stat-meta {
-grid-column: 1;
-grid-row: 2;
-font-size: 0.74rem;
-color: var(--text-sub);
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-
-.fixed-bottom-nav {
-position: fixed;
-bottom: 0;
-left: 0;
-right: 0;
-height: calc(var(--nav-height) + var(--safe-bottom));
-padding-bottom: var(--safe-bottom);
-background-color: var(--card-bg);
-border-top: 1px solid var(--border-color);
-display: flex;
-justify-content: space-around;
-align-items: center;
-z-index: 999;
-box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-padding-left: 4px;
-padding-right: 4px;
-transition: background-color 0.3s;
-}
-.nav-item {
-flex: 1;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-background: none;
-border: none;
-color: var(--text-sub);
-font-size: 0.62rem;
-font-weight: 700;
-cursor: pointer;
-gap: 2px;
-height: 100%;
-min-width: 0;
-}
-.nav-item svg {
-width: 25px;
-height: 25px;
-fill: currentColor;
-}
-.nav-item.active {
-color: var(--primary-dark);
-}
-.nav-item-add-container {
-flex: 1;
-display: flex;
-justify-content: center;
-align-items: center;
-position: relative;
-max-width: 70px;
-}
-.btn-add-highlight {
-width: 42px;
-height: 42px;
-border-radius: 50%;
-background: linear-gradient(135deg, #4a6fa5, #2c4366);
-color: white;
-border: 4px solid var(--card-bg);
-display: flex;
-justify-content: center;
-align-items: center;
-font-size: 1.7rem;
-cursor: pointer;
-transition: transform 0.2s, border-color 0.3s;
-}
-.btn-add-highlight:active {
-transform: scale(0.92);
-}
-.modal-overlay {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0, 0, 0, 0.6);
-backdrop-filter: blur(4px);
-display: none;
-justify-content: center;
-align-items: center;
-z-index: 1000;
-padding: 15px;
-overflow-y: auto;
--webkit-overflow-scrolling: touch;
-overscroll-behavior: contain;
-}
-.modal-overlay.active {
-display: flex;
-}
-.modal-content {
-background-color: var(--card-bg);
-color: var(--text-main);
-width: 100%;
-max-width: 480px;
-border-radius: 20px;
-padding: 22px;
-box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-margin: auto;
-max-height: calc(100vh - 30px);
-overflow-y: auto;
--webkit-overflow-scrolling: touch;
-}
-.modal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 15px;
-position: relative;
-}
-.modal-header h2 {
-font-size: 1.2rem;
-color: var(--primary-dark);
-font-weight: 800;
-text-align: center;
-width: 100%;
-}
-.close-btn {
-background: none;
-border: none;
-font-size: 1.4rem;
-cursor: pointer;
-color: var(--text-sub);
-position: absolute;
-right: 0;
-top: 50%;
-transform: translateY(-50%);
-}
-.date-tag-badge {
-display: block;
-background: var(--primary-light);
-color: var(--primary-dark);
-font-weight: 700;
-font-size: 0.98rem;
-padding: 9px 14px;
-border-radius: 10px;
-text-align:center;
-}
-.company-input-wrapper {
-position: relative;
-}
-.company-input-wrapper input {
-width: 100%;
-padding-right: 34px;
-}
-.company-input-wrapper::after {
-content: '';
-position: absolute;
-right: 14px;
-top: 50%;
-width: 8px;
-height: 8px;
-border-right: 2px solid var(--text-sub);
-border-bottom: 2px solid var(--text-sub);
-transform: translateY(-65%) rotate(45deg);
-pointer-events: none;
-}
-.date-picker-trigger {
-display: flex;
-align-items: center;
-justify-content: space-between;
-background: var(--primary-light);
-color: var(--primary-dark);
-border: 1px solid var(--border-color);
-border-radius: 10px;
-padding: 10px 12px;
-font-size: 0.85rem;
-font-weight: 800;
-cursor: pointer;
-margin-bottom: 8px;
-}
-.date-picker-trigger::after { content: "▾"; font-size: 0.9rem; }
-.date-range-box {
-background: var(--primary-light);
-border: 1px solid var(--border-color);
-border-radius: 12px;
-padding: 10px 12px 12px 12px;
-}
-.mini-cal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 8px;
-}
-.mini-cal-header span {
-font-weight: 800;
-font-size: 0.88rem;
-color: var(--primary-dark);
-}
-.mini-cal-header .btn-nav {
-width: 26px;
-height: 26px;
-font-size: 0.85rem;
-}
-.mini-cal-weekdays {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-text-align: center;
-font-size: 0.68rem;
-font-weight: 700;
-color: var(--text-sub);
-margin-bottom: 4px;
-}
-.mini-cal-days {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-row-gap: 2px;
-}
-.mini-cal-cell {
-position: relative;
-height: 34px;
-display: flex;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-}
-.mini-cal-cell.other-month {
-visibility: hidden;
-pointer-events: none;
-}
-.mini-cal-cell.in-range::before {
-content: '';
-position: absolute;
-top: 0;
-bottom: 0;
-left: 0;
-right: 0;
-background: var(--border-color);
-}
-.mini-cal-cell.in-range.range-start::before { left: 50%; }
-.mini-cal-cell.in-range.range-end::before { right: 50%; }
-.mini-cal-num {
-position: relative;
-z-index: 1;
-width: 27px;
-height: 27px;
-display: flex;
-align-items: center;
-justify-content: center;
-border-radius: 50%;
-font-size: 0.76rem;
-font-weight: 700;
-color: var(--text-main);
-border: 1.5px solid transparent;
-box-sizing: border-box;
-}
-.mini-cal-cell.today .mini-cal-num {
-border-color: var(--primary-dark);
-}
-.mini-cal-cell.is-holiday .mini-cal-num {
-color: var(--holiday-red);
-}
-.mini-cal-cell.range-start .mini-cal-num,
-.mini-cal-cell.range-end .mini-cal-num {
-background: var(--primary-dark);
-border-color: var(--primary-dark);
-color: #fff !important;
-}
-.date-summary-text {
-font-size: 0.78rem;
-font-weight: 700;
-color: var(--primary-dark);
-margin-top: 6px;
-}
-.form-grid {
-display: flex;
-flex-direction: column;
-gap: 12px;
-}
-.input-group {
-display: flex;
-flex-direction: column;
-gap: 4px;
-}
-.input-group label {
-font-size: 0.82rem;
-font-weight: 700;
-color: var(--primary-dark);
-}
-.input-group input, .input-group select {
-padding: 9px 12px;
-border: 1.5px solid var(--border-color);
-border-radius: 10px;
-font-size: 0.9rem;
-outline: none;
-background-color: var(--input-bg);
-color: var(--text-main);
-}
-.time-range-group {
-display: flex;
-gap: 8px;
-align-items: center;
-}
-.time-range-group select {
-flex: 1;
-}
-.checkbox-group {
-display: flex;
-align-items: center;
-gap: 6px;
-margin-top: 2px;
-}
-.checkbox-group input[type="checkbox"] {
-width: 16px;
-height: 16px;
-accent-color: var(--primary);
-}
-.checkbox-group label {
-font-size: 0.85rem;
-cursor: pointer;
-font-weight: 600;
-color: var(--text-main);
-}
-.deduct-input-wrapper {
-display: none;
-margin-top: 4px;
-padding: 8px 10px;
-background-color: var(--primary-light);
-border-radius: 8px;
-}
-.deduct-input-wrapper.active {
-display: flex;
-align-items: center;
-gap: 8px;
-}
-.calculated-duration {
-font-size: 0.82rem;
-color: var(--primary-dark);
-font-weight: 800;
-}
-.modal-btn-group {
-display: flex;
-gap: 10px;
-margin-top: 8px;
-}
-.btn-submit {
-flex: 1;
-background-color: var(--primary-dark);
-color: #ffffff;
-border: none;
-padding: 12px;
-border-radius: 12px;
-font-size: 0.95rem;
-font-weight: 800;
-cursor: pointer;
-}
-body.dark-mode .btn-submit {
-color: #121824;
-}
-.btn-delete-item {
-background-color: rgba(229, 57, 53, 0.15);
-color: var(--danger);
-border: 1px solid var(--danger);
-padding: 12px;
-border-radius: 12px;
-font-size: 0.9rem;
-font-weight: 700;
-cursor: pointer;
-}
-.action-menu-overlay {
-position: fixed;
-top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(0,0,0,0.5);
-display: none;
-justify-content: center;
-align-items: flex-end;
-z-index: 1001;
-}
-.action-menu-overlay.active {
-display: flex;
-}
-.action-sheet {
-background: var(--card-bg);
-width: 100%;
-max-width: 600px;
-border-radius: 20px 20px 0 0;
-padding: 20px;
-padding-bottom: calc(20px + var(--safe-bottom));
-display: flex;
-flex-direction: column;
-gap: 10px;
-}
-.action-sheet-title {
-text-align: center;
-font-weight: 800;
-color: var(--primary-dark);
-font-size: 0.95rem;
-margin-bottom: 4px;
-}
-.action-sheet-btn {
-padding: 12px;
-border: 1px solid var(--border-color);
-background: var(--primary-light);
-color: var(--text-main);
-border-radius: 12px;
-font-weight: 700;
-font-size: 0.9rem;
-cursor: pointer;
-text-align: center;
-}
-.action-sheet-btn.primary {
-background: var(--primary-dark);
-color: #ffffff;
-}
-body.dark-mode .action-sheet-btn.primary {
-color: #121824;
-}
-.action-sheet-btn.danger {
-background: rgba(229, 57, 53, 0.15);
-color: var(--danger);
-border-color: var(--danger);
-}
-#move-copy-overlay { background: transparent; justify-content: flex-start; align-items: flex-start; }
-#move-copy-overlay .action-sheet { width: auto; min-width: 142px; max-width: 210px; border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; padding-bottom: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); gap: 4px; }
-#move-copy-overlay .action-sheet-title { text-align: left; font-size: 0.72rem; padding: 4px 7px; margin-bottom: 0; white-space: nowrap; max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
-#move-copy-overlay .action-sheet-btn { padding: 7px 9px; border: 0; border-radius: 8px; font-size: 0.76rem; text-align: left; white-space: nowrap; }
-
-.empty-msg {
-text-align: center;
-padding: 30px;
-color: var(--text-sub);
-font-size: 0.88rem;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>薪料計算與排班系統 (雲端同步版)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #1f2937;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 16px;
+    }
+    .sync-status {
+      font-size: 14px;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-left: 8px;
+    }
+    .sync-status.online { background: #d1fae5; color: #065f46; }
+    .sync-status.offline { background: #fee2e2; color: #991b1b; }
+    .sync-status.syncing { background: #fef3c7; color: #92400e; }
+    
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .shift-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .btn-del {
+      background: #ef4444;
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-<div class="top-header">
-<h1>🔥打工狗請努力🔥</h1>
-<button class="theme-toggle-btn" id="theme-toggle" onclick="toggleDarkMode()">🌙</button>
-</div>
+  <div class="container">
+    <h2>💰 薪水計算機 <span id="syncStatus" class="sync-status offline">未同步</span></h2>
 
-<!-- 雲端狀態 Bar -->
-<div class="sync-status-bar">
-  <span class="sync-dot" id="sync-dot"></span>
-  <span id="sync-text">雲端狀態：載入中...</span>
-  <a href="#" onclick="promptChangeSyncKey(); return false;" style="color:var(--primary); text-decoration:underline; margin-left:6px;">Key 設定</a>
-</div>
+    <!-- 同步 Key 設定區 -->
+    <div class="card">
+      <div class="form-group">
+        <label>雲端同步 Key (建議輸入你的手機號碼或自訂密碼)：</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="syncKeyInput" placeholder="例如: my-secret-key-123">
+          <button style="width:100px;" onclick="setSyncKey()">設定/同步</button>
+        </div>
+      </div>
+    </div>
 
-<div class="month-salary-card">
-<div class="salary-box">
-<span>血汗已換取</span>
-<strong id="month-pay">$ 0</strong>
-</div>
-<div class="salary-divider"></div>
-<div class="salary-box">
-<span style="text-align:right;">本月努力指數</span>
-<strong id="month-total-est" style="text-align:right;">$ 0</strong>
-</div>
-</div>
+    <!-- 新增班次 -->
+    <div class="card">
+      <h3>新增班次</h3>
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="shiftDate">
+      </div>
+      <div class="form-group">
+        <label>公司/地點</label>
+        <input type="text" id="company" placeholder="例如：公司A">
+      </div>
+      <div class="form-group">
+        <label>時薪 (HKD)</label>
+        <input type="number" id="rate" value="60">
+      </div>
+      <div class="form-group">
+        <label>開始時間 - 結束時間</label>
+        <div style="display:flex; gap:8px;">
+          <input type="time" id="startTime" value="09:00">
+          <input type="time" id="endTime" value="18:00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>扣除休息時間 (分鐘)</label>
+        <input type="number" id="deductMins" value="60">
+      </div>
+      <button onclick="addShift()">新增班次</button>
+    </div>
 
-<!-- VIEW 1: Calendar View -->
-<div id="calendar-view" class="card">
-<div class="calendar-header cardTitle">
-<h2 id="calendar-month-year"></h2>
-<div class="month-nav">
-<button class="btn-nav" onclick="changeMonth(-1)">&lt;</button>
-<button class="btn-nav" onclick="changeMonth(1)">&gt;</button>
-</div>
-</div>
-<div class="calendar-weekdays">
-<div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div class="sun-label">日</div>
-</div>
-<div class="calendar-days" id="calendar-days"></div>
-</div>
-
-<!-- VIEW 2: List View -->
-<div id="list-view" class="card" style="display: none;">
-<div class="list-filter-bar cardTitle" id="company-filter-tabs"></div>
-<div id="shift-list-container"></div>
-</div>
-
-<!-- VIEW 3: Analytics View -->
-<div id="analytics-view" class="card cardTitle" style="display: none;">
-<div class="calendar-header">
-<h2 id="analytics-month-year"></h2>
-<div class="month-nav">
-<button class="btn-nav" id="prev-month-a">&lt;</button>
-<button class="btn-nav" id="next-month-a">&gt;</button>
-</div>
-</div>
-<div class="analytics-summary-grid">
-<div class="stat-box">
-<span>本月做狗總時數</span>
-<strong id="stat-hours">0h</strong>
-</div>
-<div class="stat-box">
-<span>本月已賺取</span>
-<strong id="stat-total-pay">$0</strong>
-</div>
-</div>
-<div class="analytics-section-title">
-<span>🏢 追糧報表</span>
-</div>
-<div id="company-breakdown-container"></div>
-<div class="analytics-section-title" style="margin-top: 20px;">
-<span>📊 累積血汗指數</span>
-</div>
-<div class="analytics-summary-grid">
-<div class="stat-box">
-<span>累積血汗</span>
-<strong id="stat-all-hours">0h</strong>
-</div>
-<div class="stat-box">
-<span>累積錢錢</span>
-<strong id="stat-all-pay">$0</strong>
-</div>
-</div>
-</div>
-</div>
-
-<!-- FIXED BOTTOM MENU BAR -->
-<nav class="fixed-bottom-nav">
-<button class="nav-item active" id="nav-calendar" onclick="switchNav('calendar-view')">
-<svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-</button>
-<button class="nav-item" id="nav-list" onclick="switchNav('list-view')">
-<svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-</button>
-<div class="nav-item-add-container">
-<button class="btn-add-highlight" onclick="openModal()">+</button>
-</div>
-<button class="nav-item" id="nav-analytics" onclick="switchNav('analytics-view')">
-<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
-</button>
-<button class="nav-item" id="nav-backup" onclick="openActionMenu()">
-<svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-</button>
-</nav>
-
-<!-- Action Sheet -->
-<div class="action-menu-overlay" id="action-menu-overlay" onclick="closeActionMenu()">
-<div class="action-sheet" onclick="event.stopPropagation()">
-<div class="action-sheet-title">備份與數據管理</div>
-<button class="action-sheet-btn primary" onclick="exportJSON(); closeActionMenu();">匯出 JSON 備份檔 (iCloud)</button>
-<button class="action-sheet-btn" onclick="importJSON(); closeActionMenu();">匯入 JSON 備份檔</button>
-<button class="action-sheet-btn danger" onclick="confirmClearAll(); closeActionMenu();">清空所有紀錄</button>
-<button class="action-sheet-btn" style="color:var(--text-sub);" onclick="closeActionMenu()">取消</button>
-<input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
-</div>
-</div>
-
-<!-- Move / Copy Action Sheet -->
-<div class="action-menu-overlay" id="move-copy-overlay" onclick="closeMoveCopyMenu()">
-  <div class="action-sheet" onclick="event.stopPropagation()">
-    <div class="action-sheet-title" id="move-copy-title">移動 / 複製紀錄</div>
-    <button class="action-sheet-btn primary" onclick="moveOrCopyShift('move')">移動到此日期</button>
-    <button class="action-sheet-btn primary" onclick="moveOrCopyShift('copy')">複製到此日期</button>
-    <button class="action-sheet-btn" onclick="closeMoveCopyMenu()">取消</button>
+    <!-- 班次列表與總計 -->
+    <div class="card">
+      <h3>班次紀錄</h3>
+      <div id="shiftList"></div>
+      <h3 style="margin-top:16px;">預計總薪水：HK$ <span id="totalSalary">0</span></h3>
+    </div>
   </div>
-</div>
-
-<!-- Modal Form -->
-<div class="modal-overlay" id="modal-overlay">
-<div class="modal-content">
-<div class="modal-header">
-<h2 id="modal-title">有工番啦🤑</h2>
-<button class="close-btn" onclick="closeModal()">✕</button>
-</div>
-<form id="shift-form" class="form-grid">
-<input type="hidden" id="editing-shift-id" value="">
-<input type="hidden" id="shift-type" value="planned">
-<div class="input-group" id="date-range-container">
-<div class="date-picker-trigger" id="date-picker-trigger" role="button" tabindex="0" onclick="toggleDatePicker()">📅 <span id="date-picker-label">已選 1 天</span></div>
-<div class="date-range-box" id="date-range-box" style="display:none;">
-<div class="mini-cal-header">
-<button type="button" class="btn-nav" id="mini-cal-prev">&lt;</button>
-<span id="mini-cal-month-year"></span>
-<button type="button" class="btn-nav" id="mini-cal-next">&gt;</button>
-</div>
-<div class="mini-cal-weekdays">
-<div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div style="color:var(--holiday-red);">日</div>
-</div>
-<div class="mini-cal-days" id="mini-cal-days"></div>
-<div class="date-summary-text" id="date-summary-text">已選 1 天</div>
-</div>
-<div class="date-tag-badge" id="date-tag-badge" style="display:none;"></div>
-</div>
-<div class="input-group">
-<label for="company">公司名稱</label>
-<div class="company-input-wrapper">
-<input type="text" id="company" list="company-list" required autocomplete="off">
-<datalist id="company-list"></datalist>
-</div>
-</div>
-<div class="input-group">
-<label for="event-name">Event</label>
-<input type="text" id="event-name">
-</div>
-<div class="input-group">
-<label for="rate">💰 錢錢 ($/hr)</label>
-<input type="number" id="rate" min="0" required>
-</div>
-<div class="input-group">
-<label for="allowance">🎁 津貼 ($)</label>
-<input type="number" id="allowance" min="0" step="1">
-</div>
-<div class="input-group">
-<label>工作時間 (開始 - 結束)</label>
-<div class="time-range-group">
-<select id="start-time" required onchange="calcDuration()"></select>
-<span>至</span>
-<select id="end-time" required onchange="calcDuration()"></select>
-</div>
-</div>
-<div class="checkbox-group">
-<input type="checkbox" id="no-lunch-check" onchange="toggleDeductInput()">
-<label for="no-lunch-check">扣飯鐘</label>
-</div>
-<div class="deduct-input-wrapper" id="deduct-wrapper">
-<label style="font-size:0.8rem;">扣除時間：</label>
-<select id="deduct-minutes" onchange="calcDuration()" style="padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.85rem; font-weight: 700;">
-<option value="30" selected>30 分鐘 </option>
-<option value="60">60 分鐘 </option>
-</select>
-</div>
-<div class="calculated-duration" id="duration-display">共 9 小時</div>
-<div class="modal-btn-group">
-<button type="button" class="btn-delete-item" id="btn-delete-modal" style="display:none;" onclick="deleteCurrentEditingShift()">刪除紀錄</button>
-<button type="submit" class="btn-submit" id="btn-submit-text">儲存紀錄</button>
-</div>
-</form>
-</div>
-</div>
 
 <script>
-  // ─── 全域變數定義 ───
   let shifts = [];
   let syncKey = '';
-  let db = null; // Supabase Client
+  let db = null;
 
   const SUPABASE_URL = 'https://dypaeposrqeomjpxicge.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5cGFlcG9zcnFlb21qcHhpY2dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNTMwMDMsImV4cCI6MjA1NTcyOTAwM30.dJ03iJIs5YmPzM-4V_qJ3O64vVWW4E4x4XN4zP1O-vM';
 
-  // 1. 初始化 Supabase
+  // 初始化 Supabase
   function initSupabase() {
     try {
       if (window.supabase) {
-        // 注意：這裡不能加 const 或 let，要直接指派給全域變數 db
         db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase 初始化成功');
-      } else {
-        console.error('Supabase SDK 未能載入');
       }
     } catch (e) {
-      console.error('Supabase 初始化失敗:', e);
+      console.error('Supabase init fail:', e);
     }
   }
 
-  // 2. 本地儲存 (LocalStorage)
-  function saveDataToLocalOnly() {
-    localStorage.setItem('salary_shifts', JSON.stringify(shifts));
-    localStorage.setItem('salary_sync_key', syncKey);
-  }
-
-  function loadDataFromLocal() {
-    const localShifts = localStorage.getItem('salary_shifts');
-    const localKey = localStorage.getItem('salary_sync_key');
-    if (localShifts) shifts = JSON.parse(localShifts);
-    if (localKey) syncKey = localKey;
-  }
-
-  // 3. UI 狀態更新
-  function updateSyncStatus(status, message) {
+  function updateSyncStatus(status, text) {
     const el = document.getElementById('syncStatus');
-    if (!el) return;
-    el.className = 'sync-status ' + status;
-    el.innerText = message;
+    if (el) {
+      el.className = 'sync-status ' + status;
+      el.innerText = text;
+    }
   }
 
-  // 4. 雲端儲存 (UPSERT 覆蓋邏輯)
-  async function saveData() {
-    saveDataToLocalOnly();
-    
-    if (!syncKey) {
-      updateSyncStatus('offline', '未設定同步 Key');
-      return;
-    }
-    if (!db) {
-      updateSyncStatus('offline', 'Supabase 未連線');
-      return;
-    }
+  function setSyncKey() {
+    const val = document.getElementById('syncKeyInput').value.trim();
+    if (!val) return alert('請輸入 Sync Key');
+    syncKey = val;
+    localStorage.setItem('salary_sync_key', syncKey);
+    loadDataFromCloud();
+  }
 
-    updateSyncStatus('syncing', '正在儲存到雲端...');
+  function calculateHours(start, end, deduct) {
+    if (!start || !end) return 0;
+    const [sH, sM] = start.split(':').map(Number);
+    const [eH, eM] = end.split(':').map(Number);
+    let startMins = sH * 60 + sM;
+    let endMins = eH * 60 + eM;
+    if (endMins < startMins) endMins += 24 * 60; // 跨夜
+    const total = (endMins - startMins - (deduct || 0)) / 60;
+    return total > 0 ? total : 0;
+  }
+
+  function renderShifts() {
+    const listEl = document.getElementById('shiftList');
+    listEl.innerHTML = '';
+    let totalPay = 0;
+
+    shifts.forEach((s) => {
+      const hours = calculateHours(s.startTime, s.endTime, s.deductMins);
+      const pay = hours * (s.rate || 0);
+      totalPay += pay;
+
+      const div = document.createElement('div');
+      div.className = 'shift-item';
+      div.innerHTML = `
+        <div>
+          <strong>${s.date || '無日期'}</strong> - ${s.company || '未填公司'}<br>
+          <small>${s.startTime} ~ ${s.endTime} (${hours.toFixed(1)} hrs) | HK$${pay.toFixed(1)}</small>
+        </div>
+        <button class="btn-del" onclick="deleteShift('${s.id}')">刪除</button>
+      `;
+      listEl.appendChild(div);
+    });
+
+    document.getElementById('totalSalary').innerText = totalPay.toFixed(1);
+  }
+
+  function addShift() {
+    const date = document.getElementById('shiftDate').value;
+    const company = document.getElementById('company').value;
+    const rate = Number(document.getElementById('rate').value);
+    const startTime = document.getElementById('startTime').value;
+    const endTime = document.getElementById('endTime').value;
+    const deductMins = Number(document.getElementById('deductMins').value);
+
+    const newShift = {
+      id: Date.now().toString(),
+      date,
+      company,
+      rate,
+      startTime,
+      endTime,
+      deductMins
+    };
+
+    shifts.push(newShift);
+    renderShifts();
+    saveData();
+  }
+
+  function deleteShift(id) {
+    shifts = shifts.filter(s => s.id !== id);
+    renderShifts();
+    saveData();
+  }
+
+  async function saveData() {
+    localStorage.setItem('salary_shifts', JSON.stringify(shifts));
+    if (!syncKey || !db) return;
+
+    updateSyncStatus('syncing', '正在同步到雲端...');
 
     try {
-      // 若本地無資料，刪除該 Key 在雲端的所有紀錄
-      if (shifts.length === 0) {
-        const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
-        if (delError) throw delError;
-        updateSyncStatus('online', `已同步 (${syncKey})`);
-        return;
+      // 先刪除舊 key 紀錄再寫入，解決更新/覆蓋問題
+      await db.from('user_shifts').delete().eq('sync_key', syncKey);
+
+      if (shifts.length > 0) {
+        const dbRows = shifts.map(s => ({
+          sync_key: syncKey,
+          shift_id: String(s.id),
+          date: s.date || '',
+          company: s.company || '',
+          rate: Number(s.rate) || 0,
+          start_time: s.startTime || '',
+          end_time: s.endTime || '',
+          deduct_mins: Number(s.deductMins) || 0
+        }));
+
+        const { error } = await db.from('user_shifts').insert(dbRows);
+        if (error) throw error;
       }
-
-      // 轉換資料格式 (對應 Supabase 資料表欄位)
-      const dbRows = shifts.map(s => ({
-        sync_key: syncKey,
-        shift_id: String(s.id),
-        type: s.type || '',
-        date: s.date || '',
-        company: s.company || '',
-        event_name: s.eventName || s.event_name || '',
-        rate: Number(s.rate) || 0,
-        allowance: Number(s.allowance) || 0,
-        start_time: s.startTime || s.start_time || '',
-        end_time: s.endTime || s.end_time || '',
-        deduct_mins: Number(s.deductMins || s.deduct_mins) || 0,
-        duration: Number(s.duration) || 0
-      }));
-
-      // 先清空該 Sync Key 的舊資料，再重新 Insert，最乾淨且不受 PK 衝突影響
-      const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
-      if (delError) console.warn('Delete old rows warning:', delError);
-
-      const { error: insertError } = await db.from('user_shifts').insert(dbRows);
-      if (insertError) throw insertError;
 
       updateSyncStatus('online', `已同步 (${syncKey})`);
     } catch (err) {
-      console.error('Cloud save error:', err);
-      updateSyncStatus('offline', '儲存失敗：' + (err.message || '網路錯誤'));
+      console.error(err);
+      updateSyncStatus('offline', '同步失敗');
     }
   }
 
-  // 5. 從雲端讀取資料
   async function loadDataFromCloud() {
     if (!syncKey || !db) return;
-    updateSyncStatus('syncing', '正在讀取雲端資料...');
+    updateSyncStatus('syncing', '載入雲端資料...');
 
     try {
       const { data, error } = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
       if (error) throw error;
 
       if (data && data.length > 0) {
-        shifts = data.map(row => ({
-          id: row.shift_id,
-          type: row.type,
-          date: row.date,
-          company: row.company,
-          eventName: row.event_name,
-          rate: row.rate,
-          allowance: row.allowance,
-          startTime: row.start_time,
-          endTime: row.end_time,
-          deductMins: row.deduct_mins,
-          duration: row.duration
+        shifts = data.map(r => ({
+          id: r.shift_id,
+          date: r.date,
+          company: r.company,
+          rate: r.rate,
+          startTime: r.start_time,
+          endTime: r.end_time,
+          deductMins: r.deduct_mins
         }));
-        saveDataToLocalOnly();
-        if (typeof renderShifts === 'function') renderShifts();
-        if (typeof calculateSalary === 'function') calculateSalary();
-        updateSyncStatus('online', `已同步 (${syncKey})`);
       } else {
-        updateSyncStatus('online', `雲端無資料 (${syncKey})`);
+        shifts = [];
       }
+
+      renderShifts();
+      updateSyncStatus('online', `已同步 (${syncKey})`);
     } catch (err) {
-      console.error('Cloud load error:', err);
+      console.error(err);
       updateSyncStatus('offline', '讀取失敗');
     }
   }
 
-  // 6. 頁面載入完成時執行初始化
   window.addEventListener('DOMContentLoaded', () => {
+    // 預設日期為今天
+    document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
+    
     initSupabase();
-    loadDataFromLocal();
-    if (syncKey) {
+
+    const savedKey = localStorage.getItem('salary_sync_key');
+    if (savedKey) {
+      syncKey = savedKey;
+      document.getElementById('syncKeyInput').value = syncKey;
       loadDataFromCloud();
+    } else {
+      const localShifts = localStorage.getItem('salary_shifts');
+      if (localShifts) {
+        shifts = JSON.parse(localShifts);
+        renderShifts();
+      }
     }
   });
 </script>
