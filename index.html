@@ -336,8 +336,8 @@ body.dark-mode .shift-dot-item { background-color: #2c4366; }
 
 <script>
 // ==================== SUPABASE 配置 ====================
-const SUPABASE_URL = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkcGF6b2t6bGprcWZ2cnd3cGViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjI5MzIsImV4cCI6MjEwNTc5ODkzMn0.v_7m6qy5YkNb9k3IQXUXeFbO7iYPJFhMNE2vlTXi79k'; // 貼上你的 Project URL
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkcGF6b2t6bGprcWZ2cnd3cGViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjI5MzIsImV4cCI6MjEwNTc5ODkzMn0.v_7m6qy5YkNb9k3IQXUXeFbO7iYPJFhMNE2vlTXi79k'; // 貼上你的 anon public key
+const SUPABASE_URL = 'https://tdpazokzljkqfvrwwpeb.supabase.co'; // 貼上你的 Project URL
+const SUPABASE_KEY = 'sb_publishable_u29UevU1s9qB75cVa88G-A_0mBygewi'; // 貼上你的 anon public key
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let syncKey = localStorage.getItem('user_sync_key') || '';
