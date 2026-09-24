@@ -895,6 +895,29 @@ color: var(--text-sub);
 font-size: 0.88rem;
 }
 #calendar-days { touch-action: pan-y; }
+  /* 1. 禁用日曆與班次卡片的原生觸控滾動與選取 */
+.day-cell, 
+.shift-dot-item {
+  touch-action: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* 2. 拖拽時的樣式：必須加 pointer-events: none 才能讓手指透視到底下的日曆格子 */
+.long-press-dragging {
+  opacity: 0.7 !important;
+  transform: scale(1.08) !important;
+  z-index: 9999 !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+  pointer-events: none !important; 
+}
+
+/* 3. 目標格子高亮 */
+.day-cell.drop-target {
+  background-color: rgba(25, 118, 210, 0.2) !important;
+  border: 2px dashed #1976d2 !important;
+}
 </style>
 </head>
 <body>
@@ -1721,6 +1744,7 @@ let dragDestination = null;
 
 function startShiftLongPress(event, shiftId) {
   if (event.pointerType === 'mouse' && event.button !== 0) return;
+  
   cancelShiftLongPress();
   longPressShiftId = shiftId;
   longPressTriggered = false;
@@ -1730,14 +1754,9 @@ function startShiftLongPress(event, shiftId) {
     longPressTriggered = true;
     dragShiftId = shiftId;
     item.classList.add('long-press-dragging');
-    if (navigator.vibrate) navigator.vibrate(25);
+    if (navigator.vibrate) navigator.vibrate(30);
     document.body.classList.add('dragging-shift');
-
-    // 嘗試鎖定 Pointer，防止滾動干擾
-    if (item.setPointerCapture && event.pointerId) {
-      try { item.setPointerCapture(event.pointerId); } catch(e){}
-    }
-  }, 450);
+  }, 400);
 }
 
 function cancelShiftLongPress() {
@@ -1759,7 +1778,10 @@ function finishShiftDrag() {
     if (shift && dragDestination !== shift.date) {
       window.pendingShiftId = dragShiftId;
       window.pendingShiftDestination = dragDestination;
-      document.getElementById('move-copy-title').textContent = `${shift.company} → ${dragDestination}`;
+      
+      const titleEl = document.getElementById('move-copy-title');
+      if (titleEl) titleEl.textContent = `${shift.company} → ${dragDestination}`;
+      
       const targetCell = document.querySelector(`.day-cell[data-date="${dragDestination}"]`);
       const sheet = document.querySelector('#move-copy-overlay .action-sheet');
       if (targetCell && sheet) {
@@ -1770,7 +1792,9 @@ function finishShiftDrag() {
         sheet.style.left = `${left}px`;
         sheet.style.top = `${top}px`;
       }
-      document.getElementById('move-copy-overlay').classList.add('active');
+      
+      const overlay = document.getElementById('move-copy-overlay');
+      if (overlay) overlay.classList.add('active');
     }
   }
   clearDropTarget();
@@ -1778,6 +1802,28 @@ function finishShiftDrag() {
   longPressShiftId = null;
   dragDestination = null;
 }
+
+// 監聽 Touch/Pointer 移動
+document.addEventListener('pointermove', event => {
+  if (!dragShiftId || !longPressTriggered) return;
+  
+  if (event.cancelable) event.preventDefault();
+
+  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
+  clearDropTarget();
+  if (target) {
+    target.classList.add('drop-target');
+    dragDestination = target.dataset.date;
+  }
+}, { passive: false });
+
+document.addEventListener('pointerup', () => {
+  if (dragShiftId && longPressTriggered) {
+    finishShiftDrag();
+  } else {
+    cancelShiftLongPress();
+  }
+});
 
 function closeMoveCopyMenu() {
   document.getElementById('move-copy-overlay').classList.remove('active');
