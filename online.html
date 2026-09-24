@@ -1833,7 +1833,7 @@ function renderCalendar() {
       const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;
 
       shiftsHtml += `
-      <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false;" onpointerdown="startShiftLongPress(event, ${s.id})" onpointercancel="cancelShiftLongPress()" title="${s.company} (${timeTag}) $${pay}">
+      <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" onclick="event.stopPropagation(); setTimeout(() => { if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false; }, 50);" onpointerdown="startShiftLongPress(event, ${s.id})" onpointercancel="cancelShiftLongPress()" title="${s.company} (${timeTag}) $${pay}">
         <div class="comp-name">${s.company}</div>
         <div class="shift-time">${timeTag}</div>
         <div class="shift-money">$${formatMoney(pay)}</div>
