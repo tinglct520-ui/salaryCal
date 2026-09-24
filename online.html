@@ -1108,1116 +1108,148 @@ font-size: 0.88rem;
 </div>
 
 <script>
-// ==================== SUPABASE 配置與全域變數 ====================
-const SUPABASE_URL = 'https://yrxhfimsulfxycyarmqp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyeGhmaW1zdWxmeHljeWFybXFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMzAyNDAsImV4cCI6MjEwNTgwNjI0MH0.0rSR_q270oik-8BmdKmcCt9s30X4HismVTJPGAlRa8c';
-const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+  // ─── 全域變數定義 ───
+  let shifts = [];
+  let syncKey = '';
+  let db = null; // Supabase Client
 
-let syncKey = localStorage.getItem('user_sync_key') || '';
-let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];
-let companyPaydays = JSON.parse(localStorage.getItem('companyPaydays')) || {};
-let currentDate = new Date();
-let currentYear = currentDate.getFullYear();
-let currentMonth = currentDate.getMonth();
-let selectedCompanyFilter = "ALL";
-let selectedDatesList = [];
-let currentView = 'calendar-view';
-let modalRangeStart = null;
-let modalRangeEnd = null;
-let miniCalYear = new Date().getFullYear();
-let miniCalMonth = new Date().getMonth();
-let allowRangeSelection = true;
+  const SUPABASE_URL = 'https://dypaeposrqeomjpxicge.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5cGFlcG9zcnFlb21qcHhpY2dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNTMwMDMsImV4cCI6MjA1NTcyOTAwM30.dJ03iJIs5YmPzM-4V_qJ3O64vVWW4E4x4XN4zP1O-vM';
 
-const companyColorPalette = [
-{ bg: '#e3f2fd', border: '#90caf9', text: '#1976d2' },
-{ bg: '#f3e5f5', border: '#ce93d8', text: '#7b1fa2' },
-{ bg: '#fff3e0', border: '#ffcc80', text: '#e65100' },
-{ bg: '#e8f5e9', border: '#a5d6a7', text: '#2e7d32' },
-{ bg: '#fbe9e7', border: '#ffab91', text: '#d84315' },
-{ bg: '#e0f7fa', border: '#80deea', text: '#00838f' },
-{ bg: '#fffde7', border: '#fff59d', text: '#f57f17' },
-{ bg: '#f3e5f5', border: '#b39ddb', text: '#4527a0' }
-];
-
-// 預設香港公眾假期表
-let hkHolidays = {
-"2025-01-01": "元旦", "2025-01-29": "農曆年初一", "2025-01-30": "農曆年初二",
-"2025-01-31": "農曆年初三", "2025-04-04": "清明節", "2025-04-18": "耶穌受難節",
-"2025-04-19": "耶穌受難節翌日", "2025-04-21": "復活節星期一", "2025-05-01": "勞動節",
-"2025-05-05": "佛誕", "2025-05-31": "端午節", "2025-07-01": "香港特別行政區成立紀念日",
-"2025-10-01": "國慶日", "2025-10-07": "重陽節", "2025-10-08": "中秋節翌日",
-"2025-12-25": "聖誕節", "2025-12-26": "聖誕節後第一個周日",
-"2026-01-01": "元旦", "2026-02-17": "農曆年初一", "2026-02-18": "農曆年初二",
-"2026-02-19": "農曆年初三", "2026-04-03": "耶穌受難節", "2026-04-04": "清明節",
-"2026-04-06": "復活節星期一", "2026-05-01": "勞動節",
-"2026-05-24": "佛誕", "2026-06-19": "端午節", "2026-07-01": "香港特別行政區成立紀念日",
-"2026-09-26": "中秋節翌日", "2026-10-01": "國慶日", "2026-10-18": "重陽節",
-"2026-12-25": "聖誕節", "2026-12-26": "聖誕節後第一個周日"
-};
-
-// --- Sync Key & Cloud Functions ---
-function updateSyncStatus(status, text) {
-  const dot = document.getElementById('sync-dot');
-  const txt = document.getElementById('sync-text');
-  if (dot && txt) {
-    dot.className = 'sync-dot ' + status;
-    txt.textContent = text;
-  }
-}
-
-async function initSyncKey() {
-  if (!syncKey) {
-    const defaultKey = 'dog-' + Math.floor(100000 + Math.random() * 900000);
-    const input = prompt('請輸入你的「跨裝置同步 Sync Key」\n（手機與電腦輸入同一個 Key 就能同步數據）：', defaultKey);
-    syncKey = (input && input.trim()) ? input.trim() : defaultKey;
-    localStorage.setItem('user_sync_key', syncKey);
-  }
-  updateSyncStatus('online', `Sync Key: ${syncKey}`);
-  await loadShiftsFromCloud();
-}
-
-function promptChangeSyncKey() {
-  const newKey = prompt('修改你的 Sync Key (手機與電腦輸入相同 Key 即刻同步)：', syncKey);
-  if (newKey && newKey.trim() && newKey.trim() !== syncKey) {
-    syncKey = newKey.trim();
-    localStorage.setItem('user_sync_key', syncKey);
-    updateSyncStatus('online', `Sync Key: ${syncKey}`);
-    loadShiftsFromCloud();
-  }
-}
-
-async function loadShiftsFromCloud() {
-  if (!syncKey || !db) return;
-  updateSyncStatus('syncing', '正在讀取雲端資料...');
-  try {
-    const { data, error } = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
-    if (error) throw error;
-    if (data) {
-      shifts = data.map(item => ({
-        id: item.shift_id,
-        type: item.type,
-        date: item.date,
-        company: item.company,
-        eventName: item.event_name,
-        rate: item.rate,
-        allowance: item.allowance,
-        startTime: item.start_time,
-        endTime: item.end_time,
-        deductMins: item.deduct_mins,
-        duration: item.duration
-      }));
-      autoUpdatePastPlannedShifts();
-      saveDataToLocalOnly();
-      renderCurrentView();
-      updateSyncStatus('online', `已同步 (${syncKey})`);
+  // 1. 初始化 Supabase
+  function initSupabase() {
+    try {
+      if (window.supabase) {
+        // 注意：這裡不能加 const 或 let，要直接指派給全域變數 db
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase 初始化成功');
+      } else {
+        console.error('Supabase SDK 未能載入');
+      }
+    } catch (e) {
+      console.error('Supabase 初始化失敗:', e);
     }
-  } catch (err) {
-    console.error('Cloud load error:', err);
-    updateSyncStatus('offline', '網絡連線問題 (使用本地紀錄)');
   }
-}
 
-function saveDataToLocalOnly() {
-  localStorage.setItem('partTimeShifts', JSON.stringify(shifts));
-  localStorage.setItem('companyPaydays', JSON.stringify(companyPaydays));
-}
+  // 2. 本地儲存 (LocalStorage)
+  function saveDataToLocalOnly() {
+    localStorage.setItem('salary_shifts', JSON.stringify(shifts));
+    localStorage.setItem('salary_sync_key', syncKey);
+  }
 
-async function saveData() {
-  saveDataToLocalOnly();
-  if (!syncKey || !db) return;
-  updateSyncStatus('syncing', '正在儲存到雲端...');
-  
-  try {
-    // 1. 如果本機無資料，執行清空雲端
-    if (shifts.length === 0) {
-      const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
-      if (delError) console.warn('Cloud delete notice:', delError);
-      updateSyncStatus('online', `已同步 (${syncKey})`);
+  function loadDataFromLocal() {
+    const localShifts = localStorage.getItem('salary_shifts');
+    const localKey = localStorage.getItem('salary_sync_key');
+    if (localShifts) shifts = JSON.parse(localShifts);
+    if (localKey) syncKey = localKey;
+  }
+
+  // 3. UI 狀態更新
+  function updateSyncStatus(status, message) {
+    const el = document.getElementById('syncStatus');
+    if (!el) return;
+    el.className = 'sync-status ' + status;
+    el.innerText = message;
+  }
+
+  // 4. 雲端儲存 (UPSERT 覆蓋邏輯)
+  async function saveData() {
+    saveDataToLocalOnly();
+    
+    if (!syncKey) {
+      updateSyncStatus('offline', '未設定同步 Key');
+      return;
+    }
+    if (!db) {
+      updateSyncStatus('offline', 'Supabase 未連線');
       return;
     }
 
-    // 2. 整理資料格式
-    const dbRows = shifts.map(s => ({
-      sync_key: syncKey,
-      shift_id: s.id,
-      type: s.type,
-      date: s.date,
-      company: s.company,
-      event_name: s.eventName,
-      rate: s.rate,
-      allowance: s.allowance,
-      start_time: s.startTime,
-      end_time: s.endTime,
-      deduct_mins: s.deductMins,
-      duration: s.duration
-    }));
-
-    // 3. 使用 UPSERT（覆蓋更新）
-    const { error: upsertError } = await db.from('user_shifts').upsert(dbRows, {
-      onConflict: 'sync_key,shift_id' // 確保這兩個欄位是資料庫的複合主鍵
-    });
-
-    if (upsertError) throw upsertError;
-    updateSyncStatus('online', `已同步 (${syncKey})`);
-  } catch (err) {
-    console.error('Cloud save error:', err);
-    updateSyncStatus('offline', '儲存失敗，已存在本地');
-  }
-}
-
-// --- Night Mode Functions ---
-function initDarkMode() {
-  const isDark = localStorage.getItem('nightMode') === 'true';
-  if (isDark) {
-    document.body.classList.add('dark-mode');
-    document.getElementById('theme-toggle').textContent = '☀️';
-    document.getElementById('theme-color-meta').setAttribute('content', '#121824');
-  }
-}
-
-function toggleDarkMode() {
-  const isDark = document.body.classList.toggle('dark-mode');
-  localStorage.setItem('nightMode', isDark);
-  document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
-  document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#121824' : '#f5f8fc');
-}
-
-// 非同步動態加載最新 1823 公眾假期
-async function loadHolidays() {
-  try {
-    const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.1823.gov.hk/common/ical/tc.json'));
-    if (!response.ok) throw new Error('Network response was not ok');
-
-    const data = await response.json();
-    const events = data && data.vcalendar && data.vcalendar[0] && data.vcalendar[0].vevent;
-    if (Array.isArray(events)) {
-      events.forEach(ev => {
-        const raw = ev.dtstart && ev.dtstart[0];
-        if (!raw || raw.length !== 8) return;
-        const dateStr = `${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`;
-        hkHolidays[dateStr] = ev.summary || hkHolidays[dateStr] || '';
-      });
-      renderCurrentView();
-    }
-  } catch (error) {
-    console.warn('網絡加載公眾假期失敗，使用本地預設假期資料:', error);
-  }
-}
-
-function getHolidayInfo(dateStr, dateObj) {
-  const isSun = dateObj.getDay() === 0;
-  const holidayName = hkHolidays[dateStr];
-  if (holidayName) return { isHoliday: true, label: holidayName };
-  if (isSun) return { isHoliday: true, label: '' };
-  return { isHoliday: false, label: '' };
-}
-
-const modalOverlay = document.getElementById('modal-overlay');
-const shiftForm = document.getElementById('shift-form');
-
-function formatShortTime(timeStr) {
-if (!timeStr) return '';
-const [h, m] = timeStr.split(':');
-const hourNum = parseInt(h, 10);
-return m === '00' ? `${hourNum}` : `${hourNum}:${m}`;
-}
-
-function getLocalDateStr(dateObj = new Date()) {
-const year = dateObj.getFullYear();
-const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-const day = String(dateObj.getDate()).padStart(2, '0');
-return `${year}-${month}-${day}`;
-}
-
-function autoUpdatePastPlannedShifts() {
-const now = new Date();
-const todayStr = getLocalDateStr(now);
-let updated = false;
-shifts.forEach(s => {
-if (s.type === 'planned') {
-if (s.date < todayStr) {
-s.type = 'completed';
-updated = true;
-} else if (s.date === todayStr) {
-const endTimeStr = s.endTime || "23:59";
-const [eHours, eMins] = endTimeStr.split(':').map(Number);
-const shiftEndDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eHours, eMins);
-if (now >= shiftEndDateTime) {
-s.type = 'completed';
-updated = true;
-}
-}
-}
-});
-if (updated) saveData();
-}
-
-function switchNav(viewId) {
-autoUpdatePastPlannedShifts();
-currentView = viewId;
-document.getElementById('calendar-view').style.display = 'none';
-document.getElementById('list-view').style.display = 'none';
-document.getElementById('analytics-view').style.display = 'none';
-document.getElementById('nav-calendar').classList.remove('active');
-document.getElementById('nav-list').classList.remove('active');
-document.getElementById('nav-analytics').classList.remove('active');
-document.getElementById(viewId).style.display = 'block';
-if (viewId === 'calendar-view') {
-document.getElementById('nav-calendar').classList.add('active');
-renderCalendar();
-} else if (viewId === 'list-view') {
-document.getElementById('nav-list').classList.add('active');
-renderListView();
-} else if (viewId === 'analytics-view') {
-document.getElementById('nav-analytics').classList.add('active');
-renderAnalytics();
-}
-}
-
-function populateTimeOptions() {
-const startSelect = document.getElementById('start-time');
-const endSelect = document.getElementById('end-time');
-if (!startSelect || !endSelect) return;
-let optionsHtml = '';
-for (let h = 7; h < 23; h++) {
-const hourStr = String(h).padStart(2, '0');
-optionsHtml += `<option value="${hourStr}:00">${hourStr}:00</option>`;
-optionsHtml += `<option value="${hourStr}:15">${hourStr}:15</option>`;
-optionsHtml += `<option value="${hourStr}:30">${hourStr}:30</option>`;
-optionsHtml += `<option value="${hourStr}:45">${hourStr}:45</option>`;
-}
-startSelect.innerHTML = optionsHtml;
-endSelect.innerHTML = optionsHtml;
-}
-
-function updateCompanyDatalist() {
-const companyList = document.getElementById('company-list');
-if (!companyList) return;
-const savedCompanies = [...new Set(shifts.map(s => s.company).filter(Boolean))];
-companyList.innerHTML = savedCompanies.map(c => `<option value="${c}"></option>`).join('');
-}
-
-function openModal(selectedDateStr = null) {
-modalOverlay.classList.add('active');
-const todayStr = getLocalDateStr();
-const targetDate = selectedDateStr || todayStr;
-document.getElementById('modal-title').textContent = "有工番啦🤑";
-document.getElementById('editing-shift-id').value = "";
-document.getElementById('btn-delete-modal').style.display = "none";
-document.getElementById('date-range-container').style.display = "block";
-document.getElementById('date-range-box').style.display = "none";
-document.getElementById('date-picker-trigger').style.display = "flex";
-document.getElementById('date-tag-badge').style.display = "none";
-updateCompanyDatalist();
-
-document.getElementById('company').value = "";
-document.getElementById('event-name').value = "";
-document.getElementById('rate').value = "";
-document.getElementById('no-lunch-check').checked = false;
-document.getElementById('deduct-minutes').value = "30";
-document.getElementById('deduct-wrapper').classList.remove('active');
-
-document.getElementById('start-time').value = "09:00";
-document.getElementById('end-time').value = "18:00";
-document.getElementById('allowance').value = "";
-initMiniCalendar(targetDate, true);
-setShiftType('planned');
-calcDuration();
-}
-
-function openShiftDetail(shiftId) {
-const shift = shifts.find(s => s.id === shiftId);
-if (!shift) return;
-modalOverlay.classList.add('active');
-document.getElementById('modal-title').textContent = "傻仔打錯野？";
-document.getElementById('editing-shift-id').value = shift.id;
-document.getElementById('btn-delete-modal').style.display = "block";
-document.getElementById('date-range-container').style.display = "block";
-document.getElementById('date-range-box').style.display = "none";
-document.getElementById('date-picker-trigger').style.display = "none";
-document.getElementById('date-tag-badge').style.display = "block";
-document.getElementById('date-tag-badge').textContent = `已選 ${shift.date}`;
-updateCompanyDatalist();
-initMiniCalendar(shift.date, false);
-setShiftType(shift.type || 'completed');
-document.getElementById('company').value = shift.company;
-document.getElementById('event-name').value = shift.eventName === '-' ? '' : shift.eventName;
-document.getElementById('rate').value = shift.rate;
-document.getElementById('allowance').value = shift.allowance || "";
-document.getElementById('start-time').value = shift.startTime;
-document.getElementById('end-time').value = shift.endTime;
-if (shift.deductMins && shift.deductMins > 0) {
-document.getElementById('no-lunch-check').checked = true;
-document.getElementById('deduct-minutes').value = shift.deductMins;
-document.getElementById('deduct-wrapper').classList.add('active');
-} else {
-document.getElementById('no-lunch-check').checked = false;
-document.getElementById('deduct-wrapper').classList.remove('active');
-}
-calcDuration();
-}
-
-function closeModal() { modalOverlay.classList.remove('active'); }
-
-function initMiniCalendar(dateStr, canSelectRange) {
-const d = new Date(dateStr);
-miniCalYear = d.getFullYear();
-miniCalMonth = d.getMonth();
-modalRangeStart = dateStr;
-modalRangeEnd = null;
-allowRangeSelection = canSelectRange;
-selectedDatesList = [dateStr];
-renderMiniCalendar();
-updateDateSummary();
-}
-
-function renderMiniCalendar() {
-document.getElementById('mini-cal-month-year').textContent = `${miniCalYear} 年 ${miniCalMonth + 1} 月`;
-const daysContainer = document.getElementById('mini-cal-days');
-daysContainer.innerHTML = '';
-let rawFirstDay = new Date(miniCalYear, miniCalMonth, 1).getDay();
-let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;
-const totalDays = new Date(miniCalYear, miniCalMonth + 1, 0).getDate();
-const today = new Date();
-for (let i = 0; i < firstDay; i++) {
-const cell = document.createElement('div');
-cell.className = 'mini-cal-cell other-month';
-daysContainer.appendChild(cell);
-}
-for (let day = 1; day <= totalDays; day++) {
-const dateStr = `${miniCalYear}-${String(miniCalMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-const dateObj = new Date(miniCalYear, miniCalMonth, day);
-const cell = document.createElement('div');
-cell.className = 'mini-cal-cell';
-if (day === today.getDate() && miniCalMonth === today.getMonth() && miniCalYear === today.getFullYear()) {
-cell.classList.add('today');
-}
-const holidayInfo = getHolidayInfo(dateStr, dateObj);
-if (holidayInfo.isHoliday) cell.classList.add('is-holiday');
-const isStart = dateStr === modalRangeStart;
-const isEnd = modalRangeEnd ? dateStr === modalRangeEnd : isStart;
-const inRange = isDateInSelectedRange(dateStr);
-if (inRange) cell.classList.add('in-range');
-if (isStart) cell.classList.add('range-start');
-if (isEnd) cell.classList.add('range-end');
-cell.innerHTML = `<span class="mini-cal-num">${day}</span>`;
-cell.onclick = () => handleMiniCalClick(dateStr);
-daysContainer.appendChild(cell);
-}
-}
-
-function isDateInSelectedRange(dateStr) {
-if (!modalRangeStart) return false;
-if (!modalRangeEnd) return dateStr === modalRangeStart;
-return dateStr >= modalRangeStart && dateStr <= modalRangeEnd;
-}
-
-function handleMiniCalClick(dateStr) {
-if (!allowRangeSelection) {
-modalRangeStart = dateStr;
-modalRangeEnd = null;
-selectedDatesList = [dateStr];
-renderMiniCalendar();
-updateDateSummary();
-return;
-}
-if (!modalRangeStart || modalRangeEnd) {
-modalRangeStart = dateStr;
-modalRangeEnd = null;
-} else if (dateStr === modalRangeStart) {
-modalRangeEnd = null;
-} else if (dateStr < modalRangeStart) {
-modalRangeEnd = modalRangeStart;
-modalRangeStart = dateStr;
-} else {
-modalRangeEnd = dateStr;
-}
-if (modalRangeEnd) {
-selectedDatesList = [];
-let cur = new Date(modalRangeStart);
-const end = new Date(modalRangeEnd);
-while (cur <= end) {
-selectedDatesList.push(getLocalDateStr(cur));
-cur.setDate(cur.getDate() + 1);
-}
-} else {
-selectedDatesList = [modalRangeStart];
-}
-renderMiniCalendar();
-updateDateSummary();
-}
-
-function updateDateSummary() {
-const summary = `已選 ${selectedDatesList.length} 天`;
-const label = modalRangeEnd ? `${modalRangeStart} 至 ${modalRangeEnd}` : modalRangeStart;
-document.getElementById('date-summary-text').textContent = summary;
-document.getElementById('date-picker-label').textContent = label || summary;
-}
-
-function toggleDatePicker() {
-const box = document.getElementById('date-range-box');
-const isOpen = box.style.display !== "none";
-box.style.display = isOpen ? "none" : "block";
-}
-
-function openActionMenu() { document.getElementById('action-menu-overlay').classList.add('active'); }
-function closeActionMenu() { document.getElementById('action-menu-overlay').classList.remove('active'); }
-
-function setShiftType(type) {
-document.getElementById('shift-type').value = type;
-document.getElementById('btn-submit-text').textContent = (type === 'completed') ? '儲存已完成工時' : '儲存排班';
-}
-
-function toggleDeductInput() {
-const isChecked = document.getElementById('no-lunch-check').checked;
-const wrapper = document.getElementById('deduct-wrapper');
-if (isChecked) {
-wrapper.classList.add('active');
-} else {
-wrapper.classList.remove('active');
-}
-calcDuration();
-}
-
-function getCalculatedDuration() {
-const startTime = document.getElementById('start-time').value;
-const endTime = document.getElementById('end-time').value;
-if (!startTime || !endTime) return 0;
-const [sHours, sMins] = startTime.split(':').map(Number);
-const [eHours, eMins] = endTime.split(':').map(Number);
-let startTotalMins = sHours * 60 + sMins;
-let endTotalMins = eHours * 60 + eMins;
-if (endTotalMins < startTotalMins) {
-endTotalMins += 24 * 60;
-}
-let diffMins = endTotalMins - startTotalMins;
-if (document.getElementById('no-lunch-check').checked) {
-const deductMins = parseFloat(document.getElementById('deduct-minutes').value) || 0;
-diffMins = Math.max(0, diffMins - deductMins);
-}
-return Math.round((diffMins / 60) * 100) / 100;
-}
-
-function calcDuration() {
-const dur = getCalculatedDuration();
-document.getElementById('duration-display').textContent = `共 ${dur} 小時`;
-}
-
-function formatMoney(value) {
-return (Math.floor((Number(value) + Number.EPSILON) * 100) / 100).toLocaleString();
-}
-
-function getShiftPay(s) {
-return (s.rate || 0) * (s.duration || 0) + (Number(s.allowance) || 0);
-}
-
-function deleteCurrentEditingShift() {
-const editingId = document.getElementById('editing-shift-id').value;
-if (editingId) {
-deleteShift(Number(editingId));
-closeModal();
-}
-}
-
-function deleteShift(id) {
-shifts = shifts.filter(s => s.id !== id);
-saveData();
-renderCurrentView();
-}
-
-function renderCurrentView() {
-if (currentView === 'calendar-view') { renderCalendar(); }
-else if (currentView === 'list-view') { renderListView(); }
-else if (currentView === 'analytics-view') { renderAnalytics(); }
-else { renderCalendar(); }
-if (currentView !== 'calendar-view') { updateMonthSalaryCard(); }
-}
-
-async function shareOrDownloadFile(filename, mimeType, content) {
-try {
-const blob = new Blob([content], { type: mimeType });
-const file = new File([blob], filename, { type: mimeType });
-if (navigator.canShare && navigator.canShare({ files: [file] })) {
-await navigator.share({
-files: [file],
-title: filename,
-text: '兼職紀錄備份'
-});
-return;
-}
-const url = URL.createObjectURL(blob);
-const link = document.createElement('a');
-link.href = url;
-link.download = filename;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-setTimeout(() => URL.revokeObjectURL(url), 2000);
-} catch (err) {
-if (err && err.name === 'AbortError') return;
-console.error('Export Error:', err);
-alert('匯出失敗');
-}
-}
-
-function exportJSON() {
-if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
-const content = JSON.stringify(shifts, null, 2);
-shareOrDownloadFile(`part_time_backup_${getLocalDateStr()}.json`, 'application/json', content);
-}
-
-function importJSON() { document.getElementById('import-file').click(); }
-
-function handleFileSelect(event) {
-const file = event.target.files[0];
-if (!file) return;
-const reader = new FileReader();
-reader.onload = function(e) {
-try {
-const importedData = JSON.parse(e.target.result);
-if (Array.isArray(importedData)) {
-shifts = importedData;
-autoUpdatePastPlannedShifts();
-saveData();
-renderCurrentView();
-alert('匯入成功！');
-} else { alert('無效的備份檔案'); }
-} catch (err) { alert('解析檔案失敗'); }
-};
-reader.readAsText(file);
-event.target.value = '';
-}
-
-function exportCSV() {
-if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
-let csvContent = "\uFEFF";
-csvContent += "日期,狀態,公司,工作備註,時薪($),開始時間,結束時間,扣除(分鐘),總時數(小時),津貼($),薪金($)\n";
-shifts.forEach(s => {
-const pay = getShiftPay(s);
-const status = s.type === 'planned' ? '排班' : '已完成';
-csvContent += `"${s.date}","${status}","${s.company}","${s.eventName}",${s.rate},"${s.startTime}","${s.endTime}",${s.deductMins},${s.duration},${s.allowance || 0},${pay}\n`;
-});
-shareOrDownloadFile(`part_time_records_${getLocalDateStr()}.csv`, 'text/csv;charset=utf-8;', csvContent);
-}
-
-function confirmClearAll() {
-if (shifts.length === 0) { alert('目前沒有紀錄'); return; }
-const ok = confirm('確定要清空所有資料嗎？此動作無法復原！\n建議先匯出 JSON 備份檔。');
-if (ok) {
-shifts = [];
-saveData();
-renderCurrentView();
-alert('已清空所有紀錄');
-}
-}
-
-function changeMonth(delta) {
-currentMonth += delta;
-if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-autoUpdatePastPlannedShifts();
-renderCurrentView();
-}
-
-function updateMonthSalaryCard() {
-let mPayCompleted = 0;
-let mPayTotal = 0;
-const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-shifts.filter(s => s.date && s.date.startsWith(monthPrefix)).forEach(s => {
-const pay = getShiftPay(s);
-mPayTotal += pay;
-if (s.type === 'completed' || !s.type) mPayCompleted += pay;
-});
-document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
-document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
-}
-
-// === 完美相容手機與電腦的長按拖拽邏輯 ===
-let longPressTimer = null;
-let longPressShiftId = null;
-let longPressTriggered = false;
-let dragShiftId = null;
-let dragDestination = null;
-let activeDraggingElement = null;
-
-function startShiftLongPress(event, shiftId) {
-  if (event.pointerType === 'mouse' && event.button !== 0) return;
-  
-  cancelShiftLongPress();
-  longPressShiftId = shiftId;
-  longPressTriggered = false;
-  activeDraggingElement = event.currentTarget;
-
-  longPressTimer = setTimeout(() => {
-    longPressTriggered = true;
-    dragShiftId = shiftId;
-    if (activeDraggingElement) {
-      activeDraggingElement.classList.add('long-press-dragging');
-    }
-    if (navigator.vibrate) navigator.vibrate(40);
-    document.body.classList.add('dragging-shift');
-  }, 350);
-}
-
-function cancelShiftLongPress() {
-  if (longPressTimer) clearTimeout(longPressTimer);
-  longPressTimer = null;
-}
-
-function clearDropTarget() {
-  document.querySelectorAll('.day-cell.drop-target').forEach(el => el.classList.remove('drop-target'));
-}
-
-function finishShiftDrag() {
-  cancelShiftLongPress();
-  document.querySelectorAll('.long-press-dragging').forEach(el => el.classList.remove('long-press-dragging'));
-  document.body.classList.remove('dragging-shift');
-  
-  if (dragShiftId && dragDestination) {
-    const shift = shifts.find(s => s.id === dragShiftId);
-    if (shift && dragDestination !== shift.date) {
-      window.pendingShiftId = dragShiftId;
-      window.pendingShiftDestination = dragDestination;
-      
-      const titleEl = document.getElementById('move-copy-title');
-      if (titleEl) titleEl.textContent = `${shift.company} → ${dragDestination}`;
-      
-      const targetCell = document.querySelector(`.day-cell[data-date="${dragDestination}"]`);
-      const sheet = document.querySelector('#move-copy-overlay .action-sheet');
-      if (targetCell && sheet) {
-        const rect = targetCell.getBoundingClientRect();
-        const left = Math.min(window.innerWidth - 218, Math.max(8, rect.right - 8));
-        const top = Math.min(window.innerHeight - 105, Math.max(8, rect.top + 8));
-        sheet.style.position = 'fixed';
-        sheet.style.left = `${left}px`;
-        sheet.style.top = `${top}px`;
-      }
-      
-      const overlay = document.getElementById('move-copy-overlay');
-      if (overlay) overlay.classList.add('active');
-    }
-  }
-  clearDropTarget();
-  dragShiftId = null;
-  longPressShiftId = null;
-  dragDestination = null;
-  activeDraggingElement = null;
-}
-
-function closeMoveCopyMenu() {
-  document.getElementById('move-copy-overlay').classList.remove('active');
-  const sheet = document.querySelector('#move-copy-overlay .action-sheet');
-  if (sheet) { sheet.style.left = ''; sheet.style.top = ''; }
-  dragShiftId = null;
-  longPressShiftId = null;
-  dragDestination = null;
-}
-
-function moveOrCopyShift(mode) {
-  const destination = window.pendingShiftDestination;
-  const shiftId = window.pendingShiftId;
-  const shift = shifts.find(s => s.id === shiftId);
-  if (!shift || !destination) return closeMoveCopyMenu();
-  if (mode === 'move') shift.date = destination;
-  else shifts.push({ ...shift, id: Date.now(), date: destination });
-  saveData();
-  const refDate = new Date(destination + 'T12:00:00');
-  currentYear = refDate.getFullYear();
-  currentMonth = refDate.getMonth();
-  window.pendingShiftDestination = null;
-  window.pendingShiftId = null;
-  closeMoveCopyMenu();
-  renderCurrentView();
-}
-
-/* Render Calendar Function */
-function renderCalendar() {
-  autoUpdatePastPlannedShifts();
-  document.getElementById('calendar-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
-  const daysContainer = document.getElementById('calendar-days');
-  daysContainer.innerHTML = '';
-
-  let rawFirstDay = new Date(currentYear, currentMonth, 1).getDay();
-  let firstDay = (rawFirstDay === 0) ? 6 : rawFirstDay - 1;
-  const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
-  const today = new Date();
-
-  let mPayCompleted = 0;
-  let mPayTotal = 0;
-
-  const createCellContent = (dayNum, dateStr, dateObj, isCurrentMonth) => {
-    const holidayInfo = getHolidayInfo(dateStr, dateObj);
-    let html = `<span class="day-number">${dayNum}</span>`;
-
-    if (holidayInfo.isHoliday && holidayInfo.label) {
-      html += `<div class="holiday-label">${holidayInfo.label}</div>`;
-    }
-
-    const dayShifts = shifts.filter(s => s.date === dateStr);
-    let shiftsHtml = '';
-
-    dayShifts.forEach(s => {
-      const pay = getShiftPay(s);
-      if (isCurrentMonth) {
-        mPayTotal += pay;
-        if (s.type === 'completed' || !s.type) {
-          mPayCompleted += pay;
-        }
-      }
-
-      const isPlanned = s.type === 'planned';
-      const timeTag = `${formatShortTime(s.startTime)}-${formatShortTime(s.endTime)}`;
-
-      shiftsHtml += `
-      <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" 
-           data-id="${s.id}"
-           onpointerdown="startShiftLongPress(event, ${s.id})" 
-           onpointercancel="cancelShiftLongPress()"
-           onpointerleave="cancelShiftLongPress()"
-           title="${s.company} (${timeTag}) $${pay}">
-        <div class="comp-name">${s.company}</div>
-        <div class="shift-time">${timeTag}</div>
-        <div class="shift-money">$${formatMoney(pay)}</div>
-      </div>
-      `;
-    });
-
-    html += `<div class="shift-items-wrap">${shiftsHtml}</div>`;
-    return html;
-  };
-
-  // 1. 上個月 Preview
-  for (let i = firstDay - 1; i >= 0; i--) {
-    const cell = document.createElement('div');
-    cell.className = 'day-cell other-month';
-    const prevDate = new Date(currentYear, currentMonth, -(i));
-    const prevDateStr = getLocalDateStr(prevDate);
-    cell.dataset.date = prevDateStr;
-    cell.onclick = (e) => {
-      if (longPressTriggered) return;
-      openModal(prevDateStr);
-    };
-    cell.innerHTML = createCellContent(prevLastDay - i, prevDateStr, prevDate, false);
-    daysContainer.appendChild(cell);
-  }
-
-  // 2. 本月日子
-  for (let day = 1; day <= totalDays; day++) {
-    const cell = document.createElement('div');
-    cell.className = 'day-cell';
-    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const dateObj = new Date(currentYear, currentMonth, day);
-    cell.dataset.date = dateStr;
-    cell.onclick = (e) => {
-      if (longPressTriggered) return;
-      openModal(dateStr);
-    };
-
-    if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
-      cell.classList.add('today');
-    }
-    if (getHolidayInfo(dateStr, dateObj).isHoliday) {
-      cell.classList.add('is-holiday');
-    }
-
-    cell.innerHTML = createCellContent(day, dateStr, dateObj, true);
-    daysContainer.appendChild(cell);
-  }
-
-  // 3. 下個月 Preview
-  const totalRendered = firstDay + totalDays;
-  const nextDays = (7 - (totalRendered % 7)) % 7;
-  for (let i = 1; i <= nextDays; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'day-cell other-month';
-    const nextDate = new Date(currentYear, currentMonth + 1, i);
-    const nextDateStr = getLocalDateStr(nextDate);
-    cell.dataset.date = nextDateStr;
-    cell.onclick = (e) => {
-      if (longPressTriggered) return;
-      openModal(nextDateStr);
-    };
-    cell.innerHTML = createCellContent(i, nextDateStr, nextDate, false);
-    daysContainer.appendChild(cell);
-  }
-
-  // 為每個班次標籤專屬綁定點擊事件，避免滑動中誤觸
-  document.querySelectorAll('.shift-dot-item').forEach(el => {
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (!longPressTriggered && el.dataset.id) {
-        openShiftDetail(Number(el.dataset.id));
-      }
-    });
-  });
-
-  document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
-  document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
-}
-
-function renderListView() {
-autoUpdatePastPlannedShifts();
-updateMonthSalaryCard();
-const filterTabsContainer = document.getElementById('company-filter-tabs');
-const listContainer = document.getElementById('shift-list-container');
-const companies = [...new Set(shifts.map(s => s.company))];
-filterTabsContainer.innerHTML = `
-<button class="filter-btn ${selectedCompanyFilter === 'ALL' ? 'active' : ''}" onclick="filterListCompany('ALL')">全部</button>
-` + companies.map((comp, idx) => {
-const color = companyColorPalette[idx % companyColorPalette.length];
-const isActive = selectedCompanyFilter === comp;
-const inlineStyle = isActive
-? `background-color: ${color.text}; color: #ffffff; border-color: ${color.text};`
-: `background-color: ${color.bg}; color: ${color.text}; border-color: ${color.border};`;
-return `
-<button class="filter-btn ${isActive ? 'active' : ''}" style="${inlineStyle}" onclick="filterListCompany('${comp}')">${comp}</button>
-`;
-}).join('');
-let filteredShifts = selectedCompanyFilter === 'ALL' ? shifts : shifts.filter(s => s.company === selectedCompanyFilter);
-filteredShifts.sort((a,b) => new Date(b.date) - new Date(a.date));
-if (filteredShifts.length === 0) {
-listContainer.innerHTML = `<div class="empty-msg">沒有相關工時紀錄</div>`;
-return;
-}
-listContainer.innerHTML = filteredShifts.map(s => {
-const pay = getShiftPay(s);
-const isPlanned = s.type === 'planned';
-return `
-<div class="shift-list-item" onclick="openShiftDetail(${s.id})">
-<div class="shift-info">
-<h4>${s.company} ${isPlanned ? '<span style="color:#1976d2; font-size:0.75rem;">(排班)</span>' : ''}</h4>
-<p>${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}</p>
-</div>
-<div class="shift-amount">
-<div class="price">$${formatMoney(pay)}</div>
-<div class="hrs">${s.duration}小時 ($${s.rate}/hr)</div>
-</div>
-</div>
-`;
-}).join('');
-}
-
-function filterListCompany(comp) {
-selectedCompanyFilter = comp;
-renderListView();
-}
-
-function renderAnalytics() {
-autoUpdatePastPlannedShifts();
-updateMonthSalaryCard();
-document.getElementById('analytics-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
-const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-const monthShifts = shifts.filter(s => s.date && s.date.startsWith(monthPrefix));
-let totalHours = 0;
-let totalPay = 0;
-const companyMap = {};
-monthShifts.forEach(s => {
-const pay = getShiftPay(s);
-if (s.type === 'completed' || !s.type) {
-totalHours += s.duration;
-totalPay += pay;
-}
-if (!companyMap[s.company]) {
-companyMap[s.company] = { hours: 0, pay: 0, totalEstPay: 0, count: 0 };
-}
-companyMap[s.company].totalEstPay += pay;
-if (s.type === 'completed' || !s.type) {
-companyMap[s.company].hours += s.duration;
-companyMap[s.company].pay += pay;
-companyMap[s.company].count += 1;
-}
-});
-document.getElementById('stat-hours').textContent = `${Math.round(totalHours * 10) / 10}h`;
-document.getElementById('stat-total-pay').textContent = `$${formatMoney(totalPay)}`;
-const companyBreakdownContainer = document.getElementById('company-breakdown-container');
-const companyEntries = Object.entries(companyMap).sort((a, b) => b[1].totalEstPay - a[1].totalEstPay);
-const allCompanyNames = [...new Set(shifts.map(s => s.company))];
-
-if (companyEntries.length === 0) {
-companyBreakdownContainer.innerHTML = `<div class="empty-msg">本月沒有工時紀錄</div>`;
-} else {
-companyBreakdownContainer.innerHTML = companyEntries.map(([name, data]) => {
-const idx = allCompanyNames.indexOf(name);
-const color = companyColorPalette[idx % companyColorPalette.length];
-const avgCompRate = data.hours > 0 ? (data.pay / data.hours) : 0;
-return `
-<div class="company-stat-item">
-<div class="company-stat-name">
-<span class="company-stat-dot" style="background:${color.text};"></span>
-${name}
-</div>
-<div class="company-stat-pay">$${formatMoney(data.totalEstPay)}</div>
-<div class="company-stat-meta">
-<span>${data.count} job • ${Math.round(data.hours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
-</div>
-</div>
-`;
-}).join('');
-}
-
-const allCompleted = shifts.filter(s => s.type === 'completed' || !s.type);
-let allHours = 0, allPay = 0;
-allCompleted.forEach(s => {
-allHours += s.duration;
-allPay += getShiftPay(s);
-});
-document.getElementById('stat-all-hours').textContent = `${Math.round(allHours * 10) / 10}h`;
-document.getElementById('stat-all-pay').textContent = `$${formatMoney(allPay)}`;
-}
-
-// 初始化頁面事件綁定
-window.addEventListener('DOMContentLoaded', () => {
-  initDarkMode();
-  loadHolidays();
-  initSyncKey();
-  autoUpdatePastPlannedShifts();
-  populateTimeOptions();
-  updateCompanyDatalist();
-  renderCalendar();
-
-  document.getElementById('mini-cal-prev').addEventListener('click', () => {
-    miniCalMonth--;
-    if (miniCalMonth < 0) { miniCalMonth = 11; miniCalYear--; }
-    renderMiniCalendar();
-  });
-  document.getElementById('mini-cal-next').addEventListener('click', () => {
-    miniCalMonth++;
-    if (miniCalMonth > 11) { miniCalMonth = 0; miniCalYear++; }
-    renderMiniCalendar();
-  });
-
-  document.getElementById('prev-month-a').addEventListener('click', () => changeMonth(-1));
-  document.getElementById('next-month-a').addEventListener('click', () => changeMonth(1));
-
-  shiftForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const editingId = document.getElementById('editing-shift-id').value;
-    const duration = getCalculatedDuration();
-    const isDeduct = document.getElementById('no-lunch-check').checked;
-    const deductMins = isDeduct ? (parseFloat(document.getElementById('deduct-minutes').value) || 0) : 0;
-    let type = document.getElementById('shift-type').value;
-    const company = document.getElementById('company').value.trim();
-    const eventName = document.getElementById('event-name').value.trim() || "-";
-    const rate = parseFloat(document.getElementById('rate').value);
-    const allowance = parseFloat(document.getElementById('allowance').value) || 0;
-    const startTime = document.getElementById('start-time').value;
-    const endTime = document.getElementById('end-time').value;
-    const now = new Date();
-    const todayStr = getLocalDateStr(now);
-
-    if (editingId) {
-      const targetIndex = shifts.findIndex(s => s.id == editingId);
-      if (targetIndex !== -1) {
-        let finalType = type;
-        if (finalType === 'planned') {
-          if (modalRangeStart < todayStr) {
-            finalType = 'completed';
-          } else if (modalRangeStart === todayStr) {
-            const [eH, eM] = endTime.split(':').map(Number);
-            const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
-            if (now >= endDt) finalType = 'completed';
-          }
-        }
-        shifts[targetIndex] = {
-          id: Number(editingId),
-          type: finalType,
-          date: modalRangeStart,
-          company: company,
-          eventName: eventName,
-          rate: rate,
-          allowance: allowance,
-          startTime: startTime,
-          endTime: endTime,
-          deductMins: deductMins,
-          duration: duration
-        };
-      }
-    } else {
-      if (selectedDatesList.length === 0) {
-        alert('請選擇日期');
+    updateSyncStatus('syncing', '正在儲存到雲端...');
+
+    try {
+      // 若本地無資料，刪除該 Key 在雲端的所有紀錄
+      if (shifts.length === 0) {
+        const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
+        if (delError) throw delError;
+        updateSyncStatus('online', `已同步 (${syncKey})`);
         return;
       }
-      selectedDatesList.forEach((dateStr, index) => {
-        let finalType = type;
-        if (finalType === 'planned') {
-          if (dateStr < todayStr) {
-            finalType = 'completed';
-          } else if (dateStr === todayStr) {
-            const [eH, eM] = endTime.split(':').map(Number);
-            const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
-            if (now >= endDt) finalType = 'completed';
-          }
-        }
-        const newShift = {
-          id: Date.now() + index,
-          type: finalType,
-          date: dateStr,
-          company: company,
-          eventName: eventName,
-          rate: rate,
-          allowance: allowance,
-          startTime: startTime,
-          endTime: endTime,
-          deductMins: deductMins,
-          duration: duration
-        };
-        shifts.push(newShift);
-      });
+
+      // 轉換資料格式 (對應 Supabase 資料表欄位)
+      const dbRows = shifts.map(s => ({
+        sync_key: syncKey,
+        shift_id: String(s.id),
+        type: s.type || '',
+        date: s.date || '',
+        company: s.company || '',
+        event_name: s.eventName || s.event_name || '',
+        rate: Number(s.rate) || 0,
+        allowance: Number(s.allowance) || 0,
+        start_time: s.startTime || s.start_time || '',
+        end_time: s.endTime || s.end_time || '',
+        deduct_mins: Number(s.deductMins || s.deduct_mins) || 0,
+        duration: Number(s.duration) || 0
+      }));
+
+      // 先清空該 Sync Key 的舊資料，再重新 Insert，最乾淨且不受 PK 衝突影響
+      const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
+      if (delError) console.warn('Delete old rows warning:', delError);
+
+      const { error: insertError } = await db.from('user_shifts').insert(dbRows);
+      if (insertError) throw insertError;
+
+      updateSyncStatus('online', `已同步 (${syncKey})`);
+    } catch (err) {
+      console.error('Cloud save error:', err);
+      updateSyncStatus('offline', '儲存失敗：' + (err.message || '網路錯誤'));
     }
-    saveData();
-    const refDate = new Date(modalRangeStart);
-    currentYear = refDate.getFullYear();
-    currentMonth = refDate.getMonth();
-    renderCurrentView();
-    closeModal();
-    document.getElementById('event-name').value = '';
+  }
+
+  // 5. 從雲端讀取資料
+  async function loadDataFromCloud() {
+    if (!syncKey || !db) return;
+    updateSyncStatus('syncing', '正在讀取雲端資料...');
+
+    try {
+      const { data, error } = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        shifts = data.map(row => ({
+          id: row.shift_id,
+          type: row.type,
+          date: row.date,
+          company: row.company,
+          eventName: row.event_name,
+          rate: row.rate,
+          allowance: row.allowance,
+          startTime: row.start_time,
+          endTime: row.end_time,
+          deductMins: row.deduct_mins,
+          duration: row.duration
+        }));
+        saveDataToLocalOnly();
+        if (typeof renderShifts === 'function') renderShifts();
+        if (typeof calculateSalary === 'function') calculateSalary();
+        updateSyncStatus('online', `已同步 (${syncKey})`);
+      } else {
+        updateSyncStatus('online', `雲端無資料 (${syncKey})`);
+      }
+    } catch (err) {
+      console.error('Cloud load error:', err);
+      updateSyncStatus('offline', '讀取失敗');
+    }
+  }
+
+  // 6. 頁面載入完成時執行初始化
+  window.addEventListener('DOMContentLoaded', () => {
+    initSupabase();
+    loadDataFromLocal();
+    if (syncKey) {
+      loadDataFromCloud();
+    }
   });
-
-  // 全域 Pointer 移動與放開監聽
-  document.addEventListener('pointermove', event => {
-    if (!dragShiftId || !longPressTriggered) return;
-    
-    if (event.cancelable) event.preventDefault(); // 阻止原生滾動
-
-    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
-    clearDropTarget();
-    if (target) {
-      target.classList.add('drop-target');
-      dragDestination = target.dataset.date;
-    }
-  }, { passive: false });
-
-  document.addEventListener('pointerup', () => {
-    if (dragShiftId && longPressTriggered) {
-      finishShiftDrag();
-    } else {
-      cancelShiftLongPress();
-    }
-  });
-
-  (function setupCalendarSwipe() {
-    const calendar = document.getElementById('calendar-days');
-    if (!calendar || calendar.dataset.swipeReady) return;
-    calendar.dataset.swipeReady = '1';
-    let startX = 0;
-    let startY = 0;
-    calendar.addEventListener('touchstart', event => {
-      if (event.touches.length !== 1 || dragShiftId) return;
-      startX = event.touches[0].clientX;
-      startY = event.touches[0].clientY;
-    }, { passive: true });
-    calendar.addEventListener('touchend', event => {
-      if (!startX || !startY || event.changedTouches.length !== 1 || dragShiftId) return;
-      const dx = event.changedTouches[0].clientX - startX;
-      const dy = event.changedTouches[0].clientY - startY;
-      startX = 0;
-      startY = 0;
-      if (Math.abs(dx) < 60 || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
-      changeMonth(dx < 0 ? 1 : -1);
-    }, { passive: true });
-  })();
-});
 </script>
 </body>
 </html>
