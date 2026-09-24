@@ -1226,28 +1226,38 @@ async function saveData() {
   saveDataToLocalOnly();
   if (!syncKey || !db) return;
   updateSyncStatus('syncing', '正在儲存到雲端...');
+  
   try {
-    const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
-    if (delError) throw delError;
-
-    if (shifts.length > 0) {
-      const dbRows = shifts.map(s => ({
-        sync_key: syncKey,
-        shift_id: s.id,
-        type: s.type,
-        date: s.date,
-        company: s.company,
-        event_name: s.eventName,
-        rate: s.rate,
-        allowance: s.allowance,
-        start_time: s.startTime,
-        end_time: s.endTime,
-        deduct_mins: s.deductMins,
-        duration: s.duration
-      }));
-      const { error: insertError } = await db.from('user_shifts').insert(dbRows);
-      if (insertError) throw insertError;
+    // 1. 如果本機無資料，執行清空雲端
+    if (shifts.length === 0) {
+      const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
+      if (delError) console.warn('Cloud delete notice:', delError);
+      updateSyncStatus('online', `已同步 (${syncKey})`);
+      return;
     }
+
+    // 2. 整理資料格式
+    const dbRows = shifts.map(s => ({
+      sync_key: syncKey,
+      shift_id: s.id,
+      type: s.type,
+      date: s.date,
+      company: s.company,
+      event_name: s.eventName,
+      rate: s.rate,
+      allowance: s.allowance,
+      start_time: s.startTime,
+      end_time: s.endTime,
+      deduct_mins: s.deductMins,
+      duration: s.duration
+    }));
+
+    // 3. 使用 UPSERT（覆蓋更新）
+    const { error: upsertError } = await db.from('user_shifts').upsert(dbRows, {
+      onConflict: 'sync_key,shift_id' // 確保這兩個欄位是資料庫的複合主鍵
+    });
+
+    if (upsertError) throw upsertError;
     updateSyncStatus('online', `已同步 (${syncKey})`);
   } catch (err) {
     console.error('Cloud save error:', err);
