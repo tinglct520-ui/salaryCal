@@ -1102,7 +1102,7 @@ font-size: 0.88rem;
 // ==================== SUPABASE 配置與全域變數 ====================
 const SUPABASE_URL = 'https://tdpazokzljkqfvrwwpeb.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkcGF6b2t6bGprcWZ2cnd3cGViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMjI5MzIsImV4cCI6MjEwNTc5ODkzMn0.v_7m6qy5YkNb9k3IQXUXeFbO7iYPJFhMNE2vlTXi79k';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 let syncKey = localStorage.getItem('user_sync_key') || '';
 let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];
@@ -1178,7 +1178,7 @@ function promptChangeSyncKey() {
 }
 
 async function loadShiftsFromCloud() {
-  if (!syncKey) return;
+  if (!syncKey || !db) return;
   updateSyncStatus('syncing', '正在讀取雲端資料...');
   try {
     const { data, error } = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
@@ -1215,10 +1215,9 @@ function saveDataToLocalOnly() {
 
 async function saveData() {
   saveDataToLocalOnly();
-  if (!syncKey) return;
+  if (!syncKey || !db) return;
   updateSyncStatus('syncing', '正在儲存到雲端...');
   try {
-    // 先清理該 sync_key 的舊記錄再寫入最新數據
     const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
     if (delError) throw delError;
 
@@ -1311,12 +1310,6 @@ const day = String(dateObj.getDate()).padStart(2, '0');
 return `${year}-${month}-${day}`;
 }
 
-initDarkMode();
-loadHolidays();
-initSyncKey();
-autoUpdatePastPlannedShifts();
-renderCalendar();
-
 function autoUpdatePastPlannedShifts() {
 const now = new Date();
 const todayStr = getLocalDateStr(now);
@@ -1384,9 +1377,6 @@ if (!companyList) return;
 const savedCompanies = [...new Set(shifts.map(s => s.company).filter(Boolean))];
 companyList.innerHTML = savedCompanies.map(c => `<option value="${c}"></option>`).join('');
 }
-
-populateTimeOptions();
-updateCompanyDatalist();
 
 function openModal(selectedDateStr = null) {
 modalOverlay.classList.add('active');
@@ -1551,17 +1541,6 @@ const isOpen = box.style.display !== "none";
 box.style.display = isOpen ? "none" : "block";
 }
 
-document.getElementById('mini-cal-prev').addEventListener('click', () => {
-miniCalMonth--;
-if (miniCalMonth < 0) { miniCalMonth = 11; miniCalYear--; }
-renderMiniCalendar();
-});
-document.getElementById('mini-cal-next').addEventListener('click', () => {
-miniCalMonth++;
-if (miniCalMonth > 11) { miniCalMonth = 0; miniCalYear++; }
-renderMiniCalendar();
-});
-
 function openActionMenu() { document.getElementById('action-menu-overlay').classList.add('active'); }
 function closeActionMenu() { document.getElementById('action-menu-overlay').classList.remove('active'); }
 
@@ -1612,90 +1591,6 @@ return (Math.floor((Number(value) + Number.EPSILON) * 100) / 100).toLocaleString
 function getShiftPay(s) {
 return (s.rate || 0) * (s.duration || 0) + (Number(s.allowance) || 0);
 }
-
-shiftForm.addEventListener('submit', (e) => {
-e.preventDefault();
-const editingId = document.getElementById('editing-shift-id').value;
-const duration = getCalculatedDuration();
-const isDeduct = document.getElementById('no-lunch-check').checked;
-const deductMins = isDeduct ? (parseFloat(document.getElementById('deduct-minutes').value) || 0) : 0;
-let type = document.getElementById('shift-type').value;
-const company = document.getElementById('company').value.trim();
-const eventName = document.getElementById('event-name').value.trim() || "-";
-const rate = parseFloat(document.getElementById('rate').value);
-const allowance = parseFloat(document.getElementById('allowance').value) || 0;
-const startTime = document.getElementById('start-time').value;
-const endTime = document.getElementById('end-time').value;
-const now = new Date();
-const todayStr = getLocalDateStr(now);
-
-if (editingId) {
-const targetIndex = shifts.findIndex(s => s.id == editingId);
-if (targetIndex !== -1) {
-let finalType = type;
-if (finalType === 'planned') {
-if (modalRangeStart < todayStr) {
-finalType = 'completed';
-} else if (modalRangeStart === todayStr) {
-const [eH, eM] = endTime.split(':').map(Number);
-const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
-if (now >= endDt) finalType = 'completed';
-}
-}
-shifts[targetIndex] = {
-id: Number(editingId),
-type: finalType,
-date: modalRangeStart,
-company: company,
-eventName: eventName,
-rate: rate,
-allowance: allowance,
-startTime: startTime,
-endTime: endTime,
-deductMins: deductMins,
-duration: duration
-};
-}
-} else {
-if (selectedDatesList.length === 0) {
-alert('請選擇日期');
-return;
-}
-selectedDatesList.forEach((dateStr, index) => {
-let finalType = type;
-if (finalType === 'planned') {
-if (dateStr < todayStr) {
-finalType = 'completed';
-} else if (dateStr === todayStr) {
-const [eH, eM] = endTime.split(':').map(Number);
-const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
-if (now >= endDt) finalType = 'completed';
-}
-}
-const newShift = {
-id: Date.now() + index,
-type: finalType,
-date: dateStr,
-company: company,
-eventName: eventName,
-rate: rate,
-allowance: allowance,
-startTime: startTime,
-endTime: endTime,
-deductMins: deductMins,
-duration: duration
-};
-shifts.push(newShift);
-});
-}
-saveData();
-const refDate = new Date(modalRangeStart);
-currentYear = refDate.getFullYear();
-currentMonth = refDate.getMonth();
-renderCurrentView();
-closeModal();
-document.getElementById('event-name').value = '';
-});
 
 function deleteCurrentEditingShift() {
 const editingId = document.getElementById('editing-shift-id').value;
@@ -1805,9 +1700,6 @@ autoUpdatePastPlannedShifts();
 renderCurrentView();
 }
 
-document.getElementById('prev-month-a').addEventListener('click', () => changeMonth(-1));
-document.getElementById('next-month-a').addEventListener('click', () => changeMonth(1));
-
 function updateMonthSalaryCard() {
 let mPayCompleted = 0;
 let mPayTotal = 0;
@@ -1901,23 +1793,6 @@ function moveOrCopyShift(mode) {
   closeMoveCopyMenu();
   renderCurrentView();
 }
-document.addEventListener('pointermove', event => {
-  if (!dragShiftId) return;
-  event.preventDefault();
-  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
-  clearDropTarget();
-  if (target) {
-    target.classList.add('drop-target');
-    dragDestination = target.dataset.date;
-  }
-});
-document.addEventListener('pointerup', () => {
-  if (dragShiftId) {
-    window.pendingShiftId = dragShiftId;
-    window.pendingShiftDestination = dragDestination;
-    finishShiftDrag();
-  } else cancelShiftLongPress();
-});
 
 /* Render Calendar Function */
 function renderCalendar() {
@@ -2020,28 +1895,6 @@ function renderCalendar() {
   document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
   document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
 }
-
-(function setupCalendarSwipe() {
-  const calendar = document.getElementById('calendar-days');
-  if (!calendar || calendar.dataset.swipeReady) return;
-  calendar.dataset.swipeReady = '1';
-  let startX = 0;
-  let startY = 0;
-  calendar.addEventListener('touchstart', event => {
-    if (event.touches.length !== 1) return;
-    startX = event.touches[0].clientX;
-    startY = event.touches[0].clientY;
-  }, { passive: true });
-  calendar.addEventListener('touchend', event => {
-    if (!startX || !startY || event.changedTouches.length !== 1) return;
-    const dx = event.changedTouches[0].clientX - startX;
-    const dy = event.changedTouches[0].clientY - startY;
-    startX = 0;
-    startY = 0;
-    if (Math.abs(dx) < 60 || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
-    changeMonth(dx < 0 ? 1 : -1);
-  }, { passive: true });
-})();
 
 function renderListView() {
 autoUpdatePastPlannedShifts();
@@ -2152,6 +2005,156 @@ allPay += getShiftPay(s);
 document.getElementById('stat-all-hours').textContent = `${Math.round(allHours * 10) / 10}h`;
 document.getElementById('stat-all-pay').textContent = `$${formatMoney(allPay)}`;
 }
+
+// 初始化頁面事件綁定
+window.addEventListener('DOMContentLoaded', () => {
+  initDarkMode();
+  loadHolidays();
+  initSyncKey();
+  autoUpdatePastPlannedShifts();
+  populateTimeOptions();
+  updateCompanyDatalist();
+  renderCalendar();
+
+  document.getElementById('mini-cal-prev').addEventListener('click', () => {
+    miniCalMonth--;
+    if (miniCalMonth < 0) { miniCalMonth = 11; miniCalYear--; }
+    renderMiniCalendar();
+  });
+  document.getElementById('mini-cal-next').addEventListener('click', () => {
+    miniCalMonth++;
+    if (miniCalMonth > 11) { miniCalMonth = 0; miniCalYear++; }
+    renderMiniCalendar();
+  });
+
+  document.getElementById('prev-month-a').addEventListener('click', () => changeMonth(-1));
+  document.getElementById('next-month-a').addEventListener('click', () => changeMonth(1));
+
+  shiftForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const editingId = document.getElementById('editing-shift-id').value;
+    const duration = getCalculatedDuration();
+    const isDeduct = document.getElementById('no-lunch-check').checked;
+    const deductMins = isDeduct ? (parseFloat(document.getElementById('deduct-minutes').value) || 0) : 0;
+    let type = document.getElementById('shift-type').value;
+    const company = document.getElementById('company').value.trim();
+    const eventName = document.getElementById('event-name').value.trim() || "-";
+    const rate = parseFloat(document.getElementById('rate').value);
+    const allowance = parseFloat(document.getElementById('allowance').value) || 0;
+    const startTime = document.getElementById('start-time').value;
+    const endTime = document.getElementById('end-time').value;
+    const now = new Date();
+    const todayStr = getLocalDateStr(now);
+
+    if (editingId) {
+      const targetIndex = shifts.findIndex(s => s.id == editingId);
+      if (targetIndex !== -1) {
+        let finalType = type;
+        if (finalType === 'planned') {
+          if (modalRangeStart < todayStr) {
+            finalType = 'completed';
+          } else if (modalRangeStart === todayStr) {
+            const [eH, eM] = endTime.split(':').map(Number);
+            const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
+            if (now >= endDt) finalType = 'completed';
+          }
+        }
+        shifts[targetIndex] = {
+          id: Number(editingId),
+          type: finalType,
+          date: modalRangeStart,
+          company: company,
+          eventName: eventName,
+          rate: rate,
+          allowance: allowance,
+          startTime: startTime,
+          endTime: endTime,
+          deductMins: deductMins,
+          duration: duration
+        };
+      }
+    } else {
+      if (selectedDatesList.length === 0) {
+        alert('請選擇日期');
+        return;
+      }
+      selectedDatesList.forEach((dateStr, index) => {
+        let finalType = type;
+        if (finalType === 'planned') {
+          if (dateStr < todayStr) {
+            finalType = 'completed';
+          } else if (dateStr === todayStr) {
+            const [eH, eM] = endTime.split(':').map(Number);
+            const endDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), eH, eM);
+            if (now >= endDt) finalType = 'completed';
+          }
+        }
+        const newShift = {
+          id: Date.now() + index,
+          type: finalType,
+          date: dateStr,
+          company: company,
+          eventName: eventName,
+          rate: rate,
+          allowance: allowance,
+          startTime: startTime,
+          endTime: endTime,
+          deductMins: deductMins,
+          duration: duration
+        };
+        shifts.push(newShift);
+      });
+    }
+    saveData();
+    const refDate = new Date(modalRangeStart);
+    currentYear = refDate.getFullYear();
+    currentMonth = refDate.getMonth();
+    renderCurrentView();
+    closeModal();
+    document.getElementById('event-name').value = '';
+  });
+
+  document.addEventListener('pointermove', event => {
+    if (!dragShiftId) return;
+    event.preventDefault();
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
+    clearDropTarget();
+    if (target) {
+      target.classList.add('drop-target');
+      dragDestination = target.dataset.date;
+    }
+  });
+
+  document.addEventListener('pointerup', () => {
+    if (dragShiftId) {
+      window.pendingShiftId = dragShiftId;
+      window.pendingShiftDestination = dragDestination;
+      finishShiftDrag();
+    } else cancelShiftLongPress();
+  });
+
+  (function setupCalendarSwipe() {
+    const calendar = document.getElementById('calendar-days');
+    if (!calendar || calendar.dataset.swipeReady) return;
+    calendar.dataset.swipeReady = '1';
+    let startX = 0;
+    let startY = 0;
+    calendar.addEventListener('touchstart', event => {
+      if (event.touches.length !== 1) return;
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+    }, { passive: true });
+    calendar.addEventListener('touchend', event => {
+      if (!startX || !startY || event.changedTouches.length !== 1) return;
+      const dx = event.changedTouches[0].clientX - startX;
+      const dy = event.changedTouches[0].clientY - startY;
+      startX = 0;
+      startY = 0;
+      if (Math.abs(dx) < 60 || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
+      changeMonth(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  })();
+});
 </script>
 </body>
 </html>
