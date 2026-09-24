@@ -236,6 +236,7 @@ transition: all 0.15s;
 overflow: hidden;
 border-bottom: 1px solid var(--border-color);
 border-right: 1px solid var(--border-color);
+touch-action: none !important;
 }
 .day-cell:hover {
 filter: brightness(0.95);
@@ -286,10 +287,10 @@ flex: 1;
 min-height: 0;
 }
 .shift-dot-item {
-user-select: none;
--webkit-user-select: none;
--webkit-touch-callout: none;
-touch-action: none;
+user-select: none !important;
+-webkit-user-select: none !important;
+-webkit-touch-callout: none !important;
+touch-action: none !important;
 background-color: #3f5f8f;
 padding: 1px 0;
 width: 100%;
@@ -326,8 +327,18 @@ color: #ffffff;
 .shift-dot-item:hover {
 filter: brightness(0.9);
 }
-.shift-dot-item.long-press-dragging { opacity: 0.55; transform: scale(0.98); }
-.day-cell.drop-target { outline: 2px dashed var(--primary); outline-offset: -3px; background: var(--primary-light) !important; }
+.shift-dot-item.long-press-dragging {
+opacity: 0.7 !important;
+transform: scale(1.08) !important;
+z-index: 9999 !important;
+box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+pointer-events: none !important;
+}
+.day-cell.drop-target {
+outline: 2px dashed var(--primary);
+outline-offset: -3px;
+background: var(--primary-light) !important;
+}
 #calendar-view, #list-view, #analytics-view {
 margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
 }
@@ -893,30 +904,6 @@ text-align: center;
 padding: 30px;
 color: var(--text-sub);
 font-size: 0.88rem;
-}
-#calendar-days { touch-action: pan-y; }
-  /* 1. 禁用日曆與班次卡片的原生觸控滾動與選取 */
-.day-cell, 
-.shift-dot-item {
-  touch-action: none !important;
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-}
-
-/* 2. 拖拽時的樣式：必須加 pointer-events: none 才能讓手指透視到底下的日曆格子 */
-.long-press-dragging {
-  opacity: 0.7 !important;
-  transform: scale(1.08) !important;
-  z-index: 9999 !important;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
-  pointer-events: none !important; 
-}
-
-/* 3. 目標格子高亮 */
-.day-cell.drop-target {
-  background-color: rgba(25, 118, 210, 0.2) !important;
-  border: 2px dashed #1976d2 !important;
 }
 </style>
 </head>
@@ -1735,12 +1722,13 @@ document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayComplete
 document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
 }
 
-// === 修復後的長按與拖拽邏輯 ===
+// === 完美相容手機與電腦的長按拖拽邏輯 ===
 let longPressTimer = null;
 let longPressShiftId = null;
 let longPressTriggered = false;
 let dragShiftId = null;
 let dragDestination = null;
+let activeDraggingElement = null;
 
 function startShiftLongPress(event, shiftId) {
   if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -1748,15 +1736,17 @@ function startShiftLongPress(event, shiftId) {
   cancelShiftLongPress();
   longPressShiftId = shiftId;
   longPressTriggered = false;
-  const item = event.currentTarget;
+  activeDraggingElement = event.currentTarget;
 
   longPressTimer = setTimeout(() => {
     longPressTriggered = true;
     dragShiftId = shiftId;
-    item.classList.add('long-press-dragging');
-    if (navigator.vibrate) navigator.vibrate(30);
+    if (activeDraggingElement) {
+      activeDraggingElement.classList.add('long-press-dragging');
+    }
+    if (navigator.vibrate) navigator.vibrate(40);
     document.body.classList.add('dragging-shift');
-  }, 400);
+  }, 350);
 }
 
 function cancelShiftLongPress() {
@@ -1801,29 +1791,8 @@ function finishShiftDrag() {
   dragShiftId = null;
   longPressShiftId = null;
   dragDestination = null;
+  activeDraggingElement = null;
 }
-
-// 監聽 Touch/Pointer 移動
-document.addEventListener('pointermove', event => {
-  if (!dragShiftId || !longPressTriggered) return;
-  
-  if (event.cancelable) event.preventDefault();
-
-  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
-  clearDropTarget();
-  if (target) {
-    target.classList.add('drop-target');
-    dragDestination = target.dataset.date;
-  }
-}, { passive: false });
-
-document.addEventListener('pointerup', () => {
-  if (dragShiftId && longPressTriggered) {
-    finishShiftDrag();
-  } else {
-    cancelShiftLongPress();
-  }
-});
 
 function closeMoveCopyMenu() {
   document.getElementById('move-copy-overlay').classList.remove('active');
@@ -1892,9 +1861,10 @@ function renderCalendar() {
 
       shiftsHtml += `
       <div class="shift-dot-item ${isPlanned ? 'planned' : ''}" 
-           onclick="event.stopPropagation(); setTimeout(() => { if (!longPressTriggered) openShiftDetail(${s.id}); longPressTriggered = false; }, 50);" 
+           data-id="${s.id}"
            onpointerdown="startShiftLongPress(event, ${s.id})" 
-           onpointercancel="cancelShiftLongPress()" 
+           onpointercancel="cancelShiftLongPress()"
+           onpointerleave="cancelShiftLongPress()"
            title="${s.company} (${timeTag}) $${pay}">
         <div class="comp-name">${s.company}</div>
         <div class="shift-time">${timeTag}</div>
@@ -1914,7 +1884,10 @@ function renderCalendar() {
     const prevDate = new Date(currentYear, currentMonth, -(i));
     const prevDateStr = getLocalDateStr(prevDate);
     cell.dataset.date = prevDateStr;
-    cell.onclick = () => openModal(prevDateStr);
+    cell.onclick = (e) => {
+      if (longPressTriggered) return;
+      openModal(prevDateStr);
+    };
     cell.innerHTML = createCellContent(prevLastDay - i, prevDateStr, prevDate, false);
     daysContainer.appendChild(cell);
   }
@@ -1926,7 +1899,10 @@ function renderCalendar() {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const dateObj = new Date(currentYear, currentMonth, day);
     cell.dataset.date = dateStr;
-    cell.onclick = () => openModal(dateStr);
+    cell.onclick = (e) => {
+      if (longPressTriggered) return;
+      openModal(dateStr);
+    };
 
     if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
       cell.classList.add('today');
@@ -1948,10 +1924,23 @@ function renderCalendar() {
     const nextDate = new Date(currentYear, currentMonth + 1, i);
     const nextDateStr = getLocalDateStr(nextDate);
     cell.dataset.date = nextDateStr;
-    cell.onclick = () => openModal(nextDateStr);
+    cell.onclick = (e) => {
+      if (longPressTriggered) return;
+      openModal(nextDateStr);
+    };
     cell.innerHTML = createCellContent(i, nextDateStr, nextDate, false);
     daysContainer.appendChild(cell);
   }
+
+  // 為每個班次標籤專屬綁定點擊事件，避免滑動中誤觸
+  document.querySelectorAll('.shift-dot-item').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!longPressTriggered && el.dataset.id) {
+        openShiftDetail(Number(el.dataset.id));
+      }
+    });
+  });
 
   document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
   document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
@@ -2177,10 +2166,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 全域 Pointer 移動與放開監聽
   document.addEventListener('pointermove', event => {
-    if (!dragShiftId) return;
-    if (longPressTriggered) {
-      event.preventDefault(); // 防止滾動
-    }
+    if (!dragShiftId || !longPressTriggered) return;
+    
+    if (event.cancelable) event.preventDefault(); // 阻止原生滾動
+
     const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.day-cell[data-date]');
     clearDropTarget();
     if (target) {
@@ -2190,9 +2179,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }, { passive: false });
 
   document.addEventListener('pointerup', () => {
-    if (dragShiftId) {
-      window.pendingShiftId = dragShiftId;
-      window.pendingShiftDestination = dragDestination;
+    if (dragShiftId && longPressTriggered) {
       finishShiftDrag();
     } else {
       cancelShiftLongPress();
