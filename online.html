@@ -1210,8 +1210,8 @@ async function loadShiftsFromCloud() {
         eventName: item.event_name || '-',
         rate: Number(item.rate) || 0,
         allowance: Number(item.allowance) || 0,
-        startTime: item.start_time,
-        endTime: item.end_time,
+        startTime: (item.start_time || '').slice(0, 5), // Supabase time 欄位會回傳 09:00:00，切走秒數
+        endTime: (item.end_time || '').slice(0, 5),
         deductMins: Number(item.deduct_mins) || 0,
         duration: Number(item.duration) || 0
       }));
@@ -1727,6 +1727,7 @@ document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTo
 let longPressTimer = null;
 let longPressShiftId = null;
 let longPressTriggered = false;
+let suppressClickUntil = 0; // 只喺「真係拖咗去第日」之後短暫擋住 click
 let dragShiftId = null;
 let dragDestination = null;
 let activeDraggingElement = null;
@@ -1767,6 +1768,7 @@ function finishShiftDrag() {
   if (dragShiftId && dragDestination) {
     const shift = shifts.find(s => s.id == dragShiftId);
     if (shift && dragDestination !== shift.date) {
+      suppressClickUntil = Date.now() + 400;
       window.pendingShiftId = dragShiftId;
       window.pendingShiftDestination = dragDestination;
       
@@ -1793,6 +1795,7 @@ function finishShiftDrag() {
   longPressShiftId = null;
   dragDestination = null;
   activeDraggingElement = null;
+  longPressTriggered = false; // 放手就重設，唔好留住 true 擋住之後嘅 click
 }
 
 function closeMoveCopyMenu() {
@@ -1886,7 +1889,7 @@ function renderCalendar() {
     const prevDateStr = getLocalDateStr(prevDate);
     cell.dataset.date = prevDateStr;
     cell.onclick = (e) => {
-      if (longPressTriggered) return;
+      if (Date.now() < suppressClickUntil) return;
       openModal(prevDateStr);
     };
     cell.innerHTML = createCellContent(prevLastDay - i, prevDateStr, prevDate, false);
@@ -1901,7 +1904,7 @@ function renderCalendar() {
     const dateObj = new Date(currentYear, currentMonth, day);
     cell.dataset.date = dateStr;
     cell.onclick = (e) => {
-      if (longPressTriggered) return;
+      if (Date.now() < suppressClickUntil) return;
       openModal(dateStr);
     };
 
@@ -1926,7 +1929,7 @@ function renderCalendar() {
     const nextDateStr = getLocalDateStr(nextDate);
     cell.dataset.date = nextDateStr;
     cell.onclick = (e) => {
-      if (longPressTriggered) return;
+      if (Date.now() < suppressClickUntil) return;
       openModal(nextDateStr);
     };
     cell.innerHTML = createCellContent(i, nextDateStr, nextDate, false);
@@ -1936,7 +1939,7 @@ function renderCalendar() {
   document.querySelectorAll('.shift-dot-item').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (!longPressTriggered && el.dataset.id) {
+      if (Date.now() >= suppressClickUntil && el.dataset.id) {
         openShiftDetail(el.dataset.id);
       }
     });
