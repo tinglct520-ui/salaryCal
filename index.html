@@ -264,8 +264,7 @@ body.dark-mode .shift-dot-item { background-color: #2c4366; }
 <div class="action-sheet" onclick="event.stopPropagation()">
 <div class="action-sheet-title">備份與數據管理</div>
 <button class="action-sheet-btn primary" onclick="exportJSON(); closeActionMenu();">匯出 JSON 備份檔</button>
-<button class="action-sheet-btn primary" onclick="exportCSV(); closeActionMenu();">匯出 CSV (Excel)</button>
-<button class="action-sheet-btn" onclick="importJSON(); closeActionMenu();">匯入 JSON 備份檔到雲端</button>
+<button class="action-sheet-btn" onclick="importJSON(); closeActionMenu();">匯入 JSON 備份</button>
 <button class="action-sheet-btn danger" onclick="confirmClearAll(); closeActionMenu();">清空此 Sync Key 的雲端紀錄</button>
 <button class="action-sheet-btn" onclick="closeActionMenu()">取消</button>
 <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
@@ -855,13 +854,34 @@ function handleFileSelect(event) {
     try {
       const data = JSON.parse(e.target.result);
       if (Array.isArray(data)) {
+        updateSyncStatus('syncing', '正在將 JSON 資料匯入雲端...');
+        
+        // 使用 Promise.all 確保所有資料均上傳至 Supabase
         for (let item of data) {
-          await saveShiftToCloud(item);
+          const shiftObj = {
+            id: Number(item.id),
+            date: item.date,
+            company: item.company,
+            eventName: item.eventName || item.event_name || '-',
+            rate: Number(item.rate) || 0,
+            allowance: Number(item.allowance) || 0,
+            startTime: item.startTime || item.start_time,
+            endTime: item.endTime || item.end_time,
+            deductMins: Number(item.deductMins || item.deduct_mins) || 0,
+            duration: Number(item.duration) || 0,
+            type: item.type || 'completed'
+          };
+          await saveShiftToCloud(shiftObj);
         }
+        
+        // 上傳完成後，重新從雲端抓取並更新畫面
         await loadShiftsFromCloud();
-        alert('備份匯入雲端成功！');
+        alert('🎉 成功將 ' + data.length + ' 筆紀錄匯入至雲端！');
       }
-    } catch (err) { alert('解析檔案失敗'); }
+    } catch (err) {
+      console.error(err);
+      alert('解析檔案失敗，請確認是否為有效的 JSON 備份檔。');
+    }
   };
   reader.readAsText(file);
 }
