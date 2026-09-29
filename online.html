@@ -1731,6 +1731,14 @@ let suppressClickUntil = 0; // 只喺「真係拖咗去第日」之後短暫擋�
 let dragShiftId = null;
 let dragDestination = null;
 let activeDraggingElement = null;
+let activePointerId = null;
+
+function releaseActivePointerCapture() {
+  if (activeDraggingElement && activePointerId != null) {
+    try { activeDraggingElement.releasePointerCapture(activePointerId); } catch (e) {}
+  }
+  activePointerId = null;
+}
 
 function startShiftLongPress(event, shiftId) {
   if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -1739,6 +1747,12 @@ function startShiftLongPress(event, shiftId) {
   longPressShiftId = shiftId;
   longPressTriggered = false;
   activeDraggingElement = event.currentTarget;
+
+  // 鎖住個指標:滑鼠喺電腦郁出粒圓點範圍時，唔會被當成 pointerleave 而取消長按
+  try {
+    activeDraggingElement.setPointerCapture(event.pointerId);
+    activePointerId = event.pointerId;
+  } catch (e) {}
 
   longPressTimer = setTimeout(() => {
     longPressTriggered = true;
@@ -1754,6 +1768,7 @@ function startShiftLongPress(event, shiftId) {
 function cancelShiftLongPress() {
   if (longPressTimer) clearTimeout(longPressTimer);
   longPressTimer = null;
+  if (!dragShiftId) releaseActivePointerCapture();
 }
 
 function clearDropTarget() {
@@ -1790,6 +1805,7 @@ function finishShiftDrag() {
       if (overlay) overlay.classList.add('active');
     }
   }
+  releaseActivePointerCapture();
   clearDropTarget();
   dragShiftId = null;
   longPressShiftId = null;
