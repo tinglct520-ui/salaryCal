@@ -1168,7 +1168,11 @@ function updateSyncStatus(status, text) {
 
 function initSupabaseClient() {
   if (window.supabase) {
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // 將 sync key 放喺獨立 header 送去，等 Supabase 個 RLS 政策可以喺資料庫層面核對，
+    // 唔淨係靠前端自己加 .eq('sync_key', ...) 嚟篩選（純篩選任何人都繞得過）。
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: { headers: { 'x-sync-key': syncKey || '' } }
+    });
   } else {
     console.error('Supabase SDK 未能載入');
   }
@@ -1180,6 +1184,7 @@ async function initSyncKey() {
     const input = prompt('請輸入你的「跨裝置同步 Sync Key」\n（手機與電腦輸入同一個 Key 就能同步數據）：', defaultKey);
     syncKey = (input && input.trim()) ? input.trim() : defaultKey;
     localStorage.setItem('user_sync_key', syncKey);
+    initSupabaseClient(); // sync key 啱啱先出現，重新建立 client 帶埋新 header
   }
   updateSyncStatus('online', `Sync Key: ${syncKey}`);
   await loadShiftsFromCloud();
@@ -1190,6 +1195,7 @@ function promptChangeSyncKey() {
   if (newKey && newKey.trim() && newKey.trim() !== syncKey) {
     syncKey = newKey.trim();
     localStorage.setItem('user_sync_key', syncKey);
+    initSupabaseClient(); // 換咗 key，重新建立 client 帶埋新 header
     updateSyncStatus('online', `Sync Key: ${syncKey}`);
     loadShiftsFromCloud();
   }
