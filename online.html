@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="努力賺錢錢">
-<meta name="theme-color" content="#f5f8fc" id="theme-color-meta">
+<meta name="theme-color" content="#FFF6E3" id="theme-color-meta">
 <link rel="apple-touch-icon" href="icon.png">
 <title>努力賺錢錢 (Cloud Sync)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,43 +17,43 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
---bg-color: #f5f8fc;
---card-bg: #ffffff;
---primary: #6d90c4;
---primary-dark: #3f5f8f;
---primary-hover: #3f5f8f;
---primary-light: #eaf1fb;
---text-main: #212529;
---text-sub: #6c757d;
---border-color: #f5f8fa;
+--bg-color: #FFF6E3;
+--card-bg: #FFFCF5;
+--primary: #F6A79A;
+--primary-dark: #D5642A;
+--primary-hover: #D5642A;
+--primary-light: #FFEDC0;
+--text-main: #4A2C20;
+--text-sub: #9A7B6E;
+--border-color: #F6E3C8;
 --accent-price: #2e7d32;
---plan-bg: #eaf1fb;
---plan-border: #90b8e0;
+--plan-bg: #FFEDC0;
+--plan-border: #F6A79A;
 --danger: #e53935;
 --holiday-red: #e53935;
 --nav-height: 50px;
 --safe-bottom: env(safe-area-inset-bottom, 0px);
 --safe-top: env(safe-area-inset-top, 0px);
---input-bg: #fdfdfc;
+--input-bg: #FFF9EC;
 }
 
 /* Night Mode Colors */
 body.dark-mode {
---bg-color: #121824;
---card-bg: #1e2638;
---primary: #8fb1e0;
---primary-dark: #8fb1e0;
---primary-hover: #a3c2ee;
---primary-light: #2a364f;
---text-main: #f0f4f9;
---text-sub: #9ca3af;
---border-color: #2a3447;
+--bg-color: #2B1D18;
+--card-bg: #3A2822;
+--primary: #F6A79A;
+--primary-dark: #F6A79A;
+--primary-hover: #FFC4B8;
+--primary-light: #4E352C;
+--text-main: #FFF1DC;
+--text-sub: #C9A99A;
+--border-color: #55392F;
 --accent-price: #81c784;
---plan-bg: #2a364f;
---plan-border: #4a5d7e;
+--plan-bg: #4E352C;
+--plan-border: #8A5A4A;
 --danger: #ef5350;
 --holiday-red: #ef5350;
---input-bg: #2a364f;
+--input-bg: #4E352C;
 }
 
 * {
@@ -145,7 +145,7 @@ transition: background-color 0.3s;
 padding: 18px;
 }
 .month-salary-card {
-background: linear-gradient(135deg, #4a6fa5, #2c4366);
+background: linear-gradient(135deg, #EE8350, #D5642A);
 border-radius: 18px;
 padding: 18px 20px;
 color: white;
@@ -291,7 +291,7 @@ user-select: none !important;
 -webkit-user-select: none !important;
 -webkit-touch-callout: none !important;
 touch-action: none !important;
-background-color: #3f5f8f;
+background-color: #D5642A;
 padding: 1px 0;
 width: 100%;
 text-align: center;
@@ -303,7 +303,7 @@ line-height: 1.3;
 flex-shrink: 0;
 }
 body.dark-mode .shift-dot-item {
-background-color: #2c4366;
+background-color: #D5642A;
 }
 .shift-dot-item .comp-name {
 color: #ffffff;
@@ -339,7 +339,7 @@ outline: 2px dashed var(--primary);
 outline-offset: -3px;
 background: var(--primary-light) !important;
 }
-#calendar-view, #list-view, #analytics-view {
+#calendar-view, #list-view, #analytics-view, #analysis-view {
 margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
 }
 .list-filter-bar {
@@ -539,7 +539,7 @@ max-width: 70px;
 width: 42px;
 height: 42px;
 border-radius: 50%;
-background: linear-gradient(135deg, #4a6fa5, #2c4366);
+background: linear-gradient(135deg, #EE8350, #D5642A);
 color: white;
 border: 4px solid var(--card-bg);
 display: flex;
@@ -829,7 +829,7 @@ font-weight: 800;
 cursor: pointer;
 }
 body.dark-mode .btn-submit {
-color: #121824;
+color: #2B1D18;
 }
 .btn-delete-item {
 background-color: rgba(229, 57, 53, 0.15);
@@ -887,7 +887,7 @@ background: var(--primary-dark);
 color: #ffffff;
 }
 body.dark-mode .action-sheet-btn.primary {
-color: #121824;
+color: #2B1D18;
 }
 .action-sheet-btn.danger {
 background: rgba(229, 57, 53, 0.15);
@@ -905,6 +905,75 @@ padding: 30px;
 color: var(--text-sub);
 font-size: 0.88rem;
 }
+
+/* ===== Budget Tracker ===== */
+.month-salary-card{gap:6px}.month-salary-card .salary-box{flex:1;align-items:center;text-align:center}
+.month-salary-card .salary-box strong{font-size:1.08rem}
+.bt-tabs{display:flex;gap:10px;padding:0 18px 6px}
+.bt-tabs button{flex:1;padding:14px 6px;border-radius:14px;border:2px solid transparent;background:var(--primary-light);color:var(--text-sub);font-size:1.1rem;font-weight:800;cursor:pointer}
+.bt-tabs button.on.ex{border-color:var(--danger);color:var(--danger)}.bt-tabs button.on.in{border-color:var(--accent-price);color:var(--accent-price)}
+.bt-pad{padding:10px 18px 18px}
+.bt-box{background:var(--primary-light);border-radius:16px;padding:14px;margin-bottom:8px}
+.bt-row{display:flex;justify-content:space-between;align-items:center}
+.bt-mu{color:var(--text-sub);font-size:.8rem}.bt-big{font-size:1.6rem;font-weight:800;color:var(--text-main)}
+.bt-bar{height:12px;background:var(--border-color);border-radius:8px;overflow:hidden;margin:10px 0 6px}.bt-bar i{display:block;height:100%;border-radius:8px;transition:width .3s}
+.bt-msg{padding:8px 10px;border-radius:10px;font-size:.8rem;font-weight:700;margin-top:8px}
+.bt-btn{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-main);border-radius:10px;padding:7px 11px;font-size:.8rem;font-weight:700;cursor:pointer}
+.bt-day{display:flex;justify-content:space-between;padding:12px 2px 4px;color:var(--text-sub);font-size:.8rem;font-weight:800}
+.bt-it{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--border-color)}
+.bt-ic{font-size:1.3rem;width:38px;height:38px;display:grid;place-items:center;background:var(--primary-light);border-radius:50%;flex-shrink:0}
+.bt-m{flex:1;min-width:0}.bt-m b{display:block;font-size:.92rem}.bt-m span{display:block;color:var(--text-sub);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt-x{background:none;border:0;color:var(--text-sub);font-size:1rem;cursor:pointer;padding:4px}
+.bt-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:999}.bt-ov.on{display:flex}
+.bt-sheet{background:var(--card-bg);color:var(--text-main);width:100%;max-width:600px;border-radius:20px 20px 0 0;padding:18px 18px calc(18px + var(--safe-bottom));max-height:88vh;overflow:auto}
+.bt-sheet h3{margin-bottom:10px}
+.bt-sheet input{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--border-color);background:var(--input-bg);color:var(--text-main);font-size:16px;margin:4px 0 10px}
+.bt-cats{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.bt-cat{padding:7px 10px;border-radius:20px;border:1px solid var(--border-color);background:var(--input-bg);color:var(--text-main);font-size:.85rem;cursor:pointer}.bt-cat.on{background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+.bt-pri{width:100%;padding:13px;border:0;border-radius:12px;background:var(--primary-dark);color:#fff;font-size:1rem;font-weight:800;cursor:pointer}
+body.dark-mode .bt-pri,body.dark-mode .bt-cat.on{color:#2B1D18}
+
+.fab-add{position:fixed;right:16px;bottom:calc(var(--nav-height) + var(--safe-bottom) + 16px);width:56px;height:56px;border-radius:50%;border:0;background:linear-gradient(135deg,#EE8350,#D5642A);color:#fff;font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.3);cursor:pointer;z-index:998;transition:transform .15s}
+.fab-add:active{transform:scale(.92)}
+.an-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.an-wd{text-align:center;font-size:.7rem;font-weight:800;color:var(--text-sub);padding-bottom:2px}
+.an-c{min-height:58px;border-radius:8px;background:var(--card-bg);padding:3px 2px;text-align:center;font-size:.62rem;font-weight:800;line-height:1.25;cursor:pointer;overflow:hidden}
+.an-c.empty{background:transparent;cursor:default}.an-c.today{outline:2px solid var(--primary)}
+.an-c .dn{font-size:.7rem;color:var(--text-main);font-weight:700;display:block}
+.an-i{color:var(--accent-price);display:block}.an-e{color:var(--danger);display:block}
+.an-leg{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:.85rem}.an-leg i{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.an-bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:18px}
+.an-bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:.65rem;color:var(--text-sub);font-weight:700}
+.an-bar div{width:100%;border-radius:6px 6px 0 0;background:var(--primary);min-height:2px}.an-bar.cur div{background:var(--danger)}
+
+.bt-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.bt-gc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 2px;border-radius:14px;border:2px solid transparent;background:var(--primary-light);color:var(--text-main);font-size:.75rem;font-weight:700;cursor:pointer}
+.bt-gc span{font-size:1.9rem;line-height:1.1}.bt-gc.on{border-color:var(--primary-dark);background:var(--card-bg);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.bt-disp{display:flex;align-items:center;gap:10px;background:var(--primary-light);border-radius:14px;padding:10px 14px;margin-bottom:8px}
+.bt-disp .l{font-size:.85rem;font-weight:800;white-space:nowrap}.bt-disp .v{flex:1;text-align:right;overflow:hidden}
+.bt-disp .v b{display:block;font-size:1.8rem;font-weight:800;color:var(--danger);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bt-disp .v small{color:var(--text-sub);font-size:.8rem}
+.bt-meta{display:flex;gap:8px;margin-bottom:8px}.bt-meta input{margin:0;flex:1;min-width:0;padding:9px}
+.bt-pad4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.bt-pad4 button{height:50px;border:0;border-radius:12px;background:var(--primary-light);color:var(--text-main);font-size:1.3rem;font-weight:800;cursor:pointer}
+.bt-pad4 button:active{filter:brightness(.9)}.bt-pad4 .op{background:var(--border-color)}
+.bt-pad4 .ok{grid-column:4;grid-row:3 / span 2;height:auto;background:var(--primary-dark);color:#fff;font-size:1.1rem}
+body.dark-mode .bt-pad4 .ok{color:#2B1D18}
+
+.bt-dt{position:relative;margin-bottom:10px;cursor:pointer}
+.bt-sheet .bt-dt input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;padding:0;border:0}
+.bt-disp input{flex:1.1;min-width:0;margin:0;padding:10px;background:var(--card-bg)}
+.bt-disp .v{flex:1}
+
+.bt-chip{position:relative;flex-shrink:0;background:var(--card-bg);border-radius:10px;padding:10px 8px;font-size:.78rem;font-weight:800;color:var(--primary-dark);white-space:nowrap;cursor:pointer}
+.bt-sheet .bt-chip input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;padding:0;border:0}
+.bt-disp .v{min-width:0}.bt-disp .v b{font-size:1.5rem}
+
+.bt-g{grid-template-columns:repeat(5,1fr);gap:6px}
+.bt-gc{background:transparent;border:2px solid transparent;border-radius:12px;font-size:.7rem;padding:8px 0}
+.bt-gc span{font-size:1.7rem}
+.bt-gc.on{background:transparent;box-shadow:none;border-color:var(--primary-dark)}
+
+.bt-sheet .bt-disp input#bt-n{background:transparent;border:0;border-radius:0;padding:6px 4px;outline:none;box-shadow:none}
+.bt-chip{background:transparent;border-radius:0;padding:6px 0}
 </style>
 </head>
 <body>
@@ -922,15 +991,11 @@ font-size: 0.88rem;
 </div>
 
 <div class="month-salary-card">
-<div class="salary-box">
-<span>血汗已換取</span>
-<strong id="month-pay">$ 0</strong>
-</div>
+<div class="salary-box"><span>血汗已換取</span><strong id="month-pay">$ 0</strong></div>
 <div class="salary-divider"></div>
-<div class="salary-box">
-<span style="text-align:right;">本月努力指數</span>
-<strong id="month-total-est" style="text-align:right;">$ 0</strong>
-</div>
+<div class="salary-box"><span>又亂使錢</span><strong id="month-spend">$ 0</strong></div>
+<div class="salary-divider"></div>
+<div class="salary-box"><span>本月身家</span><strong id="month-balance">$ 0</strong></div>
 </div>
 
 <!-- VIEW 1: Calendar View -->
@@ -950,11 +1015,23 @@ font-size: 0.88rem;
 
 <!-- VIEW 2: List View -->
 <div id="list-view" class="card" style="display: none;">
-<div class="list-filter-bar cardTitle" id="company-filter-tabs"></div>
-<div id="shift-list-container"></div>
+<div class="calendar-header cardTitle" style="margin-bottom:0;padding-bottom:8px"><h2 id="bt-month"></h2><div class="month-nav"><button class="btn-nav" onclick="changeMonth(-1)">&lt;</button><button class="btn-nav" onclick="changeMonth(1)">&gt;</button></div></div>
+<div id="bt-body"></div>
 </div>
 
-<!-- VIEW 3: Analytics View -->
+<!-- VIEW 3a: Analysis (charts) -->
+<div id="analysis-view" class="card cardTitle" style="display: none;">
+<div class="calendar-header">
+<h2 id="analysis-month-year"></h2>
+<div class="month-nav">
+<button class="btn-nav" onclick="changeMonth(-1)">&lt;</button>
+<button class="btn-nav" onclick="changeMonth(1)">&gt;</button>
+</div>
+</div>
+<div id="an-new"></div>
+</div>
+
+<!-- VIEW 3b: Income report / statement -->
 <div id="analytics-view" class="card cardTitle" style="display: none;">
 <div class="calendar-header">
 <h2 id="analytics-month-year"></h2>
@@ -963,6 +1040,7 @@ font-size: 0.88rem;
 <button class="btn-nav" id="next-month-a">&gt;</button>
 </div>
 </div>
+<div class="analytics-section-title" style="margin-top:6px"><span>💼 收入報表</span></div>
 <div class="analytics-summary-grid">
 <div class="stat-box">
 <span>本月做狗總時數</span>
@@ -1001,16 +1079,19 @@ font-size: 0.88rem;
 <button class="nav-item" id="nav-list" onclick="switchNav('list-view')">
 <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
 </button>
-<div class="nav-item-add-container">
-<button class="btn-add-highlight" onclick="openModal()">+</button>
-</div>
+<button class="nav-item" id="nav-analysis" onclick="switchNav('analysis-view')">
+<svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg>
+</button>
 <button class="nav-item" id="nav-analytics" onclick="switchNav('analytics-view')">
-<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
+<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
 </button>
 <button class="nav-item" id="nav-backup" onclick="openActionMenu()">
 <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
 </button>
 </nav>
+
+<button class="fab-add" onclick="onAddBtn()" aria-label="新增">+</button>
+<div class="bt-ov" id="bt-ov" onclick="if(event.target===this)btClose()"><div class="bt-sheet" id="bt-sheet"></div></div>
 
 <!-- Action Sheet -->
 <div class="action-menu-overlay" id="action-menu-overlay" onclick="closeActionMenu()">
@@ -1117,6 +1198,7 @@ let db = null; // 初始化爲 null，等 DOM 載入完成再建立 Client
 let syncKey = localStorage.getItem('user_sync_key') || '';
 let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];
 let companyPaydays = JSON.parse(localStorage.getItem('companyPaydays')) || {};
+let B = JSON.parse(localStorage.getItem('budgetData') || 'null') || { exp: [], subs: [], budget: 0 };
 let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth();
@@ -1130,7 +1212,7 @@ let miniCalMonth = new Date().getMonth();
 let allowRangeSelection = true;
 
 const companyColorPalette = [
-{ bg: '#e3f2fd', border: '#90caf9', text: '#1976d2' },
+{ bg: '#FFE4DE', border: '#F6A79A', text: '#D5642A' },
 { bg: '#f3e5f5', border: '#ce93d8', text: '#7b1fa2' },
 { bg: '#fff3e0', border: '#ffcc80', text: '#e65100' },
 { bg: '#e8f5e9', border: '#a5d6a7', text: '#2e7d32' },
@@ -1208,7 +1290,8 @@ async function loadShiftsFromCloud() {
     const { data, error } = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
     if (error) throw error;
     if (data && data.length > 0) {
-      shifts = data.map(item => ({
+      parseBudgetRows(data);
+      shifts = data.filter(item => !BT_TYPES.includes(item.type)).map(item => ({
         id: item.shift_id ? (isNaN(item.shift_id) ? item.shift_id : Number(item.shift_id)) : Date.now(),
         type: item.type || 'completed',
         date: item.date,
@@ -1237,6 +1320,7 @@ async function loadShiftsFromCloud() {
 function saveDataToLocalOnly() {
   localStorage.setItem('partTimeShifts', JSON.stringify(shifts));
   localStorage.setItem('companyPaydays', JSON.stringify(companyPaydays));
+  localStorage.setItem('budgetData', JSON.stringify(B));
 }
 
 async function saveData() {
@@ -1249,7 +1333,8 @@ async function saveData() {
     if (delError) console.warn('Delete warning:', delError);
 
     // 2. 重新批次寫入最新資料
-    if (shifts.length > 0) {
+    const extraRows = budgetRows();
+    if (shifts.length > 0 || extraRows.length > 0) {
       const dbRows = shifts.map(s => ({
         sync_key: syncKey,
         shift_id: String(s.id),
@@ -1264,7 +1349,7 @@ async function saveData() {
         deduct_mins: Number(s.deductMins) || 0,
         duration: Number(s.duration) || 0
       }));
-      const { error: insertError } = await db.from('user_shifts').insert(dbRows);
+      const { error: insertError } = await db.from('user_shifts').insert(dbRows.concat(extraRows));
       if (insertError) throw insertError;
     }
     updateSyncStatus('online', `已同步 (${syncKey})`);
@@ -1274,13 +1359,241 @@ async function saveData() {
   }
 }
 
+// ==================== Budget Tracker ====================
+const BT_TYPES = ['expense', 'sub', 'budget'];
+const BT_CATS = [['🍜','食飯'],['🚇','交通'],['🧴','日用品'],['🎮','娛樂'],['💄','扮靚靚'],['🔁','訂閱'],['✈️','旅行'],['🩺','睇醫生'],['🏠','家用'],['🐷','盧媽儲錢']];
+const BT_LEGACY = [['👕','衫衫'],['🍜','餐飲'],['🛒','購物'],['🏠','住屋'],['💊','醫療'],['📦','其他']];
+let btTabCur = 'ex', btCat = '食飯';
+const btEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const btIcon = c => (BT_CATS.concat(BT_LEGACY).find(x => x[1] === c) || ['📦'])[0];
+const btShortDate = d => d ? (+d.slice(5, 7)) + '/' + (+d.slice(8, 10)) : '日期';
+const btUid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const btYM = () => currentYear + '-' + String(currentMonth + 1).padStart(2, '0');
+const btDim = ym => new Date(+ym.slice(0, 4), +ym.slice(5), 0).getDate();
+
+function btMonthExp(ym = btYM()) {
+  const list = B.exp.filter(e => (e.date || '').startsWith(ym)).map(e => ({ ...e }));
+  B.subs.forEach(s => {
+    if (s.start <= ym && (!s.end || s.end >= ym)) {
+      list.push({ id: 's' + s.id, sub: 1, amt: s.amt, cat: s.cat || '訂閱', note: s.name,
+        date: ym + '-' + String(Math.min(s.day, btDim(ym))).padStart(2, '0') });
+    }
+  });
+  return list;
+}
+function btIncomeShifts(ym = btYM()) {
+  return shifts.filter(s => s.date && s.date.startsWith(ym));
+}
+function btIncomeTotal() {
+  return btIncomeShifts().filter(s => s.type === 'completed' || !s.type).reduce((a, s) => a + getShiftPay(s), 0);
+}
+
+function budgetRows() {
+  const base = { sync_key: syncKey, allowance: 0, start_time: '', end_time: '', deduct_mins: 0, duration: 1, rate: 0, event_name: '', company: '' };
+  const r = [];
+  B.exp.forEach(e => r.push({ ...base, shift_id: String(e.id), type: 'expense', date: e.date, company: e.cat, event_name: e.note || '', rate: e.amt }));
+  B.subs.forEach(s => r.push({ ...base, shift_id: String(s.id), type: 'sub', date: s.start + '-01', company: s.cat || '訂閱', event_name: s.name, rate: s.amt, deduct_mins: s.day, duration: s.end ? Number(s.end.replace('-', '')) : 0 }));
+  if (B.budget) r.push({ ...base, shift_id: 'budget', type: 'budget', date: '2000-01-01', rate: B.budget });
+  return r;
+}
+function parseBudgetRows(data) {
+  const nb = { exp: [], subs: [], budget: 0 };
+  data.forEach(i => {
+    if (i.type === 'expense') nb.exp.push({ id: i.shift_id, date: i.date, cat: i.company, note: i.event_name, amt: Number(i.rate) || 0 });
+    else if (i.type === 'sub') {
+      const e = Number(i.duration) || 0;
+      nb.subs.push({ id: i.shift_id, name: i.event_name, amt: Number(i.rate) || 0, day: Number(i.deduct_mins) || 1, cat: i.company, start: String(i.date).slice(0, 7), end: e > 1 ? String(e).slice(0, 4) + '-' + String(e).slice(4, 6) : '' });
+    } else if (i.type === 'budget') nb.budget = Number(i.rate) || 0;
+  });
+  const hasCloud = nb.exp.length || nb.subs.length || nb.budget;
+  const localEmpty = !B.exp.length && !B.subs.length && !B.budget;
+  if (hasCloud || localEmpty) B = nb;
+}
+
+function onAddBtn() {
+  if (currentView === 'list-view') btOpenExp();
+  else if (currentView === 'analytics-view' || currentView === 'analysis-view') btSheet('<h3>新增</h3><button class="bt-pri" style="margin-bottom:10px" onclick="btClose();btOpenExp()">💸 新增支出</button><button class="bt-pri" onclick="btClose();openModal()">💼 新增排班 / 打工紀錄</button>');
+  else openModal();
+}
+function btClose() { document.getElementById('bt-ov').classList.remove('on'); }
+function btSheet(h) { document.getElementById('bt-sheet').innerHTML = h; document.getElementById('bt-ov').classList.add('on'); }
+
+function renderListView() {
+  autoUpdatePastPlannedShifts();
+  updateMonthSalaryCard();
+  document.getElementById('bt-month').textContent = `💸 ${currentYear}年${currentMonth + 1}月 支出`;
+  const ex = btMonthExp(), spent = ex.reduce((a, e) => a + e.amt, 0), wd = '日一二三四五六';
+  const b = B.budget || 0, p = b ? spent / b * 100 : 0, left = b - spent;
+  const col = p >= 100 ? 'var(--danger)' : p >= 80 ? '#f59e0b' : 'var(--accent-price)';
+  const subT = ex.filter(e => e.sub).reduce((a, e) => a + e.amt, 0);
+  let h = '<div class="bt-pad">';
+  h += `<div class="bt-box"><div class="bt-row"><span class="bt-mu">每月預算餘額</span><button class="bt-btn" onclick="btOpenBudget()">設定預算</button></div>`;
+  if (b) {
+    h += `<div class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--text-main)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</div>
+    <div class="bt-bar"><i style="width:${Math.min(p, 100)}%;background:${col}"></i></div>
+    <div class="bt-row bt-mu"><span>已用 $${formatMoney(spent)} / $${formatMoney(b)}</span><b style="color:${col}">${p.toFixed(0)}%</b></div>
+    <div class="bt-msg" style="background:${col}22;color:${col}">${p >= 100 ? `🚨 已經超支 $${formatMoney(-left)}！收手啦` : p >= 80 ? `⚠️ 已用 ${p.toFixed(0)}%，只剩 $${formatMoney(left)}，小心 overbudget` : `👍 仲有 $${formatMoney(left)}，繼續保持`}</div>`;
+  } else h += '<div class="bt-mu" style="margin-top:6px">㩒「設定預算」開始</div>';
+  if (subT) h += `<div class="bt-mu" style="margin-top:8px">🔁 其中訂閱費 $${formatMoney(subT)}</div>`;
+  h += '</div><div class="bt-row" style="gap:8px"><button class="bt-btn" onclick="btOpenSubs()">🔁 訂閱管理</button></div>';
+  const g = {};
+  ex.sort((a, b) => b.date.localeCompare(a.date)).forEach(e => (g[e.date] = g[e.date] || []).push(e));
+  Object.keys(g).forEach(d => {
+    const tot = g[d].reduce((a, e) => a + e.amt, 0);
+    h += `<div class="bt-day"><span>${+d.slice(8)}日 週${wd[new Date(d + 'T00:00:00').getDay()]}</span><span>今日支出 $${formatMoney(tot)}</span></div>`;
+    g[d].forEach(e => h += `<div class="bt-it"><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b>${e.sub ? '' : `<button class="bt-x" onclick="btDelExp('${btEsc(e.id)}')">✕</button>`}</div>`);
+  });
+  if (!ex.length) h += '<div class="empty-msg">呢個月未有支出記錄<br>㩒右下角 + 新增</div>';
+  document.getElementById('bt-body').innerHTML = h + '</div>';
+}
+
+let btAmt = '';
+function btGrid() {
+  return '<div class="bt-g">' + BT_CATS.map(c => `<button type="button" class="bt-gc${c[1] === btCat ? ' on' : ''}" data-c="${c[1]}" onclick="btPick('${c[1]}')"><span>${c[0]}</span>${c[1]}</button>`).join('') + '</div>';
+}
+function btPick(c) {
+  btCat = c;
+  document.querySelectorAll('.bt-gc').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+  btRefreshAmt();
+}
+function btTotal() { return btAmt.split('+').reduce((a, x) => a + (parseFloat(x) || 0), 0); }
+function btRefreshAmt() {
+  const v = document.getElementById('bt-dv'), s = document.getElementById('bt-ds');
+  if (!v) return;
+  v.textContent = '$' + (btAmt || '0');
+  s.textContent = btAmt.includes('+') ? '= $' + formatMoney(btTotal()) : '';
+}
+function btKey(k) {
+  if (k === 'del') btAmt = btAmt.slice(0, -1);
+  else if (k === '+') { if (btAmt && !btAmt.endsWith('+') && !btAmt.endsWith('.')) btAmt += '+'; }
+  else if (k === '.') { const last = btAmt.split('+').pop(); if (!last.includes('.')) btAmt += last === '' ? '0.' : '.'; }
+  else {
+    const last = btAmt.split('+').pop();
+    if (last === '0' && k !== '00') btAmt = btAmt.slice(0, -1);
+    if (k === '00' && (last === '' || last === '0')) return;
+    if (last.includes('.') && last.split('.')[1].length >= 2) return;
+    if (btAmt.length < 14) btAmt += k;
+  }
+  btRefreshAmt();
+}
+function btOpenExp() {
+  btCat = '食飯'; btAmt = '';
+  const t = getLocalDateStr(), ym = btYM(), d = t.startsWith(ym) ? t : ym + '-01';
+  const keys = ['7','8','9','del','4','5','6','+','1','2','3','OK','.','0','00'];
+  const pad = keys.map(k => k === 'OK' ? '<button class="ok" onclick="btSaveExp()">儲存</button>' : `<button class="${k === 'del' || k === '+' ? 'op' : ''}" onclick="btKey('${k}')">${k === 'del' ? '⌫' : k}</button>`).join('');
+  btSheet(`<div class="modal-header"><h2>又亂使錢💸</h2><button class="close-btn" onclick="btClose()">✕</button></div>${btGrid()}<div class="bt-disp"><label class="bt-chip">📅 <span id="bt-dtl">${btShortDate(d)}</span><input id="bt-d" type="date" value="${d}" onchange="document.getElementById('bt-dtl').textContent=btShortDate(this.value)"></label><input id="bt-n" placeholder="輸入詳情…"><div class="v"><b id="bt-dv">$0</b><small id="bt-ds"></small></div></div><div class="bt-pad4">${pad}</div>`);
+  btRefreshAmt();
+}
+function btSaveExp() {
+  const a = btTotal(), d = document.getElementById('bt-d').value;
+  if (!(a > 0)) return alert('請輸入金額');
+  if (!d) return alert('請揀日期');
+  B.exp.push({ id: btUid(), date: d, cat: btCat, note: document.getElementById('bt-n').value.trim(), amt: Math.round(a * 100) / 100 });
+  currentYear = +d.slice(0, 4); currentMonth = +d.slice(5, 7) - 1;
+  saveData(); btClose(); renderCurrentView();
+}
+function btDelExp(id) { if (confirm('刪除呢筆支出？')) { B.exp = B.exp.filter(e => String(e.id) !== String(id)); saveData(); renderListView(); } }
+function btOpenBudget() {
+  btSheet(`<h3>每月預算</h3><input id="bt-b" type="number" inputmode="decimal" value="${B.budget || ''}" placeholder="每月預算金額"><div class="bt-mu" style="margin-bottom:10px">每個月都用同一個預算</div><button class="bt-pri" onclick="btSaveBudget()">儲存</button>`);
+}
+function btSaveBudget() { B.budget = parseFloat(document.getElementById('bt-b').value) || 0; saveData(); btClose(); renderListView(); }
+function btOpenSubs() {
+  let h = '<h3>🔁 訂閱 / 固定支出</h3><div class="bt-mu" style="margin-bottom:8px">每月自動計入支出</div>';
+  B.subs.forEach(s => h += `<div class="bt-it"><div class="bt-ic">🔁</div><div class="bt-m"><b>${btEsc(s.name)}</b><span>每月 ${s.day} 號 · 由 ${s.start} 起${s.end ? ' 至 ' + s.end : ''}</span></div><b>$${formatMoney(s.amt)}</b><button class="bt-x" onclick="btDelSub('${btEsc(s.id)}')">✕</button></div>`);
+  if (!B.subs.length) h += '<div class="empty-msg">未有訂閱</div>';
+  h += `<div style="height:10px"></div><input id="bt-sn" placeholder="名稱（Netflix / Spotify…）"><input id="bt-sa" type="number" inputmode="decimal" placeholder="每月金額"><input id="bt-sd" type="number" min="1" max="31" value="1" placeholder="每月幾號扣款"><button class="bt-pri" onclick="btAddSub()">新增訂閱（由本月起）</button>`;
+  btSheet(h);
+}
+function btAddSub() {
+  const n = document.getElementById('bt-sn').value.trim(), a = parseFloat(document.getElementById('bt-sa').value);
+  const d = Math.min(31, Math.max(1, parseInt(document.getElementById('bt-sd').value) || 1));
+  if (!n || !(a > 0)) return alert('請填名稱同金額');
+  B.subs.push({ id: btUid(), name: n, amt: a, day: d, cat: '訂閱', start: btYM(), end: '' });
+  saveData(); renderListView(); btOpenSubs();
+}
+function btDelSub(id) {
+  if (!confirm('停止呢個訂閱？由本月起唔再計入，之前月份保留。')) return;
+  const s = B.subs.find(x => String(x.id) === String(id)); if (!s) return;
+  const p = new Date(currentYear, currentMonth - 1, 1), prev = p.getFullYear() + '-' + String(p.getMonth() + 1).padStart(2, '0');
+  if (s.start > prev) B.subs = B.subs.filter(x => x !== s); else s.end = prev;
+  saveData(); renderListView(); btOpenSubs();
+}
+
+// ==================== Analysis ====================
+const AN_COLORS = ['#ef5350','#42a5f5','#66bb6a','#ffa726','#ab47bc','#26c6da','#8d6e63','#9e9e9e'];
+const anShort = n => n >= 10000 ? (Math.round(n / 100) / 10) + 'k' : String(Math.round(n));
+function renderAnalytics() {
+  renderAnalyticsOld();
+}
+function anDayMaps(ym) {
+  const de = {}, di = {};
+  btMonthExp(ym).forEach(e => de[e.date] = (de[e.date] || 0) + e.amt);
+  btIncomeShifts(ym).filter(s => s.type === 'completed' || !s.type).forEach(s => di[s.date] = (di[s.date] || 0) + getShiftPay(s));
+  return { de, di };
+}
+function renderAnalysis() {
+  updateMonthSalaryCard();
+  document.getElementById('analysis-month-year').textContent = `${currentYear}年${currentMonth + 1}月`;
+  const ym = btYM(), { de, di } = anDayMaps(ym), dim = btDim(ym), today = getLocalDateStr();
+  const off = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
+  let cal = '<div class="an-cal">' + ['一','二','三','四','五','六','日'].map(d => `<div class="an-wd">${d}</div>`).join('');
+  for (let i = 0; i < off; i++) cal += '<div class="an-c empty"></div>';
+  for (let d = 1; d <= dim; d++) {
+    const ds = ym + '-' + String(d).padStart(2, '0');
+    cal += `<div class="an-c${ds === today ? ' today' : ''}" onclick="anDay('${ds}')"><span class="dn">${d}</span>${di[ds] ? `<span class="an-i">+${anShort(di[ds])}</span>` : ''}${de[ds] ? `<span class="an-e">-${anShort(de[ds])}</span>` : ''}</div>`;
+  }
+  cal += '</div>';
+
+  const ex = btMonthExp(ym), cats = {};
+  ex.forEach(e => cats[e.cat] = (cats[e.cat] || 0) + e.amt);
+  const arr = Object.entries(cats).sort((a, b) => b[1] - a[1]), tot = arr.reduce((a, c) => a + c[1], 0);
+  let pie = '<div class="empty-msg">呢個月未有支出</div>';
+  if (tot > 0) {
+    let a0 = 0, paths = '';
+    const pt = a => [60 + 54 * Math.sin(a), 60 - 54 * Math.cos(a)];
+    arr.forEach(([c, v], i) => {
+      const col = AN_COLORS[i % AN_COLORS.length], a1 = a0 + v / tot * Math.PI * 2;
+      if (arr.length === 1) paths += `<circle cx="60" cy="60" r="54" fill="${col}"/>`;
+      else { const [x0, y0] = pt(a0), [x1, y1] = pt(a1); paths += `<path d="M60 60 L${x0} ${y0} A54 54 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1} ${y1} Z" fill="${col}"/>`; }
+      a0 = a1;
+    });
+    pie = `<svg viewBox="0 0 120 120" style="width:170px;height:170px;display:block;margin:0 auto">${paths}<circle cx="60" cy="60" r="30" fill="var(--primary-light)"/><text x="60" y="58" text-anchor="middle" font-size="7" fill="var(--text-sub)">總支出</text><text x="60" y="69" text-anchor="middle" font-size="9" font-weight="800" fill="var(--text-main)">$${anShort(tot)}</text></svg><div style="margin-top:10px">` +
+      arr.map(([c, v], i) => `<div class="an-leg"><i style="background:${AN_COLORS[i % AN_COLORS.length]}"></i><span>${btIcon(c)} ${btEsc(c)}</span><span style="margin-left:auto;font-weight:800">$${formatMoney(v)}</span><span class="bt-mu" style="width:42px;text-align:right">${(v / tot * 100).toFixed(0)}%</span></div>`).join('') + '</div>';
+  }
+
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(currentYear, currentMonth - i, 1), k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    months.push({ k, m: d.getMonth() + 1, v: btMonthExp(k).reduce((a, e) => a + e.amt, 0) });
+  }
+  const mx = Math.max(...months.map(x => x.v), 1);
+  const bars = '<div class="an-bars">' + months.map((x, i) => `<div class="an-bar${i === 5 ? ' cur' : ''}">${x.v ? '$' + anShort(x.v) : ''}<div style="height:${x.v / mx * 100}%"></div><span style="margin-top:4px">${x.m}月</span></div>`).join('') + '</div>';
+  const cur = months[5].v, prev = months[4].v, diff = cur - prev;
+  const dtxt = prev === 0 && cur === 0 ? '' : prev === 0 ? `<div class="bt-msg" style="background:#f59e0b22;color:#f59e0b">上個月冇支出記錄</div>` :
+    `<div class="bt-msg" style="background:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}22;color:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}">比上個月 ${diff > 0 ? '↑ 多使' : diff < 0 ? '↓ 慳咗' : '一樣'} $${formatMoney(Math.abs(diff))}（${diff > 0 ? '+' : ''}${(diff / prev * 100).toFixed(0)}%）</div>`;
+
+  document.getElementById('an-new').innerHTML =
+    `<div class="analytics-section-title"><span>📅 每日收支</span></div><div class="bt-box">${cal}<div class="bt-mu" style="margin-top:6px">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div></div>` +
+    `<div class="analytics-section-title"><span>🥧 支出分類</span></div><div class="bt-box">${pie}</div>` +
+    `<div class="analytics-section-title"><span>📊 每月支出比較</span></div><div class="bt-box">${bars}${dtxt}</div>`;
+}
+function anDay(ds) {
+  const ex = btMonthExp(ds.slice(0, 7)).filter(e => e.date === ds);
+  const inc = btIncomeShifts(ds.slice(0, 7)).filter(s => s.date === ds && s.type !== 'planned');
+  let h = `<h3>${ds}</h3>`;
+  inc.forEach(s => h += `<div class="bt-it"><div class="bt-ic">💼</div><div class="bt-m"><b>${btEsc(s.company)}</b><span>${s.startTime || ''}-${s.endTime || ''} · ${s.duration}小時</span></div><b style="color:var(--accent-price)">+$${formatMoney(getShiftPay(s))}</b></div>`);
+  ex.forEach(e => h += `<div class="bt-it"><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b></div>`);
+  if (!inc.length && !ex.length) h += '<div class="empty-msg">呢日冇記錄</div>';
+  btSheet(h);
+}
+
 // --- Night Mode Functions ---
 function initDarkMode() {
   const isDark = localStorage.getItem('nightMode') === 'true';
   if (isDark) {
     document.body.classList.add('dark-mode');
     document.getElementById('theme-toggle').textContent = '☀️';
-    document.getElementById('theme-color-meta').setAttribute('content', '#121824');
+    document.getElementById('theme-color-meta').setAttribute('content', '#2B1D18');
   }
 }
 
@@ -1288,7 +1601,7 @@ function toggleDarkMode() {
   const isDark = document.body.classList.toggle('dark-mode');
   localStorage.setItem('nightMode', isDark);
   document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
-  document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#121824' : '#f5f8fc');
+  document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#2B1D18' : '#FFF6E3');
 }
 
 // 非同步動態加載最新 1823 公眾假期
@@ -1367,6 +1680,8 @@ currentView = viewId;
 document.getElementById('calendar-view').style.display = 'none';
 document.getElementById('list-view').style.display = 'none';
 document.getElementById('analytics-view').style.display = 'none';
+document.getElementById('analysis-view').style.display = 'none';
+document.getElementById('nav-analysis').classList.remove('active');
 document.getElementById('nav-calendar').classList.remove('active');
 document.getElementById('nav-list').classList.remove('active');
 document.getElementById('nav-analytics').classList.remove('active');
@@ -1377,6 +1692,9 @@ renderCalendar();
 } else if (viewId === 'list-view') {
 document.getElementById('nav-list').classList.add('active');
 renderListView();
+} else if (viewId === 'analysis-view') {
+document.getElementById('nav-analysis').classList.add('active');
+renderAnalysis();
 } else if (viewId === 'analytics-view') {
 document.getElementById('nav-analytics').classList.add('active');
 renderAnalytics();
@@ -1637,6 +1955,7 @@ renderCurrentView();
 function renderCurrentView() {
 if (currentView === 'calendar-view') { renderCalendar(); }
 else if (currentView === 'list-view') { renderListView(); }
+else if (currentView === 'analysis-view') { renderAnalysis(); }
 else if (currentView === 'analytics-view') { renderAnalytics(); }
 else { renderCalendar(); }
 if (currentView !== 'calendar-view') { updateMonthSalaryCard(); }
@@ -1717,16 +2036,14 @@ renderCurrentView();
 }
 
 function updateMonthSalaryCard() {
-let mPayCompleted = 0;
-let mPayTotal = 0;
-const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-shifts.filter(s => s.date && s.date.startsWith(monthPrefix)).forEach(s => {
-const pay = getShiftPay(s);
-mPayTotal += pay;
-if (s.type === 'completed' || !s.type) mPayCompleted += pay;
-});
-document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
-document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
+const inc = btIncomeTotal();
+const spent = btMonthExp().reduce((a, e) => a + e.amt, 0);
+const bal = inc - spent;
+document.getElementById('month-pay').textContent = `$ ${formatMoney(inc)}`;
+document.getElementById('month-spend').textContent = `$ ${formatMoney(spent)}`;
+const b = document.getElementById('month-balance');
+b.textContent = `${bal < 0 ? '-' : ''}$ ${formatMoney(Math.abs(bal))}`;
+b.style.color = bal < 0 ? '#5B1A0A' : '#ffffff';
 }
 
 // === 長按拖拽邏輯 ===
@@ -1967,11 +2284,10 @@ function renderCalendar() {
     });
   });
 
-  document.getElementById('month-pay').textContent = `$ ${formatMoney(mPayCompleted)}`;
-  document.getElementById('month-total-est').textContent = `$ ${formatMoney(mPayTotal)}`;
+  updateMonthSalaryCard();
 }
 
-function renderListView() {
+function renderListViewOld() {
 autoUpdatePastPlannedShifts();
 updateMonthSalaryCard();
 const filterTabsContainer = document.getElementById('company-filter-tabs');
@@ -2001,7 +2317,7 @@ const isPlanned = s.type === 'planned';
 return `
 <div class="shift-list-item" onclick="openShiftDetail('${s.id}')">
 <div class="shift-info">
-<h4>${s.company} ${isPlanned ? '<span style="color:#1976d2; font-size:0.75rem;">(排班)</span>' : ''}</h4>
+<h4>${s.company} ${isPlanned ? '<span style="color:#D5642A; font-size:0.75rem;">(排班)</span>' : ''}</h4>
 <p>${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}</p>
 </div>
 <div class="shift-amount">
@@ -2018,7 +2334,7 @@ selectedCompanyFilter = comp;
 renderListView();
 }
 
-function renderAnalytics() {
+function renderAnalyticsOld() {
 autoUpdatePastPlannedShifts();
 updateMonthSalaryCard();
 document.getElementById('analytics-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
