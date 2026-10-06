@@ -1042,6 +1042,22 @@ body.dark-mode .st-bar button{color:#2B1D18}
 .settings-btn{left:0;top:50%;transform:translateY(-50%)}
 .top-month{height:44px;padding:0 10px;line-height:1}
 .top-title{line-height:44px}
+/* [CHANGE J] start: 有工番啦 popup -> bottom sheet (same as 又亂使錢) + nicer shared date picker */
+.modal-overlay{align-items:flex-end;padding:0;background:rgba(0,0,0,.45);backdrop-filter:none}
+.modal-content{margin:0 auto;max-width:600px;border-radius:20px 20px 0 0;padding:18px 18px calc(18px + var(--safe-bottom));max-height:88vh;box-shadow:none}
+.date-range-box{background:var(--primary-light);border:0;border-radius:16px;padding:12px 10px 14px}
+.mini-cal-header{margin-bottom:10px}
+.mini-cal-header span{font-size:1rem}
+.mini-cal-header .btn-nav{width:32px;height:32px;font-size:1rem;background:var(--card-bg)}
+.mini-cal-weekdays{font-size:.72rem;margin-bottom:6px}
+.mini-cal-days{row-gap:4px}
+.mini-cal-cell{height:40px}
+.mini-cal-num{width:36px;height:36px;font-size:.9rem}
+.date-summary-text{text-align:center;margin-top:8px}
+.dp-quick{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.dp-quick button{border:0;border-radius:999px;padding:7px 18px;background:var(--card-bg);color:var(--primary-dark);font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit}
+button.bt-chip{border:0;font-family:inherit}
+/* [CHANGE J] end */
 </style>
 </head>
 <body>
@@ -1202,7 +1218,7 @@ body.dark-mode .st-bar button{color:#2B1D18}
 </div>
 
 <!-- Modal Form -->
-<div class="modal-overlay" id="modal-overlay">
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()"><!-- [CHANGE J] tap outside to close -->
 <div class="modal-content">
 <div class="modal-header">
 <h2 id="modal-title">有工番啦🤑</h2>
@@ -1447,8 +1463,9 @@ async function saveData() {
 
 // ==================== Budget Tracker ====================
 const BT_TYPES = ['expense', 'sub', 'budget'];
-const BT_CATS = [['🍜','食飯'],['🚇','交通'],['🧴','日用品'],['🎮','娛樂'],['💄','扮靚靚'],['🔁','訂閱'],['✈️','旅行'],['🩺','睇醫生'],['🏠','家用'],['🐷','盧媽儲錢']];
-const BT_LEGACY = [['👕','衫衫'],['🍜','餐飲'],['🛒','購物'],['🏠','住屋'],['💊','醫療'],['📦','其他']];
+const BT_CATS = [['🍜','食飯'],['🚇','八達通'],['🛒','買餸'],['🧴','日用品'],['💄','扮靚靚'],['🎮','娛樂'],['🩺','睇醫生'],['✈️','旅行'],['🏠','家用'],['🐷','盧媽儲錢']]; // [CHANGE I] reordered; 交通 renamed 八達通
+// [CHANGE H] BT_CATS: ['🔁','訂閱'] -> ['🛒','買餸'] (above). 訂閱 moved into BT_LEGACY so old records + 訂閱管理 entries keep their 🔁 icon
+const BT_LEGACY = [['🔁','訂閱'],['🚇','交通'],['👕','衫衫'],['🍜','餐飲'],['🛒','購物'],['🏠','住屋'],['💊','醫療'],['📦','其他']];
 let btTabCur = 'ex', btCat = '食飯';
 const btEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const btIcon = c => (BT_CATS.concat(BT_LEGACY).find(x => x[1] === c) || ['📦'])[0];
@@ -1568,9 +1585,43 @@ function btOpenExp() {
   const t = getLocalDateStr(), ym = btYM(), d = t.startsWith(ym) ? t : ym + '-01';
   const keys = ['7','8','9','del','4','5','6','+','1','2','3','OK','.','0','00'];
   const pad = keys.map(k => k === 'OK' ? '<button class="ok" onclick="btSaveExp()">儲存</button>' : `<button class="${k === 'del' || k === '+' ? 'op' : ''}" onclick="btKey('${k}')">${k === 'del' ? '⌫' : k}</button>`).join('');
-  btSheet(`<div class="modal-header"><h2>又亂使錢💸</h2><button class="close-btn" onclick="btClose()">✕</button></div>${btGrid()}<div class="bt-disp"><label class="bt-chip">📅 <span id="bt-dtl">${btShortDate(d)}</span><input id="bt-d" type="date" value="${d}" onchange="document.getElementById('bt-dtl').textContent=btShortDate(this.value)"></label><input id="bt-n" placeholder="輸入詳情…"><div class="v"><b id="bt-dv">$0</b><small id="bt-ds"></small></div></div><div class="bt-pad4">${pad}</div>`);
+  btSheet(`<div class="modal-header"><h2>又亂使錢💸</h2><button class="close-btn" onclick="btClose()">✕</button></div>${btGrid()}<div class="bt-disp"><button type="button" class="bt-chip" onclick="btToggleDP()">📅 <span id="bt-dtl">${btShortDate(d)}</span></button><input id="bt-d" type="hidden" value="${d}"><input id="bt-n" placeholder="輸入詳情…"><div class="v"><b id="bt-dv">$0</b><small id="bt-ds"></small></div></div>${btDPHtml()}<div class="bt-pad4" id="bt-pad">${pad}</div>`); /* [CHANGE J] date chip now opens custom calendar (btDPHtml) instead of native date input */
   btRefreshAmt();
 }
+/* [CHANGE J] start: custom date picker for 又亂使錢 popup (uses same .mini-cal-* styles as 有工番啦) */
+let btPY = 0, btPM = 0;
+function btDPHtml() {
+  return '<div class="date-range-box" id="bt-dp" style="display:none;margin-bottom:8px"><div class="mini-cal-header"><button type="button" class="btn-nav" onclick="btShiftDP(-1)">&lt;</button><span id="bt-dpt"></span><button type="button" class="btn-nav" onclick="btShiftDP(1)">&gt;</button></div><div class="mini-cal-weekdays"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div style="color:var(--holiday-red)">日</div></div><div class="mini-cal-days" id="bt-dpd"></div><div class="dp-quick"><button type="button" onclick="btPickDate(0)">今日</button><button type="button" onclick="btPickDate(-1)">昨日</button></div></div>';
+}
+function btToggleDP() {
+  const p = document.getElementById('bt-dp'), pad = document.getElementById('bt-pad');
+  if (p.style.display !== 'none') { p.style.display = 'none'; pad.style.display = ''; return; }
+  const v = document.getElementById('bt-d').value;
+  btPY = +v.slice(0, 4); btPM = +v.slice(5, 7) - 1;
+  p.style.display = 'block'; pad.style.display = 'none'; btRenderDP();
+}
+function btShiftDP(n) { btPM += n; if (btPM < 0) { btPM = 11; btPY--; } if (btPM > 11) { btPM = 0; btPY++; } btRenderDP(); }
+function btRenderDP() {
+  document.getElementById('bt-dpt').textContent = `${btPY} 年 ${btPM + 1} 月`;
+  const sel = document.getElementById('bt-d').value, today = getLocalDateStr();
+  const off = (new Date(btPY, btPM, 1).getDay() + 6) % 7, dim = new Date(btPY, btPM + 1, 0).getDate();
+  let h = '<div class="mini-cal-cell other-month"></div>'.repeat(off);
+  for (let d = 1; d <= dim; d++) {
+    const ds = `${btPY}-${String(btPM + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const hol = getHolidayInfo(ds, new Date(btPY, btPM, d)).isHoliday;
+    h += `<div class="mini-cal-cell${ds === today ? ' today' : ''}${hol ? ' is-holiday' : ''}${ds === sel ? ' range-start range-end' : ''}" onclick="btPickDate('${ds}')"><span class="mini-cal-num">${d}</span></div>`;
+  }
+  document.getElementById('bt-dpd').innerHTML = h;
+}
+function btPickDate(x) {
+  let ds = x;
+  if (typeof x === 'number') { const t = new Date(); t.setDate(t.getDate() + x); ds = getLocalDateStr(t); }
+  document.getElementById('bt-d').value = ds;
+  document.getElementById('bt-dtl').textContent = btShortDate(ds);
+  document.getElementById('bt-dp').style.display = 'none';
+  document.getElementById('bt-pad').style.display = '';
+}
+/* [CHANGE J] end */
 function btSaveExp() {
   const a = btTotal(), d = document.getElementById('bt-d').value;
   if (!(a > 0)) return alert('請輸入金額');
