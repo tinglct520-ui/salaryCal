@@ -1105,7 +1105,7 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 <div class="salary-divider"></div>
 <div class="salary-box"><span>又亂使錢</span><strong id="month-spend">$ 0</strong></div>
 <div class="salary-divider"></div>
-<div class="salary-box"><span>本月身家</span><strong id="month-balance">$ 0</strong></div>
+<div class="salary-box"><span>本月現有身家</span><strong id="month-balance">$ 0</strong></div>
 </div>
 
 <!-- SETTINGS VIEW -->
@@ -1124,13 +1124,13 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 </div>
 <div class="card cardTitle st-card">
 <div class="st-t">💸 每月預算</div>
-<div class="st-bar"><input id="st-budget" type="number" inputmode="decimal" placeholder="每個月都用同一個預算"><button id="st-save" onclick="saveBudgetSetting()">儲存</button></div>
+<div class="st-bar"><input id="st-budget" type="number" inputmode="decimal" placeholder="每月預算"><button id="st-save" onclick="saveBudgetSetting()">儲存</button></div>
 </div>
 <!-- [CHANGE O] start: 備份與數據管理 moved here from the bottom-nav action sheet -->
 <div class="card cardTitle st-card">
 <div class="st-t">🗂 備份與數據管理</div>
 <div class="st-actions">
-<button class="action-sheet-btn primary" onclick="exportJSON()">匯出 JSON 備份檔 (iCloud)</button>
+<button class="action-sheet-btn" onclick="exportJSON()">匯出 JSON 備份檔</button>
 <button class="action-sheet-btn" onclick="importJSON()">匯入 JSON 備份檔</button>
 <button class="action-sheet-btn danger" onclick="confirmClearAll()">清空所有紀錄</button>
 <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
@@ -1143,7 +1143,7 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 <div id="calendar-view" class="card">
 <!-- [CHANGE A] calendar header: same spacing as budget page (added style attr) -->
 <div class="calendar-header cardTitle" style="margin-bottom:0;padding-bottom:8px">
-<h2 id="calendar-month-year"></h2>
+<h3 id="calendar-month-year"></h3>
 <div class="month-nav">
 <button class="btn-nav" onclick="changeMonth(-1)">&lt;</button>
 <button class="btn-nav" onclick="changeMonth(1)">&gt;</button>
