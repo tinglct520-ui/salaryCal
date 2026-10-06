@@ -1067,6 +1067,19 @@ body.dark-mode .dp-done{color:#2B1D18}
 .dp-quick button{border:0;border-radius:999px;padding:7px 18px;background:var(--primary-light);color:var(--primary-dark);font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit}
 button.bt-chip{border:0;font-family:inherit}
 /* [CHANGE J] end */
+/* [CHANGE L] start */
+.field-row{display:flex;gap:12px}
+.field-row .input-group{flex:1;min-width:0}
+.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.dp-row .date-picker-trigger{margin-bottom:0;gap:8px}
+.dp-row .calculated-duration{font-size:.9rem;white-space:nowrap}
+.checkbox-group label{font-size:.82rem;font-weight:700;color:var(--primary-dark)} /* same as the 錢錢 label */
+/* [CHANGE L] end */
+/* [CHANGE M] start */
+.dp-row .date-picker-trigger{flex:7;justify-content:space-between}   /* date ~70% */
+.dp-row .calculated-duration{flex:3;text-align:center}                /* 共X小時 ~30% */
+.an-c{min-height:46px}                                                /* 每日收支 cells shorter: day number + one + line + one - line */
+/* [CHANGE M] end */
 </style>
 </head>
 <body>
@@ -1237,7 +1250,11 @@ button.bt-chip{border:0;font-family:inherit}
 <input type="hidden" id="editing-shift-id" value="">
 <input type="hidden" id="shift-type" value="planned">
 <div class="input-group" id="date-range-container">
+<!-- [CHANGE L] date button no longer full width; 共X小時 moved up into this row (was a separate line above the save button) -->
+<div class="dp-row">
 <div class="date-picker-trigger" id="date-picker-trigger" role="button" tabindex="0" onclick="toggleDatePicker()">📅 <span id="date-picker-label">已選 1 天</span></div>
+<div class="calculated-duration" id="duration-display">共 9 小時</div>
+</div>
 <div class="date-range-box" id="date-range-box" style="display:none;">
 <div class="mini-cal-header">
 <button type="button" class="btn-nav" id="mini-cal-prev">&lt;</button>
@@ -1263,13 +1280,16 @@ button.bt-chip{border:0;font-family:inherit}
 <label for="event-name">Event</label>
 <input type="text" id="event-name">
 </div>
+<!-- [CHANGE L] 津貼 (left) + 錢錢 (right) on one row -->
+<div class="field-row">
+<div class="input-group">
+<label for="allowance">🎁 津貼 ($)</label>
+<input type="number" id="allowance" min="0" step="1">
+</div>
 <div class="input-group">
 <label for="rate">💰 錢錢 ($/hr)</label>
 <input type="number" id="rate" min="0" required>
 </div>
-<div class="input-group">
-<label for="allowance">🎁 津貼 ($)</label>
-<input type="number" id="allowance" min="0" step="1">
 </div>
 <div class="input-group">
 <label>工作時間 (開始 - 結束)</label>
@@ -1290,7 +1310,6 @@ button.bt-chip{border:0;font-family:inherit}
 <option value="60">60 分鐘 </option>
 </select>
 </div>
-<div class="calculated-duration" id="duration-display">共 9 小時</div>
 <div class="modal-btn-group">
 <button type="button" class="btn-delete-item" id="btn-delete-modal" style="display:none;" onclick="deleteCurrentEditingShift()">刪除紀錄</button>
 <button type="submit" class="btn-submit" id="btn-submit-text">儲存紀錄</button>
@@ -1540,10 +1559,10 @@ function renderListView() {
   const subT = ex.filter(e => e.sub).reduce((a, e) => a + e.amt, 0);
   let h = '<div class="bt-pad">';
   // [CHANGE D] 每月預算餘額 area kept; only removed the 訂閱管理 button (moved to top-right, see CHANGE C)
-  h += `<div class="bt-box"><div class="bt-row"><span class="bt-mu">每月預算餘額</span></div>`;
+  // [CHANGE M] remaining amount moved onto the same row as the label, right aligned
+  h += `<div class="bt-box"><div class="bt-row"><span class="bt-mu">每月預算餘額</span>${b ? `<span class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--text-main)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</span>` : ''}</div>`;
   if (b) {
-    h += `<div class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--text-main)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</div>
-    <div class="bt-bar"><i style="width:${Math.min(p, 100)}%;background:${col}"></i></div>
+    h += `<div class="bt-bar"><i style="width:${Math.min(p, 100)}%;background:${col}"></i></div>
     <div class="bt-row bt-mu"><span>已用 $${formatMoney(spent)} / $${formatMoney(b)}</span><b style="color:${col}">${p.toFixed(0)}%</b></div>
     ${p >= 80 ? `<div class="bt-msg" style="background:${col}22;color:${col}">${p >= 100 ? `🚨 已經超支 $${formatMoney(-left)}！收手啦` : `⚠️ 已用 ${p.toFixed(0)}%，小心 overbudget`}</div>` : ''}`;
   } // [CHANGE D] removed the else-branch hint text「去左上角 ⚙️ 設定頁設定每月預算」
@@ -1726,7 +1745,7 @@ function renderAnalysis() {
     `<div class="bt-msg" style="background:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}22;color:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}">比上個月 ${diff > 0 ? '↑ 多使' : diff < 0 ? '↓ 慳咗' : '一樣'} $${formatMoney(Math.abs(diff))}（${diff > 0 ? '+' : ''}${(diff / prev * 100).toFixed(0)}%）</div>`;
 
   document.getElementById('an-new').innerHTML =
-    `<div class="analytics-section-title"><span>📅 每日收支</span></div><div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 14px">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div>` + /* [CHANGE G] removed the bt-box wrapper around the calendar */
+    `<div class="analytics-section-title"><span>📅 每日收支</span></div><div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 14px;font-size:.68rem;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div>` + /* [CHANGE G] removed the bt-box wrapper around the calendar */
     `<div class="analytics-section-title"><span>🥧 支出分類</span></div><div class="bt-box">${pie}</div>` +
     `<div class="analytics-section-title"><span>📊 每月支出比較</span></div><div class="bt-box">${bars}${dtxt}</div>`;
 }
