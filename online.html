@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="努力賺錢錢">
-<meta name="theme-color" content="#FFF6E3" id="theme-color-meta">
+<meta name="theme-color" content="#EEF5FF" id="theme-color-meta">
 <link rel="apple-touch-icon" href="icon.png">
 <title>努力賺錢錢 (Cloud Sync)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,25 +16,26 @@
 <!-- 引入 Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+/* [CHANGE N] theme colours (v3): blue + yellow + green + coral pink. Previous orange palette values in comments */
 :root {
---bg-color: #FCFCFC;
---card-bg: #FFFCF5;
---primary: #AAA648;
---primary-dark: #8Da6CC;
---primary-hover: #8Da6CC;
---primary-light: #e9f2ff;
---text-main: #4A2C20;
---text-sub: #cedffa;
---border-color: #6988b6;
---accent-price: #2e7d32;
---plan-bg: #cedffa;
---plan-border: #6988b6;
---danger: #e53935;
---holiday-red: #e53935;
+--bg-color: #EEF5FF; /* was #E9F2FF */
+--card-bg: #F7FAFF;
+--primary: #5E94D4; /* blue; was #DF6F41 */
+--primary-dark: #3D72B4; /* deeper blue for text; was #CC5A2D */
+--primary-hover: #3D72B4; /* was #CC5A2D */
+--primary-light: #E5F0FF; /* was #F7D89A */
+--text-main: #444444; /* was #4A2C20 */
+--text-sub: #8A8A8A; /* was #9A7B6E (you left this blank - neutral grey to match #444444, change if you have a colour) */
+--border-color: #E9F2FF; /* was #D3E1F3 */
+--accent-price: #AAA648; /* green (income / good) */
+--plan-bg: #F7D89A; /* yellow */
+--plan-border: #E5BC62; /* was #DF6F41 */
+--danger: #E8636F; /* coral pink (expense / over budget); was #e53935 */
+--holiday-red: #E8636F; /* coral pink; was #e53935 */
 --nav-height: 50px;
 --safe-bottom: env(safe-area-inset-bottom, 0px);
 --safe-top: env(safe-area-inset-top, 0px);
---input-bg: #FFF9EC;
+--input-bg: #EFF5FF;
 }
 
 /* Night Mode Colors */
@@ -145,7 +146,7 @@ transition: background-color 0.3s;
 padding: 18px;
 }
 .month-salary-card {
-background: linear-gradient(135deg, #EE8350, #8Da6CC);
+background: linear-gradient(135deg, #6FA3E0, #4A7FC0);
 border-radius: 18px;
 padding: 18px 20px;
 color: white;
@@ -298,7 +299,7 @@ user-select: none !important;
 -webkit-user-select: none !important;
 -webkit-touch-callout: none !important;
 touch-action: none !important;
-background-color: #8Da6CC;
+background-color: #3D72B4;
 padding: 1px 0;
 width: 100%;
 text-align: center;
@@ -310,7 +311,7 @@ line-height: 1.3;
 flex-shrink: 0;
 }
 body.dark-mode .shift-dot-item {
-background-color: #8Da6CC;
+background-color: #3D72B4;
 }
 .shift-dot-item .comp-name {
 color: #ffffff;
@@ -546,7 +547,7 @@ max-width: 70px;
 width: 42px;
 height: 42px;
 border-radius: 50%;
-background: linear-gradient(135deg, #EE8350, #8Da6CC);
+background: linear-gradient(135deg, #6FA3E0, #4A7FC0);
 color: white;
 border: 4px solid var(--card-bg);
 display: flex;
@@ -939,7 +940,7 @@ font-size: 0.88rem;
 .bt-pri{width:100%;padding:13px;border:0;border-radius:12px;background:var(--primary-dark);color:#fff;font-size:1rem;font-weight:800;cursor:pointer}
 body.dark-mode .bt-pri,body.dark-mode .bt-cat.on{color:#2B1D18}
 
-.fab-add{position:fixed;right:16px;bottom:calc(var(--nav-height) + var(--safe-bottom) + 16px);width:56px;height:56px;border-radius:50%;border:0;background:linear-gradient(135deg,#EE8350,#8Da6CC);color:#fff;font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.3);cursor:pointer;z-index:998;transition:transform .15s}
+.fab-add{position:fixed;right:16px;bottom:calc(var(--nav-height) + var(--safe-bottom) + 16px);width:56px;height:56px;border-radius:50%;border:0;background:linear-gradient(135deg,#6FA3E0,#4A7FC0);color:#fff;font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.3);cursor:pointer;z-index:998;transition:transform .15s}
 .fab-add:active{transform:scale(.92)}
 /* [CHANGE G] start: 每日收支 calendar now follows main calendar style (no extra bg box, bordered cells, full-bleed). Original lines were:
    .an-cal{...gap:3px}  .an-wd{...padding-bottom:2px}  .an-c{...border-radius:8px;background:var(--card-bg)...}  .an-c.empty{background:transparent} .an-c.today{outline:2px solid var(--primary)} */
@@ -1080,6 +1081,13 @@ button.bt-chip{border:0;font-family:inherit}
 .dp-row .calculated-duration{flex:3;text-align:center}                /* 共X小時 ~30% */
 .an-c{min-height:46px}                                                /* 每日收支 cells shorter: day number + one + line + one - line */
 /* [CHANGE M] end */
+/* [CHANGE O] start */
+.st-actions{display:flex;flex-direction:column;gap:10px}
+.nav-item:not(.active) svg{fill:#444444} /* inactive nav icons */
+body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
+/* [CHANGE P] reverted: 每月預算餘額 box is back to var(--primary-light) (I had wrongly made it white; #fff was meant for the 本月身家 number) */
+.bt-m b{color:var(--primary-dark)} /* [CHANGE P] expense/income item name uses main blue */
+/* [CHANGE O] end */
 </style>
 </head>
 <body>
@@ -1118,6 +1126,17 @@ button.bt-chip{border:0;font-family:inherit}
 <div class="st-t">💸 每月預算</div>
 <div class="st-bar"><input id="st-budget" type="number" inputmode="decimal" placeholder="每個月都用同一個預算"><button id="st-save" onclick="saveBudgetSetting()">儲存</button></div>
 </div>
+<!-- [CHANGE O] start: 備份與數據管理 moved here from the bottom-nav action sheet -->
+<div class="card cardTitle st-card">
+<div class="st-t">🗂 備份與數據管理</div>
+<div class="st-actions">
+<button class="action-sheet-btn primary" onclick="exportJSON()">匯出 JSON 備份檔 (iCloud)</button>
+<button class="action-sheet-btn" onclick="importJSON()">匯入 JSON 備份檔</button>
+<button class="action-sheet-btn danger" onclick="confirmClearAll()">清空所有紀錄</button>
+<input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
+</div>
+</div>
+<!-- [CHANGE O] end -->
 </div>
 
 <!-- VIEW 1: Calendar View -->
@@ -1209,25 +1228,13 @@ button.bt-chip{border:0;font-family:inherit}
 <button class="nav-item" id="nav-analytics" onclick="switchNav('analytics-view')">
 <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
 </button>
-<button class="nav-item" id="nav-backup" onclick="openActionMenu()">
-<svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-</button>
+<!-- [CHANGE O] 備份 tab removed from bottom nav (moved into Settings page) -->
 </nav>
 
 <button class="fab-add" onclick="onAddBtn()" aria-label="新增">+</button>
 <div class="bt-ov" id="bt-ov" onclick="if(event.target===this)btClose()"><div class="bt-sheet" id="bt-sheet"></div></div>
 
-<!-- Action Sheet -->
-<div class="action-menu-overlay" id="action-menu-overlay" onclick="closeActionMenu()">
-<div class="action-sheet" onclick="event.stopPropagation()">
-<div class="action-sheet-title">備份與數據管理</div>
-<button class="action-sheet-btn primary" onclick="exportJSON(); closeActionMenu();">匯出 JSON 備份檔 (iCloud)</button>
-<button class="action-sheet-btn" onclick="importJSON(); closeActionMenu();">匯入 JSON 備份檔</button>
-<button class="action-sheet-btn danger" onclick="confirmClearAll(); closeActionMenu();">清空所有紀錄</button>
-<button class="action-sheet-btn" style="color:var(--text-sub);" onclick="closeActionMenu()">取消</button>
-<input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
-</div>
-</div>
+<!-- [CHANGE O] old 備份與數據管理 action sheet removed (moved into Settings page) -->
 
 <!-- Move / Copy Action Sheet -->
 <div class="action-menu-overlay" id="move-copy-overlay" onclick="closeMoveCopyMenu()">
@@ -1342,7 +1349,7 @@ let miniCalMonth = new Date().getMonth();
 let allowRangeSelection = true;
 
 const companyColorPalette = [
-{ bg: '#FFE4DE', border: '#F6A79A', text: '#8Da6CC' },
+{ bg: '#DCE9FB', border: '#5E94D4', text: '#3D72B4' },
 { bg: '#f3e5f5', border: '#ce93d8', text: '#7b1fa2' },
 { bg: '#fff3e0', border: '#ffcc80', text: '#e65100' },
 { bg: '#e8f5e9', border: '#a5d6a7', text: '#2e7d32' },
@@ -1812,7 +1819,7 @@ function toggleDarkMode() {
   const isDark = document.body.classList.toggle('dark-mode');
   localStorage.setItem('nightMode', isDark);
   const sw = document.getElementById('st-dark'); if (sw) sw.checked = isDark;
-  document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#2B1D18' : '#FFF6E3');
+  document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#2B1D18' : '#EEF5FF');
 }
 
 // 非同步動態加載最新 1823 公眾假期
@@ -2262,7 +2269,11 @@ document.getElementById('month-pay').textContent = `$ ${formatMoney(inc)}`;
 document.getElementById('month-spend').textContent = `$ ${formatMoney(spent)}`;
 const b = document.getElementById('month-balance');
 b.textContent = `${bal < 0 ? '-' : ''}$ ${formatMoney(Math.abs(bal))}`;
-b.style.color = bal < 0 ? '#5B1A0A' : '#ffffff';
+// [CHANGE P] number is always white (#fff); negative gets a coral pill so it stays readable on the blue card (was dark brown #5B1A0A)
+b.style.color = '#ffffff';
+b.style.background = bal < 0 ? '#E8636F' : '';
+b.style.padding = bal < 0 ? '1px 10px' : '';
+b.style.borderRadius = bal < 0 ? '999px' : '';
 }
 
 // === 長按拖拽邏輯 ===
@@ -2536,7 +2547,7 @@ const isPlanned = s.type === 'planned';
 return `
 <div class="shift-list-item" onclick="openShiftDetail('${s.id}')">
 <div class="shift-info">
-<h4>${s.company} ${isPlanned ? '<span style="color:#8Da6CC; font-size:0.75rem;">(排班)</span>' : ''}</h4>
+<h4>${s.company} ${isPlanned ? '<span style="color:#3D72B4; font-size:0.75rem;">(排班)</span>' : ''}</h4>
 <p>${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}</p>
 </div>
 <div class="shift-amount">
