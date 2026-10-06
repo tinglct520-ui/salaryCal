@@ -1045,17 +1045,26 @@ body.dark-mode .st-bar button{color:#2B1D18}
 /* [CHANGE J] start: 有工番啦 popup -> bottom sheet (same as 又亂使錢) + nicer shared date picker */
 .modal-overlay{align-items:flex-end;padding:0;background:rgba(0,0,0,.45);backdrop-filter:none}
 .modal-content{margin:0 auto;max-width:600px;border-radius:20px 20px 0 0;padding:18px 18px calc(18px + var(--safe-bottom));max-height:88vh;box-shadow:none}
-.date-range-box{background:var(--primary-light);border:0;border-radius:16px;padding:12px 10px 14px}
+.date-range-box{background:var(--card-bg);border:1px solid var(--border-color);border-radius:18px;padding:12px 10px 10px;box-shadow:0 12px 36px rgba(0,0,0,.32)}
+#date-range-container{position:relative}
+#date-range-box{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20}
+.dp-pop{position:fixed;z-index:1101;display:none}
+.dp-bg{position:fixed;inset:0;z-index:1100;display:none}
+.dp-arrow{position:absolute;bottom:-8px;width:14px;height:14px;background:var(--card-bg);border-right:1px solid var(--border-color);border-bottom:1px solid var(--border-color);transform:rotate(45deg)}
+.dp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:0 4px}
+.dp-foot .date-summary-text{margin:0}
+.dp-done{border:0;border-radius:999px;padding:7px 18px;background:var(--primary-dark);color:#fff;font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit}
+body.dark-mode .dp-done{color:#2B1D18}
 .mini-cal-header{margin-bottom:10px}
 .mini-cal-header span{font-size:1rem}
-.mini-cal-header .btn-nav{width:32px;height:32px;font-size:1rem;background:var(--card-bg)}
+.mini-cal-header .btn-nav{width:30px;height:30px;font-size:.95rem}
 .mini-cal-weekdays{font-size:.72rem;margin-bottom:6px}
-.mini-cal-days{row-gap:4px}
-.mini-cal-cell{height:40px}
-.mini-cal-num{width:36px;height:36px;font-size:.9rem}
+.mini-cal-days{row-gap:2px}
+.mini-cal-cell{height:36px}
+.mini-cal-num{width:32px;height:32px;font-size:.86rem}
 .date-summary-text{text-align:center;margin-top:8px}
-.dp-quick{display:flex;gap:8px;justify-content:center;margin-top:10px}
-.dp-quick button{border:0;border-radius:999px;padding:7px 18px;background:var(--card-bg);color:var(--primary-dark);font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit}
+.dp-quick{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.dp-quick button{border:0;border-radius:999px;padding:7px 18px;background:var(--primary-light);color:var(--primary-dark);font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit}
 button.bt-chip{border:0;font-family:inherit}
 /* [CHANGE J] end */
 </style>
@@ -1219,7 +1228,7 @@ button.bt-chip{border:0;font-family:inherit}
 
 <!-- Modal Form -->
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()"><!-- [CHANGE J] tap outside to close -->
-<div class="modal-content">
+<div class="modal-content" onclick="if(!event.target.closest('#date-range-container')){var b=document.getElementById('date-range-box');if(b&&b.style.display!=='none')b.style.display='none';}"><!-- [CHANGE K] tap outside date popover closes it -->
 <div class="modal-header">
 <h2 id="modal-title">有工番啦🤑</h2>
 <button class="close-btn" onclick="closeModal()">✕</button>
@@ -1239,7 +1248,7 @@ button.bt-chip{border:0;font-family:inherit}
 <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div style="color:var(--holiday-red);">日</div>
 </div>
 <div class="mini-cal-days" id="mini-cal-days"></div>
-<div class="date-summary-text" id="date-summary-text">已選 1 天</div>
+<div class="dp-foot"><div class="date-summary-text" id="date-summary-text">已選 1 天</div><button type="button" class="dp-done" onclick="toggleDatePicker()">完成</button></div><!-- [CHANGE K] 完成 button; date box is now a floating popover -->
 </div>
 <div class="date-tag-badge" id="date-tag-badge" style="display:none;"></div>
 </div>
@@ -1591,14 +1600,20 @@ function btOpenExp() {
 /* [CHANGE J] start: custom date picker for 又亂使錢 popup (uses same .mini-cal-* styles as 有工番啦) */
 let btPY = 0, btPM = 0;
 function btDPHtml() {
-  return '<div class="date-range-box" id="bt-dp" style="display:none;margin-bottom:8px"><div class="mini-cal-header"><button type="button" class="btn-nav" onclick="btShiftDP(-1)">&lt;</button><span id="bt-dpt"></span><button type="button" class="btn-nav" onclick="btShiftDP(1)">&gt;</button></div><div class="mini-cal-weekdays"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div style="color:var(--holiday-red)">日</div></div><div class="mini-cal-days" id="bt-dpd"></div><div class="dp-quick"><button type="button" onclick="btPickDate(0)">今日</button><button type="button" onclick="btPickDate(-1)">昨日</button></div></div>';
+  return '<div class="dp-bg" id="bt-dpbg" onclick="btToggleDP()"></div><div class="date-range-box dp-pop" id="bt-dp"><div class="mini-cal-header"><button type="button" class="btn-nav" onclick="btShiftDP(-1)">&lt;</button><span id="bt-dpt"></span><button type="button" class="btn-nav" onclick="btShiftDP(1)">&gt;</button></div><div class="mini-cal-weekdays"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div style="color:var(--holiday-red)">日</div></div><div class="mini-cal-days" id="bt-dpd"></div><div class="dp-quick"><button type="button" onclick="btPickDate(0)">今日</button><button type="button" onclick="btPickDate(-1)">昨日</button></div><div class="dp-arrow" id="bt-dpa"></div></div>';
 }
 function btToggleDP() {
-  const p = document.getElementById('bt-dp'), pad = document.getElementById('bt-pad');
-  if (p.style.display !== 'none') { p.style.display = 'none'; pad.style.display = ''; return; }
+  /* [CHANGE K] floating popover anchored above the date chip (does not push the layout) */
+  const p = document.getElementById('bt-dp'), bg = document.getElementById('bt-dpbg');
+  if (p.style.display === 'block') { p.style.display = 'none'; bg.style.display = 'none'; return; }
   const v = document.getElementById('bt-d').value;
   btPY = +v.slice(0, 4); btPM = +v.slice(5, 7) - 1;
-  p.style.display = 'block'; pad.style.display = 'none'; btRenderDP();
+  p.style.display = 'block'; bg.style.display = 'block'; btRenderDP();
+  const r = document.querySelector('#bt-sheet .bt-chip').getBoundingClientRect(), vw = window.innerWidth;
+  const w = Math.min(vw - 24, 360); p.style.width = w + 'px';
+  const left = Math.max(12, Math.min(r.left - 6, vw - w - 12)); p.style.left = left + 'px';
+  p.style.top = Math.max(8, r.top - p.offsetHeight - 12) + 'px';
+  document.getElementById('bt-dpa').style.left = Math.max(16, r.left + r.width / 2 - left - 7) + 'px';
 }
 function btShiftDP(n) { btPM += n; if (btPM < 0) { btPM = 11; btPY--; } if (btPM > 11) { btPM = 0; btPY++; } btRenderDP(); }
 function btRenderDP() {
@@ -1619,7 +1634,7 @@ function btPickDate(x) {
   document.getElementById('bt-d').value = ds;
   document.getElementById('bt-dtl').textContent = btShortDate(ds);
   document.getElementById('bt-dp').style.display = 'none';
-  document.getElementById('bt-pad').style.display = '';
+  document.getElementById('bt-dpbg').style.display = 'none';
 }
 /* [CHANGE J] end */
 function btSaveExp() {
