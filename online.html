@@ -180,6 +180,13 @@ justify-content: space-between;
 align-items: center;
 margin-bottom: 15px;
 }
+/* [CHANGE B] start: month header layout  <  title(center)  >  (applies to all 4 pages) */
+.calendar-header { display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; }
+.calendar-header .month-nav { display: contents; }
+.calendar-header .month-nav .btn-nav:first-child { grid-column: 1; grid-row: 1; }
+.calendar-header .month-nav .btn-nav:last-child { grid-column: 3; grid-row: 1; }
+.calendar-header h2 { grid-column: 2; grid-row: 1; text-align: center; }
+/* [CHANGE B] end */
 .calendar-header h2 {
 font-size: 1.1rem;
 color: var(--primary-dark);
@@ -481,8 +488,8 @@ grid-row: 2;
 font-size: 0.74rem;
 color: var(--text-sub);
 display: flex;
-justify-content: space-between;
-align-items: center;
+flex-direction: column; /* [CHANGE E] was: justify-content: space-between; align-items: center; */
+gap: 2px;
 }
 
 .fixed-bottom-nav {
@@ -934,10 +941,17 @@ body.dark-mode .bt-pri,body.dark-mode .bt-cat.on{color:#2B1D18}
 
 .fab-add{position:fixed;right:16px;bottom:calc(var(--nav-height) + var(--safe-bottom) + 16px);width:56px;height:56px;border-radius:50%;border:0;background:linear-gradient(135deg,#EE8350,#D5642A);color:#fff;font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.3);cursor:pointer;z-index:998;transition:transform .15s}
 .fab-add:active{transform:scale(.92)}
-.an-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.an-wd{text-align:center;font-size:.7rem;font-weight:800;color:var(--text-sub);padding-bottom:2px}
-.an-c{min-height:58px;border-radius:8px;background:var(--card-bg);padding:3px 2px;text-align:center;font-size:.62rem;font-weight:800;line-height:1.25;cursor:pointer;overflow:hidden}
-.an-c.empty{background:transparent;cursor:default}.an-c.today{outline:2px solid var(--primary)}
+/* [CHANGE G] start: 每日收支 calendar now follows main calendar style (no extra bg box, bordered cells, full-bleed). Original lines were:
+   .an-cal{...gap:3px}  .an-wd{...padding-bottom:2px}  .an-c{...border-radius:8px;background:var(--card-bg)...}  .an-c.empty{background:transparent} .an-c.today{outline:2px solid var(--primary)} */
+.an-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:0}
+.an-wd{text-align:center;font-size:.78rem;font-weight:700;color:var(--text-main);padding-bottom:8px;border-bottom:1px solid var(--border-color)}
+.an-wd:nth-child(7){color:var(--holiday-red);font-weight:800}
+.an-c{min-height:58px;background:transparent;padding:3px 2px;text-align:center;font-size:.62rem;font-weight:800;line-height:1.25;cursor:pointer;overflow:hidden;border-bottom:1px solid var(--border-color);border-right:1px solid var(--border-color)}
+.an-c:nth-child(7n+7){border-right:0}
+.an-c.empty{background:transparent;cursor:default}.an-c.today{background:var(--primary-light)}
+.an-c.today .dn{color:var(--primary-dark)}
+.an-calwrap{margin:0 -18px}
+/* [CHANGE G] end */
 .an-c .dn{font-size:.7rem;color:var(--text-main);font-weight:700;display:block}
 .an-i{color:var(--accent-price);display:block}.an-e{color:var(--danger);display:block}
 .an-leg{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:.85rem}.an-leg i{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -976,6 +990,10 @@ body.dark-mode .bt-pad4 .ok{color:#2B1D18}
 .bt-chip{background:transparent;border-radius:0;padding:6px 0}
 
 .top-header{justify-content:center;min-height:40px}
+/* [CHANGE C] start: subscription button at top-right */
+.subs-btn{position:absolute;right:5px;background:var(--primary-light);border:none;color:var(--text-main);width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem}
+body.settings-open .subs-btn{display:none!important}
+/* [CHANGE C] end */
 .settings-btn{position:absolute;left:5px;background:var(--primary-light);border:none;color:var(--text-main);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem}
 .top-month{background:none;border:0;color:var(--primary-dark);font-size:1.35rem;font-weight:800;display:flex;align-items:center;gap:4px;cursor:pointer;padding:6px 10px;font-family:inherit}
 .top-month svg{width:16px;height:16px}
@@ -1016,6 +1034,14 @@ body.settings-open .settings-btn{font-size:1.7rem;padding-bottom:3px}
 .st-bar input{flex:1;min-width:0;border:0;background:transparent;outline:none;color:var(--text-main);font-size:16px;padding:8px 0;font-family:inherit}
 .st-bar button{border:0;border-radius:9px;background:var(--primary-dark);color:#fff;font-size:.9rem;font-weight:800;padding:9px 16px;cursor:pointer;font-family:inherit;flex-shrink:0}
 body.dark-mode .st-bar button{color:#2B1D18}
+
+.bt-ov.ctr{align-items:center;padding:20px}
+.bt-ov.ctr .bt-sheet{max-width:360px;border-radius:22px;padding:18px;padding-bottom:20px;max-height:80vh}
+
+.top-header{height:44px;min-height:44px;padding:0}
+.settings-btn{left:0;top:50%;transform:translateY(-50%)}
+.top-month{height:44px;padding:0 10px;line-height:1}
+.top-title{line-height:44px}
 </style>
 </head>
 <body>
@@ -1023,6 +1049,8 @@ body.dark-mode .st-bar button{color:#2B1D18}
 <div class="top-header">
 <button class="settings-btn" id="settings-btn" onclick="settingsBtn()" aria-label="設定">⚙️</button>
 <button class="top-month" id="top-month" onclick="openMonthPicker()"></button>
+<!-- [CHANGE C] subscription button (top-right, only shown on budget page) -->
+<button class="subs-btn" id="subs-btn" onclick="btOpenSubs()" aria-label="訂閱管理" style="display:none">🔁</button>
 <div class="top-title" id="top-title">設定</div>
 </div>
 
@@ -1056,7 +1084,8 @@ body.dark-mode .st-bar button{color:#2B1D18}
 
 <!-- VIEW 1: Calendar View -->
 <div id="calendar-view" class="card">
-<div class="calendar-header cardTitle">
+<!-- [CHANGE A] calendar header: same spacing as budget page (added style attr) -->
+<div class="calendar-header cardTitle" style="margin-bottom:0;padding-bottom:8px">
 <h2 id="calendar-month-year"></h2>
 <div class="month-nav">
 <button class="btn-nav" onclick="changeMonth(-1)">&lt;</button>
@@ -1108,7 +1137,8 @@ body.dark-mode .st-bar button{color:#2B1D18}
 </div>
 </div>
 <div class="analytics-section-title">
-<span>🏢 追糧報表</span>
+<!-- [CHANGE E] title -->
+<span>🏢 追糧報表 <small style="font-weight:600;color:var(--text-sub)">· 整月（含未完成）</small></span>
 </div>
 <div id="company-breakdown-container"></div>
 <div class="analytics-section-title" style="margin-top: 20px;">
@@ -1472,26 +1502,27 @@ function onAddBtn() {
   else openModal();
 }
 function btClose() { document.getElementById('bt-ov').classList.remove('on'); }
-function btSheet(h) { document.getElementById('bt-sheet').innerHTML = h; document.getElementById('bt-ov').classList.add('on'); }
+function btSheet(h, center) { document.getElementById('bt-sheet').innerHTML = h; const o = document.getElementById('bt-ov'); o.classList.toggle('ctr', !!center); o.classList.add('on'); }
 
 function renderListView() {
   autoUpdatePastPlannedShifts();
   updateMonthSalaryCard();
-  document.getElementById('bt-month').textContent = `💸 ${currentYear}年${currentMonth + 1}月 支出`;
+  document.getElementById('bt-month').textContent = `${currentMonth + 1}月`; // [CHANGE F] removed year
   const ex = btMonthExp(), spent = ex.reduce((a, e) => a + e.amt, 0), wdE = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const b = B.budget || 0, p = b ? spent / b * 100 : 0, left = b - spent;
   const col = p >= 100 ? 'var(--danger)' : p >= 80 ? '#f59e0b' : 'var(--accent-price)';
   const subT = ex.filter(e => e.sub).reduce((a, e) => a + e.amt, 0);
   let h = '<div class="bt-pad">';
-  h += `<div class="bt-box"><div class="bt-row"><span class="bt-mu">每月預算餘額</span><button class="bt-btn" onclick="btOpenBudget()">設定預算</button></div>`;
+  // [CHANGE D] 每月預算餘額 area kept; only removed the 訂閱管理 button (moved to top-right, see CHANGE C)
+  h += `<div class="bt-box"><div class="bt-row"><span class="bt-mu">每月預算餘額</span></div>`;
   if (b) {
     h += `<div class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--text-main)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</div>
     <div class="bt-bar"><i style="width:${Math.min(p, 100)}%;background:${col}"></i></div>
     <div class="bt-row bt-mu"><span>已用 $${formatMoney(spent)} / $${formatMoney(b)}</span><b style="color:${col}">${p.toFixed(0)}%</b></div>
-    <div class="bt-msg" style="background:${col}22;color:${col}">${p >= 100 ? `🚨 已經超支 $${formatMoney(-left)}！收手啦` : p >= 80 ? `⚠️ 已用 ${p.toFixed(0)}%，只剩 $${formatMoney(left)}，小心 overbudget` : `👍 仲有 $${formatMoney(left)}，繼續保持`}</div>`;
-  } else h += '<div class="bt-mu" style="margin-top:6px">㩒「設定預算」開始</div>';
+    ${p >= 80 ? `<div class="bt-msg" style="background:${col}22;color:${col}">${p >= 100 ? `🚨 已經超支 $${formatMoney(-left)}！收手啦` : `⚠️ 已用 ${p.toFixed(0)}%，小心 overbudget`}</div>` : ''}`;
+  } // [CHANGE D] removed the else-branch hint text「去左上角 ⚙️ 設定頁設定每月預算」
   if (subT) h += `<div class="bt-mu" style="margin-top:8px">🔁 其中訂閱費 $${formatMoney(subT)}</div>`;
-  h += '</div><div class="bt-row" style="gap:8px"><button class="bt-btn" onclick="btOpenSubs()">🔁 訂閱管理</button></div>';
+  h += '</div>';
   const g = {};
   ex.sort((a, b) => b.date.localeCompare(a.date)).forEach(e => (g[e.date] = g[e.date] || []).push(e));
   Object.keys(g).forEach(d => {
@@ -1589,7 +1620,7 @@ function anDayMaps(ym) {
 }
 function renderAnalysis() {
   updateMonthSalaryCard();
-  document.getElementById('analysis-month-year').textContent = `${currentYear}年${currentMonth + 1}月`;
+  document.getElementById('analysis-month-year').textContent = `${currentMonth + 1}月`; // [CHANGE F] removed year
   const ym = btYM(), { de, di } = anDayMaps(ym), dim = btDim(ym), today = getLocalDateStr();
   const off = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
   let cal = '<div class="an-cal">' + ['一','二','三','四','五','六','日'].map(d => `<div class="an-wd">${d}</div>`).join('');
@@ -1629,7 +1660,7 @@ function renderAnalysis() {
     `<div class="bt-msg" style="background:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}22;color:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}">比上個月 ${diff > 0 ? '↑ 多使' : diff < 0 ? '↓ 慳咗' : '一樣'} $${formatMoney(Math.abs(diff))}（${diff > 0 ? '+' : ''}${(diff / prev * 100).toFixed(0)}%）</div>`;
 
   document.getElementById('an-new').innerHTML =
-    `<div class="analytics-section-title"><span>📅 每日收支</span></div><div class="bt-box">${cal}<div class="bt-mu" style="margin-top:6px">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div></div>` +
+    `<div class="analytics-section-title"><span>📅 每日收支</span></div><div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 14px">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div>` + /* [CHANGE G] removed the bt-box wrapper around the calendar */
     `<div class="analytics-section-title"><span>🥧 支出分類</span></div><div class="bt-box">${pie}</div>` +
     `<div class="analytics-section-title"><span>📊 每月支出比較</span></div><div class="bt-box">${bars}${dtxt}</div>`;
 }
@@ -1651,6 +1682,7 @@ function openSettings() {
   ['calendar-view','list-view','analytics-view','analysis-view'].forEach(v => document.getElementById(v).style.display = 'none');
   ['nav-calendar','nav-list','nav-analysis','nav-analytics'].forEach(n => document.getElementById(n).classList.remove('active'));
   document.getElementById('settings-view').style.display = 'block';
+  document.getElementById('subs-btn').style.display = 'none'; // [CHANGE C]
   document.body.classList.add('settings-open');
   document.getElementById('settings-btn').textContent = '‹';
   currentView = 'settings-view';
@@ -1673,7 +1705,7 @@ function mpShift(n) { mpY += n; renderMonthPicker(); }
 function renderMonthPicker() {
   let h = `<div class="mp-yr"><button class="btn-nav" onclick="mpShift(-1)">&lt;</button><span>${mpY}年</span><button class="btn-nav" onclick="mpShift(1)">&gt;</button></div><div class="mp-g">`;
   for (let m = 0; m < 12; m++) h += `<button class="mp-m${mpY === currentYear && m === currentMonth ? ' on' : ''}" onclick="mpPick(${m})">${m + 1}月</button>`;
-  btSheet(h + '</div>');
+  btSheet(h + '</div>', true);
 }
 function mpPick(m) {
   currentYear = mpY; currentMonth = m;
@@ -1778,6 +1810,8 @@ document.getElementById('analysis-view').style.display = 'none';
 document.getElementById('settings-view').style.display = 'none';
 document.body.classList.remove('settings-open');
 document.getElementById('settings-btn').textContent = '⚙️';
+// [CHANGE C] show subs button only on budget page
+document.getElementById('subs-btn').style.display = (viewId === 'list-view') ? 'flex' : 'none';
 document.getElementById('nav-analysis').classList.remove('active');
 document.getElementById('nav-calendar').classList.remove('active');
 document.getElementById('nav-list').classList.remove('active');
@@ -2266,7 +2300,7 @@ function moveOrCopyShift(mode) {
 /* Render Calendar Function */
 function renderCalendar() {
   autoUpdatePastPlannedShifts();
-  document.getElementById('calendar-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
+  document.getElementById('calendar-month-year').textContent = `${currentMonth + 1}月`; // [CHANGE F] removed year
   const daysContainer = document.getElementById('calendar-days');
   daysContainer.innerHTML = '';
 
@@ -2437,7 +2471,7 @@ renderListView();
 function renderAnalyticsOld() {
 autoUpdatePastPlannedShifts();
 updateMonthSalaryCard();
-document.getElementById('analytics-month-year').textContent = `${currentYear} 年 ${currentMonth + 1} 月`;
+document.getElementById('analytics-month-year').textContent = `${currentMonth + 1}月`; // [CHANGE F] removed year
 const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
 const monthShifts = shifts.filter(s => s.date && s.date.startsWith(monthPrefix));
 let totalHours = 0;
@@ -2450,19 +2484,25 @@ totalHours += s.duration;
 totalPay += pay;
 }
 if (!companyMap[s.company]) {
-companyMap[s.company] = { hours: 0, pay: 0, totalEstPay: 0, count: 0 };
+companyMap[s.company] = { hours: 0, pay: 0, totalEstPay: 0, count: 0, plannedPay: 0, plannedCount: 0, allHours: 0, allCount: 0 }; // [CHANGE E] added allHours, allCount
 }
 companyMap[s.company].totalEstPay += pay;
+companyMap[s.company].allHours += s.duration; // [CHANGE E]
+companyMap[s.company].allCount += 1; // [CHANGE E]
 if (s.type === 'completed' || !s.type) {
 companyMap[s.company].hours += s.duration;
 companyMap[s.company].pay += pay;
 companyMap[s.company].count += 1;
+} else {
+companyMap[s.company].plannedPay += pay;
+companyMap[s.company].plannedCount += 1;
 }
 });
 document.getElementById('stat-hours').textContent = `${Math.round(totalHours * 10) / 10}h`;
 document.getElementById('stat-total-pay').textContent = `$${formatMoney(totalPay)}`;
+// [CHANGE E] the 3 template lines below (company-stat-pay + company-stat-meta spans) were changed to whole-month numbers
 const companyBreakdownContainer = document.getElementById('company-breakdown-container');
-const companyEntries = Object.entries(companyMap).sort((a, b) => b[1].totalEstPay - a[1].totalEstPay);
+const companyEntries = Object.entries(companyMap).sort((a, b) => (b[1].totalEstPay - a[1].totalEstPay) || (b[1].pay - a[1].pay) /* [CHANGE E] sort by whole-month pay */);
 const allCompanyNames = [...new Set(shifts.map(s => s.company))];
 
 if (companyEntries.length === 0) {
@@ -2471,7 +2511,7 @@ companyBreakdownContainer.innerHTML = `<div class="empty-msg">本月沒有工時
 companyBreakdownContainer.innerHTML = companyEntries.map(([name, data]) => {
 const idx = allCompanyNames.indexOf(name);
 const color = companyColorPalette[idx % companyColorPalette.length];
-const avgCompRate = data.hours > 0 ? (data.pay / data.hours) : 0;
+const avgCompRate = data.allHours > 0 ? (data.totalEstPay / data.allHours) : 0; // [CHANGE E] whole month
 return `
 <div class="company-stat-item">
 <div class="company-stat-name">
@@ -2480,7 +2520,8 @@ ${name}
 </div>
 <div class="company-stat-pay">$${formatMoney(data.totalEstPay)}</div>
 <div class="company-stat-meta">
-<span>${data.count} job • ${Math.round(data.hours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
+<span>${data.allCount} job • ${Math.round(data.allHours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
+<span>✅ 已完成 $${formatMoney(data.pay)}${data.plannedCount ? ` · 📅 未完成 ${data.plannedCount} job $${formatMoney(data.plannedPay)}` : ''}</span>
 </div>
 </div>
 `;
