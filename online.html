@@ -20,8 +20,8 @@
 --bg-color: #FCFCFC;
 --card-bg: #FFFCF5;
 --primary: #AAA648;
---primary-dark: #D5642A;
---primary-hover: #D5642A;
+--primary-dark: #8Da6CC;
+--primary-hover: #8Da6CC;
 --primary-light: #FFEDC0;
 --text-main: #4A2C20;
 --text-sub: #9A7B6E;
@@ -145,7 +145,7 @@ transition: background-color 0.3s;
 padding: 18px;
 }
 .month-salary-card {
-background: linear-gradient(135deg, #EE8350, #D5642A);
+background: linear-gradient(135deg, #EE8350, #8Da6CC);
 border-radius: 18px;
 padding: 18px 20px;
 color: white;
@@ -298,7 +298,7 @@ user-select: none !important;
 -webkit-user-select: none !important;
 -webkit-touch-callout: none !important;
 touch-action: none !important;
-background-color: #D5642A;
+background-color: #8Da6CC;
 padding: 1px 0;
 width: 100%;
 text-align: center;
@@ -310,7 +310,7 @@ line-height: 1.3;
 flex-shrink: 0;
 }
 body.dark-mode .shift-dot-item {
-background-color: #D5642A;
+background-color: #8Da6CC;
 }
 .shift-dot-item .comp-name {
 color: #ffffff;
@@ -546,7 +546,7 @@ max-width: 70px;
 width: 42px;
 height: 42px;
 border-radius: 50%;
-background: linear-gradient(135deg, #EE8350, #D5642A);
+background: linear-gradient(135deg, #EE8350, #8Da6CC);
 color: white;
 border: 4px solid var(--card-bg);
 display: flex;
@@ -939,7 +939,7 @@ font-size: 0.88rem;
 .bt-pri{width:100%;padding:13px;border:0;border-radius:12px;background:var(--primary-dark);color:#fff;font-size:1rem;font-weight:800;cursor:pointer}
 body.dark-mode .bt-pri,body.dark-mode .bt-cat.on{color:#2B1D18}
 
-.fab-add{position:fixed;right:16px;bottom:calc(var(--nav-height) + var(--safe-bottom) + 16px);width:56px;height:56px;border-radius:50%;border:0;background:linear-gradient(135deg,#EE8350,#D5642A);color:#fff;font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.3);cursor:pointer;z-index:998;transition:transform .15s}
+.fab-add{position:fixed;right:16px;bottom:calc(var(--nav-height) + var(--safe-bottom) + 16px);width:56px;height:56px;border-radius:50%;border:0;background:linear-gradient(135deg,#EE8350,#8Da6CC);color:#fff;font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.3);cursor:pointer;z-index:998;transition:transform .15s}
 .fab-add:active{transform:scale(.92)}
 /* [CHANGE G] start: 每日收支 calendar now follows main calendar style (no extra bg box, bordered cells, full-bleed). Original lines were:
    .an-cal{...gap:3px}  .an-wd{...padding-bottom:2px}  .an-c{...border-radius:8px;background:var(--card-bg)...}  .an-c.empty{background:transparent} .an-c.today{outline:2px solid var(--primary)} */
@@ -1342,7 +1342,7 @@ let miniCalMonth = new Date().getMonth();
 let allowRangeSelection = true;
 
 const companyColorPalette = [
-{ bg: '#FFE4DE', border: '#F6A79A', text: '#D5642A' },
+{ bg: '#FFE4DE', border: '#F6A79A', text: '#8Da6CC' },
 { bg: '#f3e5f5', border: '#ce93d8', text: '#7b1fa2' },
 { bg: '#fff3e0', border: '#ffcc80', text: '#e65100' },
 { bg: '#e8f5e9', border: '#a5d6a7', text: '#2e7d32' },
@@ -2536,7 +2536,7 @@ const isPlanned = s.type === 'planned';
 return `
 <div class="shift-list-item" onclick="openShiftDetail('${s.id}')">
 <div class="shift-info">
-<h4>${s.company} ${isPlanned ? '<span style="color:#D5642A; font-size:0.75rem;">(排班)</span>' : ''}</h4>
+<h4>${s.company} ${isPlanned ? '<span style="color:#8Da6CC; font-size:0.75rem;">(排班)</span>' : ''}</h4>
 <p>${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}</p>
 </div>
 <div class="shift-amount">
