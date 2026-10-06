@@ -69,7 +69,7 @@ height: 100%;
 }
 body {
 background-color: var(--bg-color);
-padding: calc(4px + var(--safe-top)) 10px calc(var(--nav-height) + var(--safe-bottom) + 42px) 10px;
+padding: calc(4px + var(--safe-top)) 15px calc(var(--nav-height) + var(--safe-bottom) + 42px) 15px;
 display: flex;
 justify-content: center;
 align-items: flex-start;
@@ -141,6 +141,7 @@ border-radius: 20px;
 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 overflow: hidden;
 transition: background-color 0.3s;
+   padding:18px 20px;
 }
 .cardTitle {
 padding: 18px;
@@ -1105,7 +1106,7 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 <div class="salary-divider"></div>
 <div class="salary-box"><span>又亂使錢</span><strong id="month-spend">$ 0</strong></div>
 <div class="salary-divider"></div>
-<div class="salary-box"><span>本月身家</span><strong id="month-balance">$ 0</strong></div>
+<div class="salary-box"><span>本月現有身家</span><strong id="month-balance">$ 0</strong></div>
 </div>
 
 <!-- SETTINGS VIEW -->
@@ -1130,7 +1131,7 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 <div class="card cardTitle st-card">
 <div class="st-t">🗂 備份與數據管理</div>
 <div class="st-actions">
-<button class="action-sheet-btn primary" onclick="exportJSON()">匯出 JSON 備份檔 (iCloud)</button>
+<button class="action-sheet-btn" onclick="exportJSON()">匯出 JSON 備份檔</button>
 <button class="action-sheet-btn" onclick="importJSON()">匯入 JSON 備份檔</button>
 <button class="action-sheet-btn danger" onclick="confirmClearAll()">清空所有紀錄</button>
 <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleFileSelect(event)">
@@ -1142,13 +1143,7 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 <!-- VIEW 1: Calendar View -->
 <div id="calendar-view" class="card">
 <!-- [CHANGE A] calendar header: same spacing as budget page (added style attr) -->
-<div class="calendar-header cardTitle" style="margin-bottom:0;padding-bottom:8px">
-<h2 id="calendar-month-year"></h2>
-<div class="month-nav">
-<button class="btn-nav" onclick="changeMonth(-1)">&lt;</button>
-<button class="btn-nav" onclick="changeMonth(1)">&gt;</button>
-</div>
-</div>
+
 <div class="calendar-weekdays">
 <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div class="sun-label">日</div>
 </div>
