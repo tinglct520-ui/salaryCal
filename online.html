@@ -1088,6 +1088,8 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 /* [CHANGE P] reverted: 每月預算餘額 box is back to var(--primary-light) (I had wrongly made it white; #fff was meant for the 本月身家 number) */
 .bt-m b{color:var(--primary-dark)} /* [CHANGE P] expense/income item name uses main blue */
 /* [CHANGE O] end */
+/* [CHANGE Q] calendar card has no header now: small top padding so weekday row is not flush with the card edge */
+#calendar-view .calendar-weekdays { padding-top: 14px; }
 </style>
 </head>
 <body>
@@ -1141,14 +1143,7 @@ body.dark-mode .nav-item:not(.active) svg{fill:currentColor}
 
 <!-- VIEW 1: Calendar View -->
 <div id="calendar-view" class="card">
-<!-- [CHANGE A] calendar header: same spacing as budget page (added style attr) -->
-<div class="calendar-header cardTitle" style="margin-bottom:0;padding-bottom:8px">
-<h3 id="calendar-month-year"></h3>
-<div class="month-nav">
-<button class="btn-nav" onclick="changeMonth(-1)">&lt;</button>
-<button class="btn-nav" onclick="changeMonth(1)">&gt;</button>
-</div>
-</div>
+<!-- [CHANGE Q] calendar header removed (month is switched from the top bar) -->
 <div class="calendar-weekdays">
 <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div class="sun-label">日</div>
 </div>
@@ -2396,7 +2391,6 @@ function moveOrCopyShift(mode) {
 /* Render Calendar Function */
 function renderCalendar() {
   autoUpdatePastPlannedShifts();
-  document.getElementById('calendar-month-year').textContent = `${currentMonth + 1}月`; // [CHANGE F] removed year
   const daysContainer = document.getElementById('calendar-days');
   daysContainer.innerHTML = '';
 
