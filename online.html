@@ -347,7 +347,7 @@ outline: 2px dashed var(--primary);
 outline-offset: -3px;
 background: var(--primary-light) !important;
 }
-#calendar-view, #list-view, #analytics-view, #analysis-view {
+#calendar-view, #list-view, #analytics-view, #analysis-view, #overall-view {
 margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
 }
 .list-filter-bar {
@@ -1101,6 +1101,7 @@ body { overflow-x: clip; }
 .fab-add { transform: translate3d(0, 0, 0); will-change: transform; }
 .fab-add:active { transform: translate3d(0, 0, 0) scale(.92); }
 /* [CHANGE S] end */
+.nav-item span{font-size:.66rem;font-weight:700;line-height:1;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1174,37 +1175,42 @@ body { overflow-x: clip; }
 <div id="an-new"></div>
 </div>
 
-<!-- VIEW 3b: Income report / statement -->
-<div id="analytics-view" class="card cardTitle" style="display: none;">
-<div class="analytics-section-title" style="margin-top:6px"><span>💼 本月收入報表</span></div>
-<div class="analytics-summary-grid">
-<div class="stat-box">
-<span>做狗時數</span>
-<strong id="stat-hours">0h</strong>
-</div>
-<div class="stat-box">
-<span>已到手錢錢</span>
-<strong id="stat-total-pay">$0</strong>
-</div>
-</div>
-<div class="analytics-section-title">
-<!-- [CHANGE E] title -->
-<span>🏢 本月追糧報表 <small style="font-weight:600;color:var(--text-sub)">（含未完成）</small></span>
-</div>
-<div id="company-breakdown-container"></div>
+<!-- VIEW 3c: Overall analysis (總覽) -->
+<div id="overall-view" class="card cardTitle" style="display: none;">
+<div id="an-overall"></div>
 <div class="analytics-section-title" style="margin-top: 20px;">
 <span>📊 累積血汗指數</span>
 </div>
 <div class="analytics-summary-grid">
 <div class="stat-box">
-<span>累積做狗時數</span>
+<span>累積血汗</span>
 <strong id="stat-all-hours">0h</strong>
 </div>
 <div class="stat-box">
-<span>累積賺到錢錢</span>
+<span>累積錢錢</span>
 <strong id="stat-all-pay">$0</strong>
 </div>
 </div>
+</div>
+
+<!-- VIEW 3b: Income report / statement -->
+<div id="analytics-view" class="card cardTitle" style="display: none;">
+<div class="analytics-section-title" style="margin-top:6px"><span>💼 收入報表</span></div>
+<div class="analytics-summary-grid">
+<div class="stat-box">
+<span>本月做狗總時數</span>
+<strong id="stat-hours">0h</strong>
+</div>
+<div class="stat-box">
+<span>本月已賺取</span>
+<strong id="stat-total-pay">$0</strong>
+</div>
+</div>
+<div class="analytics-section-title">
+<!-- [CHANGE E] title -->
+<span>🏢 追糧報表 <small style="font-weight:600;color:var(--text-sub)">· 整月（含未完成）</small></span>
+</div>
+<div id="company-breakdown-container"></div>
 </div>
 </div>
 
@@ -1212,15 +1218,23 @@ body { overflow-x: clip; }
 <nav class="fixed-bottom-nav">
 <button class="nav-item active" id="nav-calendar" onclick="switchNav('calendar-view')">
 <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+<span>收入</span>
 </button>
 <button class="nav-item" id="nav-list" onclick="switchNav('list-view')">
 <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+<span>支出</span>
 </button>
 <button class="nav-item" id="nav-analysis" onclick="switchNav('analysis-view')">
 <svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg>
+<span>分析</span>
+</button>
+<button class="nav-item" id="nav-overall" onclick="switchNav('overall-view')">
+<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+<span>總覽</span>
 </button>
 <button class="nav-item" id="nav-analytics" onclick="switchNav('analytics-view')">
 <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+<span>報表</span>
 </button>
 <!-- [CHANGE O] 備份 tab removed from bottom nav (moved into Settings page) -->
 </nav>
@@ -1544,7 +1558,7 @@ function parseBudgetRows(data) {
 
 function onAddBtn() {
   if (currentView === 'list-view') btOpenExp();
-  else if (currentView === 'analytics-view' || currentView === 'analysis-view') btSheet('<h3>新增</h3><button class="bt-pri" style="margin-bottom:10px" onclick="btClose();btOpenExp()">💸 新增支出</button><button class="bt-pri" onclick="btClose();openModal()">💼 新增排班 / 打工紀錄</button>');
+  else if (currentView === 'analytics-view' || currentView === 'analysis-view' || currentView === 'overall-view') btSheet('<h3>新增</h3><button class="bt-pri" style="margin-bottom:10px" onclick="btClose();btOpenExp()">💸 新增支出</button><button class="bt-pri" onclick="btClose();openModal()">💼 新增排班 / 打工紀錄</button>');
   else openModal();
 }
 function btClose() { document.getElementById('bt-ov').classList.remove('on'); }
@@ -1694,6 +1708,10 @@ function btDelSub(id) {
 // ==================== Analysis ====================
 const AN_COLORS = ['#ef5350','#42a5f5','#66bb6a','#ffa726','#ab47bc','#26c6da','#8d6e63','#9e9e9e'];
 const anShort = n => n >= 10000 ? (Math.round(n / 100) / 10) + 'k' : String(Math.round(n * 10) / 10);
+function renderOverall() {
+  renderAnalyticsOld();
+  renderAnalysis();
+}
 function renderAnalytics() {
   renderAnalyticsOld();
 }
@@ -1743,10 +1761,32 @@ function renderAnalysis() {
   const dtxt = prev === 0 && cur === 0 ? '' : prev === 0 ? `<div class="bt-msg" style="background:#f59e0b22;color:#f59e0b">上個月冇支出記錄</div>` :
     `<div class="bt-msg" style="background:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}22;color:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}">比上個月 ${diff > 0 ? '↑ 多使' : diff < 0 ? '↓ 慳咗' : '一樣'} $${formatMoney(Math.abs(diff))}（${diff > 0 ? '+' : ''}${fmt1(diff / prev * 100)}%）</div>`;
 
+  /* [CHANGE T] 每月儲蓄 = 已完成收入 - 支出 */
+  const sm = months.map(x => { const inc = btIncomeShifts(x.k).filter(sh => sh.type === 'completed' || !sh.type).reduce((a, sh) => a + getShiftPay(sh), 0); return { ...x, inc, exp: x.v, net: inc - x.v }; });
+  const svMax = Math.max(0, ...sm.map(x => x.net)), svMin = Math.max(0, ...sm.map(x => -x.net)), svT = (svMax + svMin) || 1, svH = 110, svTop = 22, svBase = svTop + svMax / svT * svH;
+  let svg = '<svg viewBox="0 0 300 170" style="width:100%;display:block;margin-top:8px">' + `<line x1="0" x2="300" y1="${svBase}" y2="${svBase}" stroke="var(--border-color)" stroke-width="1.5"/>`;
+  sm.forEach((x, i) => {
+    const cx = 25 + i * 50, h = Math.abs(x.net) / svT * svH, y = x.net >= 0 ? svBase - h : svBase, col = x.net >= 0 ? 'var(--accent-price)' : 'var(--danger)';
+    svg += `<rect x="${cx - 14}" y="${y}" width="28" height="${Math.max(h, 1.5)}" rx="4" fill="${col}" opacity="${i === 5 ? 1 : 0.55}"/>`;
+    svg += `<text x="${cx}" y="${x.net >= 0 ? y - 4 : y + h + 10}" text-anchor="middle" font-size="9" font-weight="700" fill="${col}">${x.net < 0 ? '-' : ''}${anShort(Math.abs(x.net))}</text>`;
+    svg += `<text x="${cx}" y="165" text-anchor="middle" font-size="9" fill="var(--text-sub)">${x.m}月</text>`;
+  });
+  svg += '</svg>';
+  const sc = sm[5], scol = sc.net >= 0 ? 'var(--accent-price)' : 'var(--danger)', total6 = sm.reduce((a, x) => a + x.net, 0);
+  const rows = sm.slice().reverse().map(x => `<div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;padding:6px 0;border-top:1px solid var(--border-color);font-size:.78rem;text-align:right"><span style="text-align:left;font-weight:800">${x.m}月</span><span style="color:var(--accent-price)">+${anShort(x.inc)}</span><span style="color:var(--danger)">-${anShort(x.exp)}</span><b style="color:${x.net >= 0 ? 'var(--accent-price)' : 'var(--danger)'}">${x.net < 0 ? '-' : ''}${anShort(Math.abs(x.net))}</b></div>`).join('');
+  const sv = `<div class="bt-row"><span class="bt-mu">本月儲蓄</span><b style="font-size:1.5rem;color:${scol}">${sc.net < 0 ? '-' : ''}$${formatMoney(Math.abs(sc.net))}</b></div>
+    <div class="bt-mu" style="margin-top:2px">收入 $${formatMoney(sc.inc)} − 支出 $${formatMoney(sc.exp)}${sc.inc > 0 ? ' · 儲蓄率 ' + fmt1(sc.net / sc.inc * 100) + '%' : ''}</div>
+    ${svg}
+    <div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;font-size:.7rem;color:var(--text-sub);text-align:right;margin-top:4px;padding-bottom:4px"><span></span><span>收入</span><span>支出</span><span>儲蓄</span></div>${rows}
+    <div class="bt-msg" style="background:${total6 >= 0 ? 'var(--accent-price)' : 'var(--danger)'}22;color:${total6 >= 0 ? 'var(--accent-price)' : 'var(--danger)'}">近 6 個月累計儲蓄 ${total6 < 0 ? '-' : ''}$${formatMoney(Math.abs(total6))}</div>`;
+
   document.getElementById('an-new').innerHTML =
     `<div class="analytics-section-title"><span>📅 每日收支</span></div><div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 14px;font-size:.68rem;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div>` + /* [CHANGE G] removed the bt-box wrapper around the calendar */
-    `<div class="analytics-section-title"><span>🥧 支出分類</span></div><div class="bt-box">${pie}</div>` +
-    `<div class="analytics-section-title"><span>📊 每月支出比較</span></div><div class="bt-box">${bars}${dtxt}</div>`;
+    `<div class="analytics-section-title"><span>🥧 支出分類</span></div><div class="bt-box">${pie}</div>`;
+  const ov = document.getElementById('an-overall');
+  if (ov) ov.innerHTML =
+    `<div class="analytics-section-title" style="margin-top:6px"><span>📊 每月支出比較</span></div><div class="bt-box">${bars}${dtxt}</div>` +
+    `<div class="analytics-section-title"><span>💰 每月儲蓄</span> <small style="font-weight:600;color:var(--text-sub)">收入 − 支出</small></div><div class="bt-box">${sv}</div>`;
 }
 function anDay(ds) {
   const ex = btMonthExp(ds.slice(0, 7)).filter(e => e.date === ds);
@@ -1763,8 +1803,8 @@ let prevView = 'calendar-view', mpY = 2026;
 function settingsBtn() { if (currentView === 'settings-view') closeSettings(); else openSettings(); }
 function openSettings() {
   if (currentView !== 'settings-view') prevView = currentView;
-  ['calendar-view','list-view','analytics-view','analysis-view'].forEach(v => document.getElementById(v).style.display = 'none');
-  ['nav-calendar','nav-list','nav-analysis','nav-analytics'].forEach(n => document.getElementById(n).classList.remove('active'));
+  ['calendar-view','list-view','analytics-view','analysis-view','overall-view'].forEach(v => document.getElementById(v).style.display = 'none');
+  ['nav-calendar','nav-list','nav-analysis','nav-analytics','nav-overall'].forEach(n => document.getElementById(n).classList.remove('active'));
   document.getElementById('settings-view').style.display = 'block';
   document.getElementById('subs-btn').style.display = 'none'; // [CHANGE C]
   document.body.classList.add('settings-open');
@@ -1891,6 +1931,7 @@ document.getElementById('calendar-view').style.display = 'none';
 document.getElementById('list-view').style.display = 'none';
 document.getElementById('analytics-view').style.display = 'none';
 document.getElementById('analysis-view').style.display = 'none';
+document.getElementById('overall-view').style.display = 'none';
 document.getElementById('settings-view').style.display = 'none';
 document.body.classList.remove('settings-open');
 document.getElementById('settings-btn').textContent = '⚙️';
@@ -1900,6 +1941,7 @@ document.getElementById('nav-analysis').classList.remove('active');
 document.getElementById('nav-calendar').classList.remove('active');
 document.getElementById('nav-list').classList.remove('active');
 document.getElementById('nav-analytics').classList.remove('active');
+document.getElementById('nav-overall').classList.remove('active');
 document.getElementById(viewId).style.display = 'block';
 if (viewId === 'calendar-view') {
 document.getElementById('nav-calendar').classList.add('active');
@@ -1910,6 +1952,9 @@ renderListView();
 } else if (viewId === 'analysis-view') {
 document.getElementById('nav-analysis').classList.add('active');
 renderAnalysis();
+} else if (viewId === 'overall-view') {
+document.getElementById('nav-overall').classList.add('active');
+renderOverall();
 } else if (viewId === 'analytics-view') {
 document.getElementById('nav-analytics').classList.add('active');
 renderAnalytics();
@@ -2175,6 +2220,7 @@ if (currentView === 'calendar-view') { renderCalendar(); }
 else if (currentView === 'list-view') { renderListView(); }
 else if (currentView === 'settings-view') { renderSettings(); }
 else if (currentView === 'analysis-view') { renderAnalysis(); }
+else if (currentView === 'overall-view') { renderOverall(); }
 else if (currentView === 'analytics-view') { renderAnalytics(); }
 else { renderCalendar(); }
 if (currentView !== 'calendar-view') { updateMonthSalaryCard(); }
@@ -2779,7 +2825,7 @@ window.addEventListener('DOMContentLoaded', () => {
   })();
 
   /* [CHANGE R] swipe left/right to change month on budget / analysis / report pages too */
-  ['list-view', 'analysis-view', 'analytics-view'].forEach(id => {
+  ['list-view', 'analysis-view', 'overall-view', 'analytics-view'].forEach(id => {
     const el = document.getElementById(id);
     if (!el || el.dataset.swipeReady) return;
     el.dataset.swipeReady = '1';
