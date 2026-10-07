@@ -1102,6 +1102,21 @@ body { overflow-x: clip; }
 .fab-add:active { transform: translate3d(0, 0, 0) scale(.92); }
 /* [CHANGE S] end */
 .nav-item span{font-size:.66rem;font-weight:700;line-height:1;white-space:nowrap}
+
+/* [CHANGE U] one card per block + sticky budget card */
+.cd-pad { padding: 16px 18px; margin: 12px 0 0; }
+.cd-pad:first-child { margin-top: 0; }
+.cd-pad .bt-it:last-child { border-bottom: 0; }
+#bt-sticky { position: sticky; top: var(--ts-h, 0px); z-index: 40; background: var(--bg-color); padding-bottom: 12px; transition: background-color 0.3s; }
+#bt-sticky .cd-pad { margin: 0; }
+
+/* [CHANGE V] one shared size/weight for the big amounts: 每月預算餘額 / 本月儲蓄 / 追糧報表金額 */
+:root { --amt-size: 1.6rem; --amt-weight: 800; }
+.bt-big, .company-stat-pay { font-size: var(--amt-size); font-weight: var(--amt-weight); }
+/* [CHANGE W] */
+body.no-fab .fab-add { display: none; }
+.top-month { font-size: 1.1rem; }
+.top-month svg { width: 14px; height: 14px; }
 </style>
 </head>
 <body>
@@ -1166,21 +1181,21 @@ body { overflow-x: clip; }
 </div>
 
 <!-- VIEW 2: List View -->
-<div id="list-view" class="card" style="display: none;">
-<div id="bt-body"></div>
+<div id="list-view" style="display: none;">
+<div id="bt-sticky"><div id="bt-budget"></div></div>
+<div id="bt-days"></div>
 </div>
 
 <!-- VIEW 3a: Analysis (charts) -->
-<div id="analysis-view" class="card cardTitle" style="display: none;">
+<div id="analysis-view" style="display: none;">
 <div id="an-new"></div>
 </div>
 
 <!-- VIEW 3c: Overall analysis (總覽) -->
-<div id="overall-view" class="card cardTitle" style="display: none;">
+<div id="overall-view" style="display: none;">
 <div id="an-overall"></div>
-<div class="analytics-section-title" style="margin-top: 20px;">
-<span>📊 累積血汗指數</span>
-</div>
+<div class="card cd-pad">
+<div class="analytics-section-title" style="margin:0 0 10px"><span>📊 累積血汗指數</span></div>
 <div class="analytics-summary-grid">
 <div class="stat-box">
 <span>累積血汗</span>
@@ -1192,25 +1207,27 @@ body { overflow-x: clip; }
 </div>
 </div>
 </div>
+</div>
 
 <!-- VIEW 3b: Income report / statement -->
-<div id="analytics-view" class="card cardTitle" style="display: none;">
-<div class="analytics-section-title" style="margin-top:6px"><span>💼 本月收入報表</span></div>
+<div id="analytics-view" style="display: none;">
+<div class="card cd-pad">
+<div class="analytics-section-title" style="margin:0 0 10px"><span>💼 收入報表</span></div>
 <div class="analytics-summary-grid">
 <div class="stat-box">
-<span>做狗時數</span>
+<span>本月做狗總時數</span>
 <strong id="stat-hours">0h</strong>
 </div>
 <div class="stat-box">
-<span>已到手錢錢</span>
+<span>本月已賺取</span>
 <strong id="stat-total-pay">$0</strong>
 </div>
 </div>
-<div class="analytics-section-title">
-<!-- [CHANGE E] title -->
-<span>🏢 追糧報表 <small style="font-weight:400;color:var(--text-sub);font-size: 0.68rem;">（含未完成）</small></span>
 </div>
+<div class="card cd-pad">
+<div class="analytics-section-title" style="margin:0 0 10px"><span>🏢 追糧報表 <small style="font-weight:600;color:var(--text-sub)">· 整月（含未完成）</small></span></div>
 <div id="company-breakdown-container"></div>
+</div>
 </div>
 </div>
 
@@ -1571,26 +1588,28 @@ function renderListView() {
   const b = B.budget || 0, p = b ? spent / b * 100 : 0, left = b - spent;
   const col = p >= 100 ? 'var(--danger)' : p >= 80 ? '#f59e0b' : 'var(--accent-price)';
   const subT = ex.filter(e => e.sub).reduce((a, e) => a + e.amt, 0);
-  let h = '<div class="bt-pad">';
-  // [CHANGE D] 每月預算餘額 area kept; only removed the 訂閱管理 button (moved to top-right, see CHANGE C)
-  // [CHANGE M] remaining amount moved onto the same row as the label, right aligned
-  h += `<div class="bt-box"><div class="bt-row"><span class="bt-mu">每月預算餘額</span>${b ? `<span class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--text-main)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</span>` : ''}</div>`;
+  // [CHANGE U] 每月預算餘額 = its own (sticky) card
+  let top = `<div class="card cd-pad"><div class="bt-row"><span class="bt-mu">每月預算餘額</span>${b ? `<span class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--text-main)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</span>` : ''}</div>`;
   if (b) {
-    h += `<div class="bt-bar"><i style="width:${Math.min(p, 100)}%;background:${col}"></i></div>
+    top += `<div class="bt-bar"><i style="width:${Math.min(p, 100)}%;background:${col}"></i></div>
     <div class="bt-row bt-mu"><span>已用 $${formatMoney(spent)} / $${formatMoney(b)}</span><b style="color:${col}">${fmt1(p)}%</b></div>
     ${p >= 80 ? `<div class="bt-msg" style="background:${col}22;color:${col}">${p >= 100 ? `🚨 已經超支 $${formatMoney(-left)}！收手啦` : `⚠️ 已用 ${fmt1(p)}%，小心 overbudget`}</div>` : ''}`;
-  } // [CHANGE D] removed the else-branch hint text「去左上角 ⚙️ 設定頁設定每月預算」
-  if (subT) h += `<div class="bt-mu" style="margin-top:8px">🔁 其中訂閱費 $${formatMoney(subT)}</div>`;
-  h += '</div>';
+  }
+  if (subT) top += `<div class="bt-mu" style="margin-top:8px">🔁 其中訂閱費 $${formatMoney(subT)}</div>`;
+  top += '</div>';
+  // [CHANGE U] one card per day
   const g = {};
   ex.sort((a, b) => b.date.localeCompare(a.date)).forEach(e => (g[e.date] = g[e.date] || []).push(e));
+  let h = '';
   Object.keys(g).forEach(d => {
     const tot = g[d].reduce((a, e) => a + e.amt, 0);
-    h += `<div class="bt-day"><span>${wdE[new Date(d + 'T00:00:00').getDay()]} ${+d.slice(5, 7)}月${+d.slice(8)}日</span><span>今日支出 $${formatMoney(tot)}</span></div>`;
+    h += `<div class="card cd-pad"><div class="bt-day" style="padding:0 0 6px"><span>${wdE[new Date(d + 'T00:00:00').getDay()]} ${+d.slice(5, 7)}月${+d.slice(8)}日</span><span>今日支出 $${formatMoney(tot)}</span></div>`;
     g[d].forEach(e => h += `<div class="bt-it"><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b>${e.sub ? '' : `<button class="bt-x" onclick="btDelExp('${btEsc(e.id)}')">✕</button>`}</div>`);
+    h += '</div>';
   });
-  if (!ex.length) h += '<div class="empty-msg">呢個月未有支出記錄<br>㩒右下角 + 新增</div>';
-  document.getElementById('bt-body').innerHTML = h + '</div>';
+  if (!ex.length) h = '<div class="card cd-pad"><div class="empty-msg">呢個月未有支出記錄<br>㩒右下角 + 新增</div></div>';
+  document.getElementById('bt-budget').innerHTML = top;
+  document.getElementById('bt-days').innerHTML = h;
 }
 
 let btAmt = '';
@@ -1774,19 +1793,20 @@ function renderAnalysis() {
   svg += '</svg>';
   const sc = sm[5], scol = sc.net >= 0 ? 'var(--accent-price)' : 'var(--danger)', total6 = sm.reduce((a, x) => a + x.net, 0);
   const rows = sm.slice().reverse().map(x => `<div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;padding:6px 0;border-top:1px solid var(--border-color);font-size:.78rem;text-align:right"><span style="text-align:left;font-weight:800">${x.m}月</span><span style="color:var(--accent-price)">+${anShort(x.inc)}</span><span style="color:var(--danger)">-${anShort(x.exp)}</span><b style="color:${x.net >= 0 ? 'var(--accent-price)' : 'var(--danger)'}">${x.net < 0 ? '-' : ''}${anShort(Math.abs(x.net))}</b></div>`).join('');
-  const sv = `<div class="bt-row"><span class="bt-mu">本月儲蓄</span><b style="font-size:1.5rem;color:${scol}">${sc.net < 0 ? '-' : ''}$${formatMoney(Math.abs(sc.net))}</b></div>
+  const sv = `<div class="bt-row"><span class="bt-mu">本月儲蓄</span><b class="bt-big" style="color:${scol}">${sc.net < 0 ? '-' : ''}$${formatMoney(Math.abs(sc.net))}</b></div>
     <div class="bt-mu" style="margin-top:2px">收入 $${formatMoney(sc.inc)} − 支出 $${formatMoney(sc.exp)}${sc.inc > 0 ? ' · 儲蓄率 ' + fmt1(sc.net / sc.inc * 100) + '%' : ''}</div>
     ${svg}
     <div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;font-size:.7rem;color:var(--text-sub);text-align:right;margin-top:4px;padding-bottom:4px"><span></span><span>收入</span><span>支出</span><span>儲蓄</span></div>${rows}
     <div class="bt-msg" style="background:${total6 >= 0 ? 'var(--accent-price)' : 'var(--danger)'}22;color:${total6 >= 0 ? 'var(--accent-price)' : 'var(--danger)'}">近 6 個月累計儲蓄 ${total6 < 0 ? '-' : ''}$${formatMoney(Math.abs(total6))}</div>`;
 
+  const anT = (t, sub) => `<div class="analytics-section-title" style="margin:0 0 10px"><span>${t}</span>${sub || ''}</div>`;
   document.getElementById('an-new').innerHTML =
-    `<div class="analytics-section-title"><span>📅 每日收支</span></div><div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 14px;font-size:.68rem;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div>` + /* [CHANGE G] removed the bt-box wrapper around the calendar */
-    `<div class="analytics-section-title"><span>🥧 支出分類</span></div><div class="bt-box">${pie}</div>`;
+    `<div class="card cd-pad">${anT('📅 每日收支')}<div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 0;font-size:.68rem;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div></div>` +
+    `<div class="card cd-pad">${anT('🥧 支出分類')}${pie}</div>`;
   const ov = document.getElementById('an-overall');
   if (ov) ov.innerHTML =
-    `<div class="analytics-section-title" style="margin-top:6px"><span>📊 每月支出比較</span></div><div class="bt-box">${bars}${dtxt}</div>` +
-    `<div class="analytics-section-title"><span>💰 每月儲蓄</span> <small style="font-weight:600;color:var(--text-sub)">收入 − 支出</small></div><div class="bt-box">${sv}</div>`;
+    `<div class="card cd-pad">${anT('📊 每月支出比較')}${bars}${dtxt}</div>` +
+    `<div class="card cd-pad">${anT('💰 每月儲蓄', '<small style="font-weight:600;color:var(--text-sub)">收入 − 支出</small>')}${sv}</div>`;
 }
 function anDay(ds) {
   const ex = btMonthExp(ds.slice(0, 7)).filter(e => e.date === ds);
@@ -1927,6 +1947,8 @@ if (updated) saveData();
 function switchNav(viewId) {
 autoUpdatePastPlannedShifts();
 currentView = viewId;
+// [CHANGE W] no add button on 分析 / 總覽 / 報表
+document.body.classList.toggle('no-fab', ['analysis-view', 'overall-view', 'analytics-view'].includes(viewId));
 document.getElementById('calendar-view').style.display = 'none';
 document.getElementById('list-view').style.display = 'none';
 document.getElementById('analytics-view').style.display = 'none';
@@ -2823,6 +2845,13 @@ window.addEventListener('DOMContentLoaded', () => {
       changeMonth(dx < 0 ? 1 : -1);
     }, { passive: true });
   })();
+
+  /* [CHANGE U] keep --ts-h = height of the fixed top block so the budget card can stick right under it */
+  const tsEl = document.getElementById('top-sticky');
+  const setTs = () => document.documentElement.style.setProperty('--ts-h', tsEl.offsetHeight + 'px');
+  setTs();
+  if (window.ResizeObserver) new ResizeObserver(setTs).observe(tsEl);
+  window.addEventListener('resize', setTs);
 
   /* [CHANGE R] swipe left/right to change month on budget / analysis / report pages too */
   ['list-view', 'analysis-view', 'overall-view', 'analytics-view'].forEach(id => {
