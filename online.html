@@ -11,7 +11,6 @@
 <link rel="apple-touch-icon" href="icon.png">
 <title>努力賺錢錢 (Cloud Sync)</title>
 <!-- [CHANGE Z] Flaticon UIcons (regular rounded) for the bottom menu icons -->
-<link rel='stylesheet' href='https://flaticon.com'>
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -120,7 +119,7 @@ font-size: 1.1rem;
 transition: background-color 0.3s;
 }
 .sync-status-bar {
-font-size: 0.72rem;
+font-size: 0.8rem;
 text-align: center;
 color: var(--text-sub);
 margin-top: -8px;
@@ -165,7 +164,7 @@ display: flex;
 flex-direction: column;
 }
 .salary-box span {
-font-size: 0.76rem;
+font-size: 0.8rem;
 color: rgba(255, 255, 255, 0.85);
 font-weight: 600;
 }
@@ -397,7 +396,7 @@ font-size: 0.95rem;
 color: var(--text-main);
 }
 .shift-info p {
-font-size: 0.78rem;
+font-size: 0.8rem;
 color: var(--text-sub);
 margin-top: 2px;
 }
@@ -410,7 +409,7 @@ font-weight: 800;
 color: var(--accent-price);
 }
 .shift-amount .hrs {
-font-size: 0.75rem;
+font-size: 0.8rem;
 color: var(--text-sub);
 }
 /* Analytics Styles */
@@ -430,7 +429,7 @@ flex-direction: column;
 gap: 4px;
 }
 .stat-box span {
-font-size: 0.68rem;
+font-size: 0.8rem;
 color: var(--primary-dark);
 font-weight: 700;
 }
@@ -491,7 +490,7 @@ text-align: right;
 .company-stat-meta {
 grid-column: 1;
 grid-row: 2;
-font-size: 0.74rem;
+font-size: 0.8rem;
 color: var(--text-sub);
 display: flex;
 flex-direction: column; /* [CHANGE E] was: justify-content: space-between; align-items: center; */
@@ -754,7 +753,7 @@ border-color: var(--primary-dark);
 color: #fff !important;
 }
 .date-summary-text {
-font-size: 0.78rem;
+font-size: 0.8rem;
 font-weight: 700;
 color: var(--primary-dark);
 margin-top: 6px;
@@ -770,7 +769,7 @@ flex-direction: column;
 gap: 4px;
 }
 .input-group label {
-font-size: 0.82rem;
+font-size: 0.8rem;
 font-weight: 700;
 color: var(--primary-dark);
 }
@@ -821,7 +820,7 @@ align-items: center;
 gap: 8px;
 }
 .calculated-duration {
-font-size: 0.82rem;
+font-size: 0.8rem;
 color: var(--primary-dark);
 font-weight: 800;
 }
@@ -935,7 +934,12 @@ font-size: 0.88rem;
 .bt-day{display:flex;justify-content:space-between;padding:12px 2px 4px;color:var(--text-sub);font-size:.8rem;font-weight:800}
 .bt-it{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--border-color)}
 .bt-ic{font-size:1.3rem;width:38px;height:38px;display:grid;place-items:center;background:var(--primary-light);border-radius:50%;flex-shrink:0}
-.bt-m{flex:1;min-width:0}.bt-m b{display:block;font-size:.92rem}.bt-m span{display:block;color:var(--text-sub);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt-m{flex:1;min-width:0}.bt-m b{display:block;font-size:.92rem}.bt-m span{display:block;color:var(--text-sub);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.label-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.label-row small,.analytics-section-title small{font-size:.8rem;font-weight:600;color:var(--text-sub)}
+.label-row .calculated-duration{white-space:nowrap}
+.bt-hl{width:100%}
+.bt-del{position:absolute;left:0;top:50%;transform:translateY(-50%);padding:4px 9px;border:1px solid var(--danger);border-radius:8px;background:none;color:var(--danger);font-size:.75rem;font-weight:700;line-height:1.2;cursor:pointer;font-family:inherit}
 .bt-x{background:none;border:0;color:var(--text-sub);font-size:1rem;cursor:pointer;padding:4px}
 .bt-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:999}.bt-ov.on{display:flex}
 .bt-sheet{background:var(--card-bg);color:var(--text-main);width:100%;max-width:600px;border-radius:20px 20px 0 0;padding:18px 18px calc(18px + var(--safe-bottom));max-height:88vh;overflow:auto}
@@ -1020,7 +1024,7 @@ body.settings-open .month-salary-card,body.settings-open .top-month,body.setting
 .st-back{position:absolute;left:0;background:var(--primary-light);border:0;width:34px;height:34px;border-radius:50%;font-size:1.4rem;line-height:1;color:var(--text-main);cursor:pointer}
 .st-card{margin-bottom:12px}.st-card b{font-size:.95rem}
 .st-row{display:flex;justify-content:space-between;align-items:center}
-.st-sub{color:var(--text-sub);font-size:.78rem;margin-top:2px}
+.st-sub{color:var(--text-sub);font-size:.8rem;margin-top:2px}
 .st-input{flex:1;min-width:0;padding:10px;border-radius:10px;border:1.5px solid var(--border-color);background:var(--input-bg);color:var(--text-main);font-size:16px}
 .st-title{font-size:1.2rem;font-weight:800;color:var(--primary-dark);margin-bottom:8px}
 .sw{position:relative;width:52px;height:30px;flex-shrink:0}.sw input{opacity:0;width:0;height:0;position:absolute}
@@ -1041,7 +1045,7 @@ body.settings-open .settings-btn{font-size:1.7rem;padding-bottom:3px}
 #settings-view .st-card{margin-bottom:13px;padding:16px 18px}
 #settings-view .st-card:last-child{margin-bottom:0}
 .st-t{font-size:1.05rem;font-weight:800;color:var(--primary-dark);margin-bottom:10px}
-#settings-view .sync-status-bar{justify-content:flex-start;font-size:.82rem;margin:0}
+#settings-view .sync-status-bar{justify-content:flex-start;font-size:.8rem;margin:0}
 .st-bar{display:flex;align-items:center;gap:8px;background:var(--input-bg);border:1.5px solid var(--border-color);border-radius:12px;padding:4px 4px 4px 14px}
 .st-bar input{flex:1;min-width:0;border:0;background:transparent;outline:none;color:var(--text-main);font-size:16px;padding:8px 0;font-family:inherit}
 .st-bar button{border:0;border-radius:9px;background:var(--primary-dark);color:#fff;font-size:.9rem;font-weight:800;padding:9px 16px;cursor:pointer;font-family:inherit;flex-shrink:0}
@@ -1084,12 +1088,10 @@ button.bt-chip{border:0;font-family:inherit}
 .field-row .input-group{flex:1;min-width:0}
 .dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
 .dp-row .date-picker-trigger{margin-bottom:0;gap:8px}
-.dp-row .calculated-duration{font-size:.9rem;white-space:nowrap}
 .checkbox-group label{font-size:.82rem;font-weight:700;color:var(--primary-dark)} /* same as the 錢錢 label */
 /* [CHANGE L] end */
 /* [CHANGE M] start */
-.dp-row .date-picker-trigger{flex:7;justify-content:space-between}   /* date ~70% */
-.dp-row .calculated-duration{flex:3;text-align:center}                /* 共X小時 ~30% */
+.dp-row .date-picker-trigger{flex:1;justify-content:space-between}   /* date ~70% */
 .an-c{min-height:46px}                                                /* 每日收支 cells shorter: day number + one + line + one - line */
 /* [CHANGE M] end */
 /* [CHANGE O] start */
@@ -1304,7 +1306,6 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 <!-- [CHANGE L] date button no longer full width; 共X小時 moved up into this row (was a separate line above the save button) -->
 <div class="dp-row">
 <div class="date-picker-trigger" id="date-picker-trigger" role="button" tabindex="0" onclick="toggleDatePicker()">📅 <span id="date-picker-label">已選 1 天</span></div>
-<div class="calculated-duration" id="duration-display">共 9 小時</div>
 </div>
 <div class="date-range-box" id="date-range-box" style="display:none;">
 <div class="mini-cal-header">
@@ -1343,7 +1344,7 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 </div>
 </div>
 <div class="input-group">
-<label>工作時間 (開始 - 結束)</label>
+<div class="label-row"><label>工作時間 <small>(開始 - 結束)</small></label><span class="calculated-duration" id="duration-display">共 9 小時</span></div>
 <div class="time-range-group">
 <select id="start-time" required onchange="calcDuration()"></select>
 <span>至</span>
@@ -1623,7 +1624,7 @@ function renderListView() {
   Object.keys(g).forEach(d => {
     const tot = g[d].reduce((a, e) => a + e.amt, 0);
     h += `<div class="card cd-pad"><div class="bt-day" style="padding:0 0 6px"><span>${wdE[new Date(d + 'T00:00:00').getDay()]} ${+d.slice(5, 7)}月${+d.slice(8)}日</span><span>$${formatMoney(tot)}</span></div>`;
-    g[d].forEach(e => h += `<div class="bt-it"><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b>${e.sub ? '' : `<button class="bt-x" onclick="btDelExp('${btEsc(e.id)}')">✕</button>`}</div>`);
+    g[d].forEach(e => h += `<div class="bt-it"${e.sub ? '' : ` style="cursor:pointer" onclick="btOpenExp('${btEsc(e.id)}')"`}><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub && e.cat !== '訂閱' ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b></div>`);
     h += '</div>';
   });
   if (!ex.length) h = '<div class="card cd-pad"><div class="empty-msg">呢個月未有支出記錄<br>㩒右下角 + 新增</div></div>';
@@ -1660,12 +1661,15 @@ function btKey(k) {
   }
   btRefreshAmt();
 }
-function btOpenExp() {
-  btCat = '食飯'; btAmt = '';
-  const t = getLocalDateStr(), ym = btYM(), d = t.startsWith(ym) ? t : ym + '-01';
+let btEditId = null;
+function btOpenExp(editId) {
+  const ed = editId ? B.exp.find(e => String(e.id) === String(editId)) : null;
+  btEditId = ed ? ed.id : null;
+  btCat = ed ? ed.cat : '食飯'; btAmt = ed ? String(ed.amt) : '';
+  const t = getLocalDateStr(), ym = btYM(), d = ed ? ed.date : (t.startsWith(ym) ? t : ym + '-01');
   const keys = ['7','8','9','del','4','5','6','+','1','2','3','OK','.','0','00'];
   const pad = keys.map(k => k === 'OK' ? '<button class="ok" onclick="btSaveExp()">儲存</button>' : `<button class="${k === 'del' || k === '+' ? 'op' : ''}" onclick="btKey('${k}')">${k === 'del' ? '⌫' : k}</button>`).join('');
-  btSheet(`<div class="modal-header"><h2>又亂使錢💸</h2><button class="close-btn" onclick="btClose()">✕</button></div>${btGrid()}<div class="bt-disp"><button type="button" class="bt-chip" onclick="btToggleDP()">📅 <span id="bt-dtl">${btShortDate(d)}</span></button><input id="bt-d" type="hidden" value="${d}"><input id="bt-n" placeholder="輸入詳情…"><div class="v"><b id="bt-dv">$0</b><small id="bt-ds"></small></div></div>${btDPHtml()}<div class="bt-pad4" id="bt-pad">${pad}</div>`); /* [CHANGE J] date chip now opens custom calendar (btDPHtml) instead of native date input */
+  btSheet(`<div class="modal-header"><div class="bt-hl">${ed ? '<button type="button" class="bt-del" onclick="btDelExp(btEditId)">🗑 刪除</button>' : ''}<h2>${ed ? '編輯支出✏️' : '又亂使錢💸'}</h2></div><button class="close-btn" onclick="btClose()">✕</button></div>${btGrid()}<div class="bt-disp"><button type="button" class="bt-chip" onclick="btToggleDP()">📅 <span id="bt-dtl">${btShortDate(d)}</span></button><input id="bt-d" type="hidden" value="${d}"><input id="bt-n" placeholder="輸入詳情…" value="${ed ? btEsc(ed.note || '') : ''}"><div class="v"><b id="bt-dv">$0</b><small id="bt-ds"></small></div></div>${btDPHtml()}<div class="bt-pad4" id="bt-pad">${pad}</div>`); /* [CHANGE J] date chip now opens custom calendar (btDPHtml) instead of native date input */
   btRefreshAmt();
 }
 /* [CHANGE J] start: custom date picker for 又亂使錢 popup (uses same .mini-cal-* styles as 有工番啦) */
@@ -1712,11 +1716,14 @@ function btSaveExp() {
   const a = btTotal(), d = document.getElementById('bt-d').value;
   if (!(a > 0)) return alert('請輸入金額');
   if (!d) return alert('請揀日期');
-  B.exp.push({ id: btUid(), date: d, cat: btCat, note: document.getElementById('bt-n').value.trim(), amt: Math.round(a * 10) / 10 });
+  const rec = { date: d, cat: btCat, note: document.getElementById('bt-n').value.trim(), amt: Math.round(a * 10) / 10 };
+  const ex = btEditId ? B.exp.find(e => String(e.id) === String(btEditId)) : null;
+  if (ex) Object.assign(ex, rec); else B.exp.push({ id: btUid(), ...rec });
+  btEditId = null;
   currentYear = +d.slice(0, 4); currentMonth = +d.slice(5, 7) - 1;
   saveData(); btClose(); renderCurrentView();
 }
-function btDelExp(id) { if (confirm('刪除呢筆支出？')) { B.exp = B.exp.filter(e => String(e.id) !== String(id)); saveData(); renderListView(); } }
+function btDelExp(id) { if (confirm('刪除呢筆支出？')) { B.exp = B.exp.filter(e => String(e.id) !== String(id)); btEditId = null; saveData(); btClose(); renderCurrentView(); } }
 function btOpenBudget() {
   btSheet(`<h3>每月預算</h3><input id="bt-b" type="number" inputmode="decimal" value="${B.budget || ''}" placeholder="每月預算金額"><div class="bt-mu" style="margin-bottom:10px">每個月都用同一個預算</div><button class="bt-pri" onclick="btSaveBudget()">儲存</button>`);
 }
@@ -1825,17 +1832,17 @@ function renderAnalysis() {
   });
   svg += '</svg>';
   const sc = sm[5], scol = sc.net >= 0 ? 'var(--accent-price)' : 'var(--danger)', total6 = sm.reduce((a, x) => a + x.net, 0);
-  const rows = sm.slice().reverse().map(x => `<div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;padding:6px 0;border-top:1px solid var(--border-color);font-size:.78rem;text-align:right"><span style="text-align:left;font-weight:800">${x.m}月</span><span style="color:var(--accent-price)">+${anShort(x.inc)}</span><span style="color:var(--danger)">-${anShort(x.exp)}</span><b style="color:${x.net >= 0 ? 'var(--accent-price)' : 'var(--danger)'}">${x.net < 0 ? '-' : ''}${anShort(Math.abs(x.net))}</b></div>`).join('');
+  const rows = sm.slice().reverse().map(x => `<div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;padding:6px 0;border-top:1px solid var(--border-color);font-size:.8rem;text-align:right"><span style="text-align:left;font-weight:800">${x.m}月</span><span style="color:var(--accent-price)">+${anShort(x.inc)}</span><span style="color:var(--danger)">-${anShort(x.exp)}</span><b style="color:${x.net >= 0 ? 'var(--accent-price)' : 'var(--danger)'}">${x.net < 0 ? '-' : ''}${anShort(Math.abs(x.net))}</b></div>`).join('');
   const sv = `<div class="bt-row"><span class="bt-mu">本月儲蓄</span><b class="bt-big" style="color:${scol}">${sc.net < 0 ? '-' : ''}$${formatMoney(Math.abs(sc.net))}</b></div>
     <div class="bt-mu" style="margin-top:2px">收入 $${formatMoney(sc.inc)} − 支出 $${formatMoney(sc.exp)}${sc.inc > 0 ? ' · 儲蓄率 ' + fmt1(sc.net / sc.inc * 100) + '%' : ''}</div>
     ${momM ? `<div class="bt-mu" style="margin-top:2px">🐷 另有盧媽代儲 $${formatMoney(momM)} → 連代儲總儲蓄 ${sc.net + momM < 0 ? '-' : ''}$${formatMoney(Math.abs(sc.net + momM))}</div>` : ''}
     ${svg}
-    <div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;font-size:.7rem;color:var(--text-sub);text-align:right;margin-top:4px;padding-bottom:4px"><span></span><span>收入</span><span>支出</span><span>儲蓄</span></div>${rows}
+    <div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:6px;font-size:.8rem;color:var(--text-sub);text-align:right;margin-top:4px;padding-bottom:4px"><span></span><span>收入</span><span>支出</span><span>儲蓄</span></div>${rows}
     <div class="bt-msg" style="background:${total6 >= 0 ? 'var(--accent-price)' : 'var(--danger)'}22;color:${total6 >= 0 ? 'var(--accent-price)' : 'var(--danger)'}">近 6 個月累計儲蓄 ${total6 < 0 ? '-' : ''}$${formatMoney(Math.abs(total6))}${mom6 ? `（連盧媽代儲 ${total6 + mom6 < 0 ? '-' : ''}$${formatMoney(Math.abs(total6 + mom6))}）` : ''}</div>`;
 
   const anT = (t, sub) => `<div class="analytics-section-title" style="margin:0 0 10px"><span>${t}</span>${sub || ''}</div>`;
   document.getElementById('an-new').innerHTML =
-    `<div class="card cd-pad">${anT('📅 每日收支')}<div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 0;font-size:.68rem;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div></div>` +
+    `<div class="card cd-pad">${anT('📅 每日收支')}<div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 0;font-size:.8rem;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div></div>` +
     `<div class="card cd-pad">${anT('🥧 支出分類')}${pie}</div>` +
     `<div class="card cd-pad">${anT('📊 每月支出比較')}${bars}${dtxt}</div>`;
   /* [CHANGE Y] 分析 = expense analysis; 總覽 = 盧媽儲錢 first, then 每月儲蓄 */
@@ -1849,7 +1856,7 @@ function anDay(ds) {
   const inc = btIncomeShifts(ds.slice(0, 7)).filter(s => s.date === ds && s.type !== 'planned');
   let h = `<h3>${ds}</h3>`;
   inc.forEach(s => h += `<div class="bt-it"><div class="bt-ic">💼</div><div class="bt-m"><b>${btEsc(s.company)}</b><span>${s.startTime || ''}-${s.endTime || ''} · ${fmt1(s.duration)}小時</span></div><b style="color:var(--accent-price)">+$${formatMoney(getShiftPay(s))}</b></div>`);
-  ex.forEach(e => h += `<div class="bt-it"><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b></div>`);
+  ex.forEach(e => h += `<div class="bt-it"><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub && e.cat !== '訂閱' ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b></div>`);
   if (!inc.length && !ex.length) h += '<div class="empty-msg">呢日冇記錄</div>';
   btSheet(h);
 }
@@ -2645,7 +2652,7 @@ const isPlanned = s.type === 'planned';
 return `
 <div class="shift-list-item" onclick="openShiftDetail('${s.id}')">
 <div class="shift-info">
-<h4>${s.company} ${isPlanned ? '<span style="color:#3D72B4; font-size:0.75rem;">(排班)</span>' : ''}</h4>
+<h4>${s.company} ${isPlanned ? '<span style="color:#3D72B4; font-size:0.8rem;">(排班)</span>' : ''}</h4>
 <p>${s.date} • ${s.startTime || ''} - ${s.endTime || ''} ${s.eventName !== '-' ? ' • ' + s.eventName : ''}</p>
 </div>
 <div class="shift-amount">
