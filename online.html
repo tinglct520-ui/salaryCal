@@ -928,7 +928,7 @@ font-size: 0.88rem;
 .bt-pad{padding:10px 18px 18px}
 .bt-box{background:var(--primary-light);border-radius:16px;padding:14px;margin-bottom:8px}
 .bt-row{display:flex;justify-content:space-between;align-items:center}
-.bt-mu{color:var(--text-sub);font-size:.6rem}.bt-big{font-size:1.6rem;font-weight:800;color:var(--text-main)}
+.bt-mu{color:var(--text-sub);font-size:.7rem}.bt-big{font-size:1.6rem;font-weight:800;color:var(--text-main)}
 .bt-bar{height:12px;background:var(--border-color);border-radius:8px;overflow:hidden;margin:10px 0 6px}.bt-bar i{display:block;height:100%;border-radius:8px;transition:width .3s}
 .bt-msg{padding:8px 10px;border-radius:10px;font-size:.8rem;font-weight:700;margin-top:8px}
 .bt-btn{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-main);border-radius:10px;padding:7px 11px;font-size:.8rem;font-weight:700;cursor:pointer}
@@ -967,9 +967,9 @@ body.dark-mode .bt-pri,body.dark-mode .bt-cat.on{color:#2B1D18}
 .an-i{color:var(--accent-price);display:block}.an-e{color:var(--danger);display:block}
 .an-leg2{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;margin-top:12px}
 .an-leg2 .an-leg{gap:6px;padding:4px 0;font-size:.8rem;min-width:0}
-.an-ln{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-ln{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-main)}
 .an-lv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;flex-shrink:0;color:var(--text-main);}
-.an-lv b{font-weight:800;color:var(--text-main);}
+.an-lv b{font-weight:800;}
 .an-lv small{font-size:.6rem;color:var(--text-sub)}
 .an-leg{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:.85rem}.an-leg i{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .an-bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:18px}
@@ -1247,7 +1247,7 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 </div>
 </div>
 <div class="card cd-pad">
-<div class="analytics-section-title" style="margin:0 0 10px"><span>🏢 追糧報表 <small style="font-weight:600;color:var(--text-sub)">· 按各公司截數日（含未完成）</small></span></div>
+<div class="analytics-section-title" style="margin:0 0 10px"><span>🏢 追糧報表</span><button type="button" onclick="openCutoffSheet()" style="border:1px solid var(--border-color);background:transparent;color:var(--text-sub);border-radius:8px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;">設定截數日</button></div>
 <div id="company-breakdown-container"></div>
 </div>
 </div>
@@ -1830,7 +1830,7 @@ function renderAnalysis() {
   const mx = Math.max(...months.map(x => x.v), 1);
   const bars = '<div class="an-bars">' + months.map((x, i) => `<div class="an-bar${i === 5 ? ' cur' : ''}">${x.v ? '$' + anShort(x.v) : ''}<div style="height:${x.v / mx * 100}%"></div><span style="margin-top:4px">${x.m}月</span></div>`).join('') + '</div>';
   const cur = months[5].v, prev = months[4].v, diff = cur - prev;
-  const dtxt = prev === 0 && cur === 0 ? '' : prev === 0 ? `<div class="bt-msg" style="background:#f59e0b22;color:#f59e0b">上個月冇支出記錄</div>` :
+  const dtxt = prev === 0 && cur === 0 ? '' : prev === 0 ? `<div class="bt-msg" style="background:#CCE3B5;color: var(--accent-price);">上個月冇支出記錄</div>` :
     `<div class="bt-msg" style="background:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}22;color:${diff > 0 ? 'var(--danger)' : 'var(--accent-price)'}">比上個月 ${diff > 0 ? '↑ 多使' : diff < 0 ? '↓ 慳咗' : '一樣'} $${formatMoney(Math.abs(diff))}（${diff > 0 ? '+' : ''}${fmt1(diff / prev * 100)}%）</div>`;
 
   /* [CHANGE T] 每月儲蓄 = 已完成收入 - 支出 */
@@ -1870,7 +1870,7 @@ function renderAnalysis() {
 
   const anT = (t, sub) => `<div class="analytics-section-title" style="margin:0 0 10px"><span>${t}</span>${sub || ''}</div>`;
   document.getElementById('an-new').innerHTML =
-    `<div class="card cd-pad">${anT('📅 每日收支')}<div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 0;font-size:.8rem;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div></div>` +
+    `<div class="card cd-pad">${anT('📅 每日收支')}<div class="an-calwrap">${cal}</div><div class="bt-mu" style="margin:8px 0 0;text-align:right">撳日子睇詳情 · <span style="color:var(--accent-price)">＋收入</span> <span style="color:var(--danger)">－支出</span></div></div>` +
     `<div class="card cd-pad">${anT('🥧 支出分類')}${pie}</div>` +
     `<div class="card cd-pad">${anT('📊 每月支出比較')}${bars}${dtxt}</div>`;
   /* [CHANGE Y] 分析 = expense analysis; 總覽 = 盧媽儲錢 first, then 每月儲蓄 */
@@ -2716,16 +2716,29 @@ function inCompanyPeriod(s, y, m) {
   const p = getCompanyPeriod(s.company, y, m);
   return s.date >= p.start && s.date <= p.end;
 }
-function setCompanyCutoff(idx) {
-  const names = [...new Set(shifts.map(s => s.company))];
-  const name = names[idx]; if (!name) return;
-  const cur = companyPaydays[name] || '';
-  const v = prompt(`「${name}」每月幾號截數？\n（輸入 1–31；留空 = 照月曆 1號至月底）`, cur);
-  if (v === null) return;
-  const n = parseInt(v);
-  if (!v.trim() || isNaN(n) || n < 1 || n > 31) delete companyPaydays[name];
-  else companyPaydays[name] = n;
+let cutoffNames = [];
+function openCutoffSheet() {
+  const mp = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+  cutoffNames = [...new Set(shifts.filter(s => s.date && (s.date.startsWith(mp) || inCompanyPeriod(s, currentYear, currentMonth))).map(s => s.company))];
+  const all = [...new Set(shifts.map(s => s.company))];
+  let h = `<div class="modal-header"><div class="bt-hl"><h2>🏢 設定截數日</h2></div><button class="close-btn" onclick="btClose()">✕</button></div><div class="bt-mu" style="margin-bottom:8px">${currentYear}年${currentMonth + 1}月有紀錄嘅公司 · 填每月幾號截數（1–31），留空 = 月曆月（1號至月底）</div>`;
+  cutoffNames.forEach((n, i) => {
+    const color = companyColorPalette[all.indexOf(n) % companyColorPalette.length];
+    const per = getCompanyPeriod(n, currentYear, currentMonth);
+    h += `<div class="bt-it"><div class="bt-ic" style="background:${color.bg}"><span class="company-stat-dot" style="background:${color.text};"></span></div><div class="bt-m"><b>${btEsc(n)}</b><span>${per.start.slice(5).replace('-', '/')} – ${per.end.slice(5).replace('-', '/')}</span></div><input class="cutoff-in" data-i="${i}" type="number" inputmode="numeric" min="1" max="31" placeholder="—" value="${companyPaydays[n] || ''}" style="width:76px;margin:0;text-align:center"></div>`;
+  });
+  if (!cutoffNames.length) h += '<div class="empty-msg">本月沒有工時紀錄</div>';
+  else h += '<div style="height:10px"></div><button class="bt-pri" onclick="saveCutoffs()">儲存</button>';
+  btSheet(h);
+}
+function saveCutoffs() {
+  document.querySelectorAll('.cutoff-in').forEach(el => {
+    const n = cutoffNames[+el.dataset.i], v = parseInt(el.value);
+    if (!n) return;
+    if (isNaN(v) || v < 1 || v > 31) delete companyPaydays[n]; else companyPaydays[n] = v;
+  });
   saveDataToLocalOnly();
+  btClose();
   renderAnalyticsOld();
 }
 
@@ -2774,13 +2787,12 @@ const color = companyColorPalette[idx % companyColorPalette.length];
 const avgCompRate = data.allHours > 0 ? (data.totalEstPay / data.allHours) : 0; // [CHANGE E] whole month
 const per = getCompanyPeriod(name, currentYear, currentMonth);
 return `
-<div class="company-stat-item" style="grid-template-columns:1fr auto auto;">
+<div class="company-stat-item">
 <div class="company-stat-name">
 <span class="company-stat-dot" style="background:${color.text};"></span>
 ${name}
 </div>
 <div class="company-stat-pay">$${formatMoney(data.totalEstPay)}</div>
-<button type="button" onclick="setCompanyCutoff(${idx})" style="grid-column:3;grid-row:1;border:1px solid var(--border-color);background:transparent;color:var(--text-sub);border-radius:8px;padding:3px 8px;font-size:0.72rem;cursor:pointer;white-space:nowrap;">設定截數日</button>
 <div class="company-stat-meta">
 <span>${data.allCount} job • ${Math.round(data.allHours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
 <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">📅 ${per.start.slice(5).replace('-','/')} – ${per.end.slice(5).replace('-','/')}${per.custom ? ` · 每月${per.D}號截數` : ' · 整個月曆月'}</span>
