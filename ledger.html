@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <title>我嘅帳簿</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:light;--bg:#EEF5FF;--card:#FFFFFF;--soft:#E5F0FF;--text:#444444;--sub:#8A8A8A;--line:#E9F2FF;--pri:#3D72B4;--dr:#E8636F;--cr:#7A8B2E;--inp:#EFF5FF;--nav:50px;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
@@ -106,6 +107,19 @@ input{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);
 .pad button:active{filter:brightness(.92)}
 .pad .op{background:var(--line)}
 .pad .ok{grid-column:4;grid-row:3 / span 2;height:auto;background:var(--pri);color:#fff;font-size:1.1rem}
+.stl{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--sub);padding:0 4px}
+.stl span{cursor:pointer}.stl button{background:var(--soft);border:0;color:var(--pri);border-radius:8px;padding:3px 9px;font:700 .8rem "Nunito","Noto Sans TC",sans-serif;cursor:pointer}
+.seg{display:flex;gap:8px;margin-top:12px}.seg button{flex:1;padding:9px;border:0;border-radius:12px;background:var(--soft);color:var(--sub);font:800 .9rem "Nunito","Noto Sans TC",sans-serif;cursor:pointer}.seg button.on{background:var(--pri);color:#fff}
+/* entry popup = online.html 新增支出 */
+.gc{grid-template-columns:repeat(5,1fr);gap:6px 4px;margin-bottom:14px}
+.gt{background:transparent;border-radius:14px;padding:8px 0}
+.gt.on{background:transparent;box-shadow:none}
+.disp{background:var(--soft);border-radius:16px;padding:12px 16px;gap:10px;margin-bottom:10px}
+.dchip{display:flex;align-items:center;gap:4px;align-self:stretch;background:none;border-radius:0;padding:0 2px;font-size:.85rem}
+.disp>input{background:transparent;border:0;outline:0;font-size:1rem;padding:6px 0}
+.av b{font-size:1.6rem}
+.pad{gap:8px 8px}.pad button{border-radius:14px;height:50px}
+.pad .op{background:var(--soft);}
 </style>
 </head>
 <body>
@@ -114,12 +128,13 @@ input{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);
   <div class="mr"><button class="nb" onclick="mv(-1)" aria-label="上個月">‹</button>
   <button class="tm" onclick="openMP()"><span id="mon"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
   <button class="nb" onclick="mv(1)" aria-label="下個月">›</button></div>
-  <div class="msc"><div class="sb cr"><span>入數 Debit ▲</span><strong id="sc"></strong></div><div class="dv"></div><div class="sb dr"><span>支出 Expenses ▼</span><strong id="sd"></strong></div><div class="dv"></div><div class="sb"><span>淨額 Net</span><strong id="sn"></strong></div></div>
+  <div class="msc"><div class="sb cr"><span>入數 Debit ▲</span><strong id="sc"></strong></div><div class="dv"></div><div class="sb dr"><span>支出 Expenses ▼</span><strong id="sd"></strong></div><div class="dv"></div><div class="sb"><span id="sl">淨額 Net</span><strong id="sn"></strong></div></div>
+  <div class="stl"><span id="st" onclick="pull()">☁️ 連接中…</span><button onclick="setKey()">🔑 PIN</button></div>
  </div>
  <div id="v"></div>
 </div>
 <button class="fab" onclick="openF()" aria-label="新增">+</button>
-<nav class="nav"><button class="ni" id="t0" onclick="tab(0)"><svg viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm1 4v2h9V7H7zm0 4v2h9v-2H7zm0 4v2h6v-2H7z"/></svg><span>帳簿</span></button><button class="ni" id="t1" onclick="tab(1)"><svg viewBox="0 0 24 24"><path d="M4 20V10h4v10H4zm6 0V4h4v16h-4zm6 0v-7h4v7h-4z"/></svg><span>分析</span></button></nav>
+<nav class="nav"><button class="ni" id="t0" onclick="tab('cur')"><svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h13v3H5v1h15a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6zm14 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg><span>現時開支</span></button><button class="ni" id="t1" onclick="tab('non')"><svg viewBox="0 0 24 24"><path d="M12 2 2 7v2h20V7L12 2zM4 11v7H2v2h20v-2h-2v-7h-2v7h-3v-7h-2v7h-2v-7H9v7H6v-7H4z"/></svg><span>大數餘額</span></button><button class="ni" id="t2" onclick="tab('an')"><svg viewBox="0 0 24 24"><path d="M4 20V10h4v10H4zm6 0V4h4v16h-4zm6 0v-7h4v7h-4z"/></svg><span>分析</span></button></nav>
 <div class="ov" id="ov" onclick="if(event.target===this)closeF()"><div class="sh" id="sh"></div></div>
 <script>
 const CATS={debit:[['⭐','星星'],['🧹','工人姐姐'],['📦','其他']],credit:[['💰','入數']]};
@@ -127,33 +142,71 @@ const COL=['#E8636F','#42a5f5','#66bb6a','#ffa726','#ab47bc','#26c6da','#8d6e63'
 const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fm=n=>{n=Math.round(n*100)/100;return n.toLocaleString('en-US',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})};
-let E=[];try{E=JSON.parse(localStorage.getItem('dc-ledger-v1')||'[]')}catch(e){}
-const save=()=>{try{localStorage.setItem('dc-ledger-v1',JSON.stringify(E))}catch(e){}};
+const SB_URL='https://klmzarwylgsgbhqtpeua.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsbXphcnd5bGdzZ2JocXRwZXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0MzUxODksImV4cCI6MjEwNzAxMTE4OX0.LPUgFh7FoDQuhlyf90LvYeYmcYidSAESCOhivfcNRj4';
+const LS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+let E=LS('dc-ledger-v1',[]).map(e=>({...e,acct:e.acct||'cur'}));
+let pend=LS('dc-pend',{up:[],del:[]}),sk=localStorage.getItem('dc-sync-key')||'',db=null;
+const save=()=>{try{localStorage.setItem('dc-ledger-v1',JSON.stringify(E));localStorage.setItem('dc-pend',JSON.stringify(pend))}catch(e){}};
+const setSt=t=>{$('#st').textContent=t};
+function initDb(){db=(window.supabase&&sk)?window.supabase.createClient(SB_URL,SB_KEY,{global:{headers:{'x-sync-key':sk}}}):null}
+const toRow=e=>({id:e.id,sync_key:sk,acct:e.acct,type:e.type,cat:e.cat,date:e.date,note:e.note||'',amt:e.amt});
+const newId=()=>Date.now()*1000+Math.floor(Math.random()*1000);
+async function flush(){
+ if(!db)return false;
+ try{
+  const up=E.filter(e=>pend.up.includes(e.id)).map(toRow);
+  if(up.length){const r=await db.from('ledger_entries').upsert(up);if(r.error)throw r.error}
+  if(pend.del.length){const r=await db.from('ledger_entries').delete().in('id',pend.del).eq('sync_key',sk);if(r.error)throw r.error}
+  pend={up:[],del:[]};save();return true;
+ }catch(err){console.error(err);setSt('⚠️ 同步失敗 · 資料暫存本機（撳呢度重試）');return false}
+}
+async function pull(){
+ if(!sk){setSt('📴 本機模式 · 撳 PIN 設定同步');return}
+ if(!db){setSt('⚠️ 未能載入 Supabase');return}
+ setSt('☁️ 同步中…');
+ if(!(await flush()))return;
+ const r=await db.from('ledger_entries').select('*').eq('sync_key',sk);
+ if(r.error){console.error(r.error);setSt('⚠️ 讀取失敗 · 檢查 table / RLS（撳呢度重試）');return}
+ if(!r.data.length&&E.length){pend.up=E.map(e=>e.id);save();if(!(await flush()))return}
+ else{E=r.data.map(x=>({id:+x.id,acct:x.acct||'cur',type:x.type,cat:x.cat,date:String(x.date).slice(0,10),note:x.note||'',amt:+x.amt}));save()}
+ setSt('☁️ 已同步');render();
+}
+function setKey(){
+ const v=prompt('輸入 PIN（Sync Key，最少 8 個字元）\n手機同電腦用同一個 PIN 就會同步：',sk);
+ if(v===null)return;const k=v.trim();
+ if(k.length<8)return alert('PIN 最少 8 個字元');
+ sk=k;localStorage.setItem('dc-sync-key',sk);initDb();pull();
+}
+function push(e){if(!pend.up.includes(e.id))pend.up.push(e.id);save();return flush().then(ok=>{if(ok)setSt('☁️ 已同步')})}
+function pushDel(id){pend.up=pend.up.filter(x=>x!==id);pend.del.push(id);save();return flush().then(ok=>{if(ok)setSt('☁️ 已同步')})}
 const now=new Date(),today=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
-let ym=today.slice(0,7),tb=0,F=null;
+let ym=today.slice(0,7),pg='cur',ac='cur',F=null;
+const EA=()=>E.filter(e=>e.acct===ac);
+const ACN={cur:'現時開支 Current',non:'大數餘額 Non-current'};
 const ic=(t,c)=>((CATS[t].find(x=>x[1]===c)||[t==='debit'?'💸':'💰'])[0]);
 const amt=(l,t)=>l.filter(e=>e.type===t).reduce((a,e)=>a+e.amt,0);
 const sgn=n=>(n<0?'-':'')+'$'+fm(Math.abs(n));
 const cls=n=>n<0?'neg':'pos';
 function mv(n){const d=new Date(+ym.slice(0,4),+ym.slice(5)-1+n,1);ym=d.getFullYear()+'-'+pad(d.getMonth()+1);render()}
-function tab(n){tb=n;render()}
-function month(k){return E.filter(e=>e.date.startsWith(k))}
+function tab(p){pg=p;if(p!=='an')ac=p;render()}
+function month(k){return EA().filter(e=>e.date.startsWith(k))}
 function render(){
  $('#mon').textContent=ym.slice(0,4)+'年'+(+ym.slice(5))+'月';
- $('#t0').className='ni'+(tb===0?' on':'');$('#t1').className='ni'+(tb===1?' on':'');
+ ['cur','non','an'].forEach((k,i)=>$('#t'+i).className='ni'+(pg===k?' on':''));
  const M=month(ym),cr=amt(M,'credit'),dr=amt(M,'debit'),n=cr-dr;
- $('#sc').textContent='$'+fm(cr);$('#sd').textContent='$'+fm(dr);$('#sn').textContent=sgn(n);
- $('#v').innerHTML=tb===0?ledger():analysis();
+ $('#sc').textContent='$'+fm(cr);$('#sd').textContent='$'+fm(dr);const all=EA().reduce((a,e)=>a+(e.type==='credit'?e.amt:-e.amt),0);
+ if(pg==='non'){$('#sl').textContent='總餘額 Balance';$('#sn').textContent=sgn(all)}else{$('#sl').textContent='淨額 Net';$('#sn').textContent=sgn(n)}
+ $('#v').innerHTML=pg==='an'?analysis():ledger();
 }
 function ledger(){
  const L=month(ym).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
  const dr=amt(L,'debit'),cr=amt(L,'credit');
- const open=E.filter(e=>e.date<ym+'-01').reduce((a,e)=>a+(e.type==='credit'?e.amt:-e.amt),0);
+ const open=EA().filter(e=>e.date<ym+'-01').reduce((a,e)=>a+(e.type==='credit'?e.amt:-e.amt),0);
  let bal=open;
  let h=`<div class="card" style="padding:10px 16px"><div class="net" style="margin:0"><span>本月淨額（入數 − 支出）</span><b class="${cls(cr-dr)}">${sgn(cr-dr)}</b></div></div>`;
- h+=`<div class="card"><div class="ttl"><span>📒 分類帳</span><small>撳一筆可修改 / 刪除</small></div><div class="row h"><span>日期</span><span>項目</span><span class="dr">支出</span><span class="cr">入數 Dr</span></div>`;
+ h+=`<div class="card"><div class="ttl"><span>${ac==='cur'?'📒':'🏦'} ${ACN[ac]}</span><small>撳一筆可修改 / 刪除</small></div><div class="row h"><span>日期</span><span>項目</span><span class="dr">支出</span><span class="cr">入數 Dr</span></div>`;
  h+=`<div class="row op"><span></span><span>承上結餘</span><span></span><span class="a ${cls(open)}">${sgn(open)}</span></div>`;
- if(!L.length&&!E.length)h+=`<div class="empty">未有帳目<br><button class="btn" style="margin-top:10px" onclick="demo()">載入示範資料</button></div>`;
+ if(!L.length&&!EA().length)h+=`<div class="empty">未有帳目<br><button class="btn" style="margin-top:10px" onclick="demo()">載入示範資料</button></div>`;
  else if(!L.length)h+='<div class="empty">呢個月未有帳目 · 撳右下角 +</div>';
  L.forEach(e=>{bal+=e.type==='credit'?e.amt:-e.amt;
   h+=`<div class="row" onclick="openF(${e.id})"><span class="d">${+e.date.slice(5,7)}/${+e.date.slice(8)}</span><div class="n"><b>${ic(e.type,e.cat)} ${esc(e.cat)}</b><span>${esc(e.note)||'—'} · 餘 ${sgn(bal)}</span></div><span class="a dr">${e.type==='debit'?'$'+fm(e.amt):''}</span><span class="a cr">${e.type==='credit'?'$'+fm(e.amt):''}</span></div>`});
@@ -168,6 +221,7 @@ function cat(L,t){
  return '<div class="leg">'+a.map(([c,v],i)=>`<div class="lg"><div class="t"><span>${ic(t,c)} ${esc(c)}</span><b>$${fm(v)}</b></div><div class="t"><span></span><small>${(v/tot*100).toFixed(1)}%</small></div><div class="pb"><i style="width:${v/tot*100}%;background:${t==='debit'?COL[i%8]:'var(--cr)'}"></i></div></div>`).join('')+'</div>';
 }
 function analysis(){
+ const sg=`<div class="seg"><button class="${ac==='cur'?'on':''}" onclick="ac='cur';render()">現時開支</button><button class="${ac==='non'?'on':''}" onclick="ac='non';render()">大數餘額</button></div>`;
  const L=month(ym),dr=amt(L,'debit'),cr=amt(L,'credit');
  const ms=[];for(let i=5;i>=0;i--){const d=new Date(+ym.slice(0,4),+ym.slice(5)-1-i,1),k=d.getFullYear()+'-'+pad(d.getMonth()+1),l=month(k);ms.push({k,m:d.getMonth()+1,dr:amt(l,'debit'),cr:amt(l,'credit')})}
  const mx=Math.max(1,...ms.map(x=>Math.max(x.dr,x.cr))),H=100;
@@ -177,7 +231,7 @@ function analysis(){
  s+='</svg>';
  const rows=ms.slice().reverse().map(x=>{const n=x.cr-x.dr;return `<div class="mt"><span>${x.m}月</span><span class="neg">-${fm(x.dr)}</span><span class="pos">+${fm(x.cr)}</span><b class="${cls(n)}">${n<0?'-':''}${fm(Math.abs(n))}</b></div>`}).join('');
  const t6=ms.reduce((a,x)=>a+x.cr-x.dr,0);
- return `<div class="card"><div class="ttl"><span>⚖️ 本月借貸對照</span></div>
+ return sg+`<div class="card"><div class="ttl"><span>⚖️ ${ACN[ac]} · 本月</span></div>
  <div class="net" style="margin:0"><span>入數 $${fm(cr)} − 支出 $${fm(dr)}${cr>0?' · 儲蓄率 '+((cr-dr)/cr*100).toFixed(1)+'%':''}</span><b class="${cls(cr-dr)}">${sgn(cr-dr)}</b></div></div>
  <div class="card"><div class="ttl"><span>📊 近 6 個月</span><small><span class="neg">■</span> 支出 <span class="pos">■</span> 入數</small></div>${s}
  <div class="mt" style="border:0;color:var(--sub)"><span></span><span>支出</span><span>入數</span><span>淨額</span></div>${rows}
@@ -190,7 +244,7 @@ const dlab=d=>(+d.slice(5,7))+'/'+(+d.slice(8))+(d===today?' 今日':'');
 const tot=()=>String(F.amt).split('+').reduce((a,x)=>a+(parseFloat(x)||0),0);
 function openF(id){
  const e=id?E.find(x=>x.id===id):null;
- F=e?{...e,amt:String(e.amt)}:{id:0,type:'debit',cat:CATS.debit[0][1],date:ym===today.slice(0,7)?today:ym+'-01',note:'',amt:''};
+ F=e?{...e,amt:String(e.amt)}:{id:0,acct:ac,type:'debit',cat:CATS.debit[0][1],date:ym===today.slice(0,7)?today:ym+'-01',note:'',amt:''};
  drawF();$('#ov').classList.add('on');
 }
 function closeF(){$('#ov').classList.remove('on')}
@@ -198,7 +252,7 @@ function drawF(){
  const all=[...CATS.debit.map(c=>[c,'debit']),...CATS.credit.map(c=>[c,'credit'])];
  $('#sh').innerHTML=`<div class="hd">${F.id?'<button class="del" onclick="delE()">🗑 刪除</button>':''}${F.id?'編輯帳目✏️':'又亂使錢💸'}<button class="x" onclick="closeF()">✕</button></div>
  <div class="gc">${all.map(([c,t])=>`<button class="gt ${t==='debit'?'dr':'cr'}${c[1]===F.cat?' on':''}" onclick="setC('${c[1]}','${t}')"><span>${c[0]}</span>${c[1]}</button>`).join('')}</div>
- <div class="disp"><label class="dchip">📅 <span id="dl">${dlab(F.date)}</span><input id="fd" type="date" value="${F.date}" onchange="F.date=this.value||F.date;$('#dl').textContent=dlab(F.date)"></label>
+ <div class="disp"><label class="dchip">📅 <span id="dl">${dlab(F.date)}</span><input id="fd" type="date" value="${F.date}" onclick="try{this.showPicker()}catch(e){}" onchange="F.date=this.value||F.date;$('#dl').textContent=dlab(F.date)"></label>
  <input id="fn" placeholder="詳情" value="${esc(F.note)}" oninput="F.note=this.value">
  <div class="av"><b id="av" class="${F.type==='debit'?'neg':'pos'}">$0</b><small id="as"></small></div></div>
  <div class="pad">${KEYS.map(k=>k==='OK'?'<button class="ok" onclick="saveE()">儲存</button>':`<button class="${k==='del'||k==='+'?'op':''}" onclick="kp('${k}')">${k==='del'?'⌫':k}</button>`).join('')}</div>`;
@@ -217,9 +271,9 @@ function setC(c,t){F.cat=c;F.type=t;document.querySelectorAll('.gt').forEach(b=>
 function saveE(){
  const a=Math.round(tot()*100)/100;
  if(!(a>0))return alert('請輸入金額');if(!F.date)return alert('請揀日期');
- const r={type:F.type,cat:F.cat,date:F.date,note:(F.note||'').trim(),amt:a};
- if(F.id)Object.assign(E.find(x=>x.id===F.id),r);else E.push({id:Date.now(),...r});
- ym=F.date.slice(0,7);save();closeF();render();
+ const r={acct:F.acct||ac,type:F.type,cat:F.cat,date:F.date,note:(F.note||'').trim(),amt:a};
+ let ent;if(F.id){ent=E.find(x=>x.id===F.id);Object.assign(ent,r)}else{ent={id:newId(),...r};E.push(ent)}
+ ym=F.date.slice(0,7);save();closeF();render();push(ent);
 }
 let mpY=0;
 function openMP(){mpY=+ym.slice(0,4);drawMP();$('#ov').classList.add('on')}
@@ -229,14 +283,16 @@ function drawMP(){
  $('#sh').innerHTML=`<div class="hd">選擇月份<button class="x" onclick="closeF()">✕</button></div><div class="mpy"><button onclick="mpS(-1)">‹</button><span>${mpY}年</span><button onclick="mpS(1)">›</button></div><div class="mpg">${g}</div><button class="btn" style="width:100%;margin-top:14px;background:var(--soft);color:var(--pri)" onclick="mpP('${today.slice(0,7)}')">回到今個月</button>`;
 }
 function mpP(k){ym=k;closeF();render()}
-function delE(){if(!confirm('刪除呢筆帳目？'))return;E=E.filter(x=>x.id!==F.id);save();closeF();render()}
+function delE(){if(!confirm('刪除呢筆帳目？'))return;const id=F.id;E=E.filter(x=>x.id!==id);save();closeF();render();pushDel(id)}
 function demo(){
  const m=ym,d=n=>m+'-'+pad(n);let i=1;
  [['credit','入數','月薪',1,18000],['debit','工人姐姐','工資',2,4500],['debit','星星','生活費',5,1200],['debit','其他','雜項',6,200],['credit','入數','股息',12,420],['debit','星星','學費',14,800]]
- .forEach(x=>E.push({id:Date.now()+i++,type:x[0],cat:x[1],note:x[2],date:d(x[3]),amt:x[4]}));
- save();render();
+ .forEach(x=>{const e={id:newId()+i++,acct:ac,type:x[0],cat:x[1],note:x[2],date:d(x[3]),amt:x[4]};E.push(e);pend.up.push(e.id)});
+ save();render();flush().then(ok=>ok&&setSt('☁️ 已同步'));
 }
-render();
+render();initDb();
+if(sk)pull();else{setSt('📴 本機模式 · 撳 PIN 設定同步');setTimeout(setKey,400)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&sk)pull()});
 </script>
 </body>
 </html>
