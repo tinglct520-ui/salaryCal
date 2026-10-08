@@ -2774,16 +2774,16 @@ const color = companyColorPalette[idx % companyColorPalette.length];
 const avgCompRate = data.allHours > 0 ? (data.totalEstPay / data.allHours) : 0; // [CHANGE E] whole month
 const per = getCompanyPeriod(name, currentYear, currentMonth);
 return `
-<div class="company-stat-item">
+<div class="company-stat-item" style="grid-template-columns:1fr auto auto;">
 <div class="company-stat-name">
 <span class="company-stat-dot" style="background:${color.text};"></span>
 ${name}
 </div>
 <div class="company-stat-pay">$${formatMoney(data.totalEstPay)}</div>
+<button type="button" onclick="setCompanyCutoff(${idx})" style="grid-column:3;grid-row:1;border:1px solid var(--border-color);background:transparent;color:var(--text-sub);border-radius:8px;padding:3px 8px;font-size:0.72rem;cursor:pointer;white-space:nowrap;">設定截數日</button>
 <div class="company-stat-meta">
 <span>${data.allCount} job • ${Math.round(data.allHours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
-<span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">📅 ${per.start.slice(5).replace('-','/')} – ${per.end.slice(5).replace('-','/')}${per.custom ? ` · 每月${per.D}號截數` : ' · 整個月曆月'} <button type="button" onclick="setCompanyCutoff(${idx})" style="border:1px solid var(--border-color);background:transparent;color:var(--text-sub);border-radius:8px;padding:2px 8px;font-size:0.72rem;cursor:pointer;">設定截數日</button></span>
-<span>✅ 已完成 $${formatMoney(data.pay)}${data.plannedCount ? ` · 📅 未完成 ${data.plannedCount} job $${formatMoney(data.plannedPay)}` : ''}</span>
+<span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">📅 ${per.start.slice(5).replace('-','/')} – ${per.end.slice(5).replace('-','/')}${per.custom ? ` · 每月${per.D}號截數` : ' · 整個月曆月'}</span>
 </div>
 </div>
 `;
