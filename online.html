@@ -1247,7 +1247,7 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 </div>
 </div>
 <div class="card cd-pad">
-<div class="analytics-section-title" style="margin:0 0 10px"><span>🏢 追糧報表 <small style="font-weight:600;color:var(--text-sub)">· 整月（含未完成）</small></span></div>
+<div class="analytics-section-title" style="margin:0 0 10px"><span>🏢 追糧報表 <small style="font-weight:600;color:var(--text-sub)">· 按各公司截數日（含未完成）</small></span></div>
 <div id="company-breakdown-container"></div>
 </div>
 </div>
@@ -2697,11 +2697,43 @@ selectedCompanyFilter = comp;
 renderListView();
 }
 
+// ===== 公司截數日（例如 Ulifestyle 每月24號）=====
+function _cutoff(y, m, d) { // 該月截數日（超過月底就當月底）
+  const last = new Date(y, m + 1, 0).getDate();
+  return Math.min(d, last);
+}
+function _ds(y, m, d) { return `${new Date(y, m, 1).getFullYear()}-${String(new Date(y, m, 1).getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
+function getCompanyPeriod(company, y, m) {
+  const D = parseInt(companyPaydays[company]) || 0;
+  if (!D) return { start: _ds(y, m, 1), end: _ds(y, m, new Date(y, m + 1, 0).getDate()), custom: false, D: 0 };
+  const endD = _cutoff(y, m, D);
+  const pm = new Date(y, m - 1, 1);
+  const prevEnd = _cutoff(pm.getFullYear(), pm.getMonth(), D);
+  const st = new Date(pm.getFullYear(), pm.getMonth(), prevEnd + 1); // 上個截數日隔日
+  return { start: _ds(st.getFullYear(), st.getMonth(), st.getDate()), end: _ds(y, m, endD), custom: true, D };
+}
+function inCompanyPeriod(s, y, m) {
+  const p = getCompanyPeriod(s.company, y, m);
+  return s.date >= p.start && s.date <= p.end;
+}
+function setCompanyCutoff(idx) {
+  const names = [...new Set(shifts.map(s => s.company))];
+  const name = names[idx]; if (!name) return;
+  const cur = companyPaydays[name] || '';
+  const v = prompt(`「${name}」每月幾號截數？\n（輸入 1–31；留空 = 照月曆 1號至月底）`, cur);
+  if (v === null) return;
+  const n = parseInt(v);
+  if (!v.trim() || isNaN(n) || n < 1 || n > 31) delete companyPaydays[name];
+  else companyPaydays[name] = n;
+  saveDataToLocalOnly();
+  renderAnalyticsOld();
+}
+
 function renderAnalyticsOld() {
 autoUpdatePastPlannedShifts();
 updateMonthSalaryCard();
 const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-const monthShifts = shifts.filter(s => s.date && s.date.startsWith(monthPrefix));
+const monthShifts = shifts.filter(s => s.date && inCompanyPeriod(s, currentYear, currentMonth));
 let totalHours = 0;
 let totalPay = 0;
 const companyMap = {};
@@ -2740,6 +2772,7 @@ companyBreakdownContainer.innerHTML = companyEntries.map(([name, data]) => {
 const idx = allCompanyNames.indexOf(name);
 const color = companyColorPalette[idx % companyColorPalette.length];
 const avgCompRate = data.allHours > 0 ? (data.totalEstPay / data.allHours) : 0; // [CHANGE E] whole month
+const per = getCompanyPeriod(name, currentYear, currentMonth);
 return `
 <div class="company-stat-item">
 <div class="company-stat-name">
@@ -2749,6 +2782,7 @@ ${name}
 <div class="company-stat-pay">$${formatMoney(data.totalEstPay)}</div>
 <div class="company-stat-meta">
 <span>${data.allCount} job • ${Math.round(data.allHours * 10) / 10}h ($${formatMoney(avgCompRate)}/hr)</span>
+<span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">📅 ${per.start.slice(5).replace('-','/')} – ${per.end.slice(5).replace('-','/')}${per.custom ? ` · 每月${per.D}號截數` : ' · 整個月曆月'} <button type="button" onclick="setCompanyCutoff(${idx})" style="border:1px solid var(--border-color);background:transparent;color:var(--text-sub);border-radius:8px;padding:2px 8px;font-size:0.72rem;cursor:pointer;">設定截數日</button></span>
 <span>✅ 已完成 $${formatMoney(data.pay)}${data.plannedCount ? ` · 📅 未完成 ${data.plannedCount} job $${formatMoney(data.plannedPay)}` : ''}</span>
 </div>
 </div>
