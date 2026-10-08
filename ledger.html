@@ -39,7 +39,7 @@ body{background:var(--bg);color:var(--text);font:15px/1.4 "Nunito","Noto Sans TC
 .mpm.now{background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
 .card{background:var(--card);border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.07);padding:14px 16px;margin-top:12px;overflow:hidden}
 .ttl{font-weight:800;font-size:.9rem;color:var(--pri);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.ttl small{font-size:.8rem;font-weight:600;color:var(--sub)}
+.ttl small{font-size:.8rem;font-weight:400;color:var(--sub);line-height:1.4}
 .sum{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .box{border-radius:14px;padding:10px 12px;background:var(--soft)}
 .box span{display:block;font-size:.8rem;color:var(--sub)}
@@ -128,7 +128,7 @@ input{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);
   <div class="mr"><button class="nb" onclick="mv(-1)" aria-label="上個月">‹</button>
   <button class="tm" onclick="openMP()"><span id="mon"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
   <button class="nb" onclick="mv(1)" aria-label="下個月">›</button></div>
-  <div class="msc"><div class="sb cr"><span>入數 Debit ▲</span><strong id="sc"></strong></div><div class="dv"></div><div class="sb dr"><span>支出 Expenses ▼</span><strong id="sd"></strong></div><div class="dv"></div><div class="sb"><span id="sl">淨額 Net</span><strong id="sn"></strong></div></div>
+  <div class="msc"><div class="sb cr"><span>入數 Debit ▲</span><strong id="sc"></strong></div><div class="dv"></div><div class="sb dr"><span>支出 Expenses ▼</span><strong id="sd"></strong></div></div>
   <div class="stl"><span id="st" onclick="pull()">☁️ 連接中…</span><button onclick="setKey()">🔑 PIN</button></div>
  </div>
  <div id="v"></div>
@@ -194,24 +194,22 @@ function render(){
  $('#mon').textContent=ym.slice(0,4)+'年'+(+ym.slice(5))+'月';
  ['cur','non','an'].forEach((k,i)=>$('#t'+i).className='ni'+(pg===k?' on':''));
  const M=month(ym),cr=amt(M,'credit'),dr=amt(M,'debit'),n=cr-dr;
- $('#sc').textContent='$'+fm(cr);$('#sd').textContent='$'+fm(dr);const all=EA().reduce((a,e)=>a+(e.type==='credit'?e.amt:-e.amt),0);
- if(pg==='non'){$('#sl').textContent='總餘額 Balance';$('#sn').textContent=sgn(all)}else{$('#sl').textContent='淨額 Net';$('#sn').textContent=sgn(n)}
- $('#v').innerHTML=pg==='an'?analysis():ledger();
+ $('#sc').textContent='$'+fm(cr);$('#sd').textContent='$'+fm(dr);$('#v').innerHTML=pg==='an'?analysis():ledger();
 }
 function ledger(){
  const L=month(ym).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
  const dr=amt(L,'debit'),cr=amt(L,'credit');
  const open=EA().filter(e=>e.date<ym+'-01').reduce((a,e)=>a+(e.type==='credit'?e.amt:-e.amt),0);
  let bal=open;
- let h=`<div class="card" style="padding:10px 16px"><div class="net" style="margin:0"><span>本月淨額（入數 − 支出）</span><b class="${cls(cr-dr)}">${sgn(cr-dr)}</b></div></div>`;
- h+=`<div class="card"><div class="ttl"><span>${ac==='cur'?'📒':'🏦'} ${ACN[ac]}</span><small>撳一筆可修改 / 刪除</small></div><div class="row h"><span>日期</span><span>項目</span><span class="dr">支出</span><span class="cr">入數 Dr</span></div>`;
+ const close=open+cr-dr;
+ let h=`<div class="card" style="padding:10px 16px"><div class="net" style="margin:0"><span>期末結餘 Closing balance</span><b class="${cls(close)}">${sgn(close)}</b></div></div>`;
+ h+=`<div class="card" style="padding-bottom:0"><div class="ttl"><span>${ac==='cur'?'📒':'🏦'} ${ACN[ac]}</span><small>撳一筆可修改 / 刪除</small></div><div class="row h"><span>日期</span><span>項目</span><span class="dr">支出</span><span class="cr">入數 Dr</span></div>`;
  h+=`<div class="row op"><span></span><span>承上結餘</span><span></span><span class="a ${cls(open)}">${sgn(open)}</span></div>`;
  if(!L.length&&!EA().length)h+=`<div class="empty">未有帳目<br><button class="btn" style="margin-top:10px" onclick="demo()">載入示範資料</button></div>`;
  else if(!L.length)h+='<div class="empty">呢個月未有帳目 · 撳右下角 +</div>';
  L.forEach(e=>{bal+=e.type==='credit'?e.amt:-e.amt;
   h+=`<div class="row" onclick="openF(${e.id})"><span class="d">${+e.date.slice(5,7)}/${+e.date.slice(8)}</span><div class="n"><b>${ic(e.type,e.cat)} ${esc(e.cat)}</b><span>${esc(e.note)||'—'}</span></div><span class="a dr">${e.type==='debit'?'$'+fm(e.amt):''}</span><span class="a cr">${e.type==='credit'?'$'+fm(e.amt):''}</span></div>`});
- h+=`<div class="row t"><span></span><span>合計 Total</span><span class="a dr">$${fm(dr)}</span><span class="a cr">$${fm(cr)}</span></div>
- <div class="net"><span>期末結餘 Closing balance</span><b class="${cls(bal)}">${sgn(bal)}</b></div></div>`;
+ h+=`<div class="row t"><span></span><span>合計 Total</span><span class="a dr">$${fm(dr)}</span><span class="a cr">$${fm(cr)}</span></div></div>`;
  return h;
 }
 function cat(L,t){
