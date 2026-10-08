@@ -209,7 +209,7 @@ function ledger(){
  if(!L.length&&!EA().length)h+=`<div class="empty">未有帳目<br><button class="btn" style="margin-top:10px" onclick="demo()">載入示範資料</button></div>`;
  else if(!L.length)h+='<div class="empty">呢個月未有帳目 · 撳右下角 +</div>';
  L.forEach(e=>{bal+=e.type==='credit'?e.amt:-e.amt;
-  h+=`<div class="row" onclick="openF(${e.id})"><span class="d">${+e.date.slice(5,7)}/${+e.date.slice(8)}</span><div class="n"><b>${ic(e.type,e.cat)} ${esc(e.cat)}</b><span>${esc(e.note)||'—'} · 餘 ${sgn(bal)}</span></div><span class="a dr">${e.type==='debit'?'$'+fm(e.amt):''}</span><span class="a cr">${e.type==='credit'?'$'+fm(e.amt):''}</span></div>`});
+  h+=`<div class="row" onclick="openF(${e.id})"><span class="d">${+e.date.slice(5,7)}/${+e.date.slice(8)}</span><div class="n"><b>${ic(e.type,e.cat)} ${esc(e.cat)}</b><span>${esc(e.note)||'—'}</span></div><span class="a dr">${e.type==='debit'?'$'+fm(e.amt):''}</span><span class="a cr">${e.type==='credit'?'$'+fm(e.amt):''}</span></div>`});
  h+=`<div class="row t"><span></span><span>合計 Total</span><span class="a dr">$${fm(dr)}</span><span class="a cr">$${fm(cr)}</span></div>
  <div class="net"><span>期末結餘 Closing balance</span><b class="${cls(bal)}">${sgn(bal)}</b></div></div>`;
  return h;
