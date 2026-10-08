@@ -57,7 +57,7 @@ body{background:var(--bg);color:var(--text);font:15px/1.4 "Nunito","Noto Sans TC
 .row .a{text-align:right;font-weight:800;font-size:.9rem}
 .a.dr{color:var(--dr)}.a.cr{color:var(--cr)}
 .h .dr{color:var(--dr);text-align:right}.h .cr{color:var(--cr);text-align:right}
-.row.t{cursor:default;border-top:2px solid var(--text);font-weight:800;background:var(--soft);margin:6px -16px 0;padding:9px 16px}
+.row.t{cursor:default;border-top:2px solid var(--text);font-weight:800;background:#FFFFFF;margin:6px -16px 0;padding:9px 16px}
 .row.op{cursor:default;color:var(--sub);font-size:.8rem}
 .empty{text-align:center;color:var(--sub);padding:22px 0;font-size:.9rem}
 .btn{border:0;border-radius:12px;background:var(--pri);color:#fff;font-weight:800;padding:11px 16px;cursor:pointer;font-size:.9rem}
@@ -209,7 +209,7 @@ function ledger(){
  else if(!L.length)h+='<div class="empty">呢個月未有帳目 · 撳右下角 +</div>';
  L.forEach(e=>{bal+=e.type==='credit'?e.amt:-e.amt;
   h+=`<div class="row" onclick="openF(${e.id})"><span class="d">${+e.date.slice(5,7)}/${+e.date.slice(8)}</span><div class="n"><b>${ic(e.type,e.cat)} ${esc(e.cat)}</b><span>${esc(e.note)||'—'}</span></div><span class="a dr">${e.type==='debit'?'$'+fm(e.amt):''}</span><span class="a cr">${e.type==='credit'?'$'+fm(e.amt):''}</span></div>`});
- h+=`<div class="row t"><span></span><span>合計 Total</span><span class="a dr">$${fm(dr)}</span><span class="a cr">$${fm(cr)}</span></div></div>`;
+ h+=`<div class="row t"><span></span><span style="color:var(--pri);">合計 Total</span><span class="a dr">$${fm(dr)}</span><span class="a cr">$${fm(cr)}</span></div></div>`;
  return h;
 }
 function cat(L,t){
