@@ -30,7 +30,7 @@
 --text-main: #444444; /* was #4A2C20 */
 --text-sub: #8A8A8A; /* was #9A7B6E (you left this blank - neutral grey to match #444444, change if you have a colour) */
 --border-color: #E9F2FF; /* was #D3E1F3 */
---accent-price: #AAA648; /* green (income / good) */
+--accent-price: #7A8B2E; /* green (income / good) */
 --plan-bg: #F7D89A; /* yellow */
 --plan-border: #E5BC62; /* was #DF6F41 */
 --olive: #7A8B2E; /* olive green (positive amounts) */
@@ -928,7 +928,7 @@ font-size: 0.88rem;
 .bt-pad{padding:10px 18px 18px}
 .bt-box{background:var(--primary-light);border-radius:16px;padding:14px;margin-bottom:8px}
 .bt-row{display:flex;justify-content:space-between;align-items:center}
-.bt-mu{color:var(--text-sub);font-size:.8rem}.bt-big{font-size:1.6rem;font-weight:800;color:var(--text-main)}
+.bt-mu{color:var(--text-sub);font-size:.6rem}.bt-big{font-size:1.6rem;font-weight:800;color:var(--text-main)}
 .bt-bar{height:12px;background:var(--border-color);border-radius:8px;overflow:hidden;margin:10px 0 6px}.bt-bar i{display:block;height:100%;border-radius:8px;transition:width .3s}
 .bt-msg{padding:8px 10px;border-radius:10px;font-size:.8rem;font-weight:700;margin-top:8px}
 .bt-btn{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-main);border-radius:10px;padding:7px 11px;font-size:.8rem;font-weight:700;cursor:pointer}
@@ -968,8 +968,8 @@ body.dark-mode .bt-pri,body.dark-mode .bt-cat.on{color:#2B1D18}
 .an-leg2{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;margin-top:12px}
 .an-leg2 .an-leg{gap:6px;padding:4px 0;font-size:.8rem;min-width:0}
 .an-ln{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.an-lv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;flex-shrink:0}
-.an-lv b{font-weight:800}
+.an-lv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;flex-shrink:0;color:var(--text-main);}
+.an-lv b{font-weight:800;color:var(--text-main);}
 .an-lv small{font-size:.6rem;color:var(--text-sub)}
 .an-leg{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:.85rem}.an-leg i{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .an-bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:18px}
@@ -1876,8 +1876,8 @@ function renderAnalysis() {
   /* [CHANGE Y] 分析 = expense analysis; 總覽 = 盧媽儲錢 first, then 每月儲蓄 */
   const ov = document.getElementById('an-overall');
   if (ov) ov.innerHTML =
-    `<div class="card cd-pad">${anT('🐷 盧媽儲錢', '<small style="font-weight:600;color:var(--text-sub)">支出 · 同時係儲蓄</small>')}${momCard}</div>` +
-    `<div class="card cd-pad">${anT('💰 每月儲蓄', '<small style="font-weight:600;color:var(--text-sub)">收入 − 支出</small>')}${sv}</div>`;
+    `<div class="card cd-pad">${anT('🐷 盧媽儲錢')}${momCard}</div>` +
+    `<div class="card cd-pad">${anT('💰 每月儲蓄')}${sv}</div>`;
 }
 function anDay(ds) {
   const ex = btMonthExp(ds.slice(0, 7)).filter(e => e.date === ds);
