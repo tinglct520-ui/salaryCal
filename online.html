@@ -1118,7 +1118,7 @@ body { overflow-x: clip; }
 .nav-item span{font-size:.66rem;font-weight:700;line-height:1;white-space:nowrap}
 
 /* [CHANGE U] one card per block + sticky budget card */
-.cd-pad { padding: 16px 18px; margin: 12px 0 0; }
+.cd-pad { padding: 16px 18px;}
 .cd-pad:first-child { margin-top: 0; }
 .cd-pad .bt-it:last-child { border-bottom: 0; }
 #bt-sticky { position: sticky; top: var(--ts-h, 0px); z-index: 40; background: var(--bg-color); margin-top: -13px; padding-top: 13px; padding-bottom: 20px; transition: background-color 0.3s; }
@@ -1899,7 +1899,7 @@ function renderAnalysis() {
   const momFirst = momList.length ? momList[0].date : '';
   const momPast = momList.filter(e => e.date.slice(0, 4) < String(currentYear)).reduce((a, e) => a + e.amt, 0);
   const momCard = momAll > 0 ? `<div class="bt-row"><span class="bt-mu">累積代儲</span><b class="bt-big" style="color:var(--primary-dark)">$${formatMoney(momAll)}</b></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div class="bt-box" style="margin:0"><div class="bt-mu">本年度（${currentYear}年）累計</div><b>$${formatMoney(momYear)}</b></div><div class="bt-box" style="margin:0"><div class="bt-mu">過往年度累計</div><b>$${formatMoney(momPast)}</b></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div class="bt-box" style="margin:0"><div class="bt-mu">本年度累計</div><b style="color: var(--primary-dark);">$${formatMoney(momYear)}</b></div><div class="bt-box" style="margin:0"><div class="bt-mu">過往年度累計</div><b style="color: var(--primary-dark);">$${formatMoney(momPast)}</b></div></div>
     <div class="bt-mu" style="margin-top:10px">共 ${momList.length} 筆 · 由 ${momFirst.slice(0, 4)}年${+momFirst.slice(5, 7)}月 開始</div>`
     : '<div class="empty-msg">未有盧媽儲錢記錄<br>喺支出新增時揀 🐷 盧媽儲錢</div>';
   const svMax = Math.max(0, ...sm.map(x => x.net)), svMin = Math.max(0, ...sm.map(x => -x.net)), svT = (svMax + svMin) || 1, svH = 110, svTop = 22, svBase = svTop + svMax / svT * svH;
