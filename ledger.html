@@ -248,7 +248,7 @@ function openF(id){
 function closeF(){$('#ov').classList.remove('on')}
 function drawF(){
  const all=[...CATS.debit.map(c=>[c,'debit']),...CATS.credit.map(c=>[c,'credit'])];
- $('#sh').innerHTML=`<div class="hd">${F.id?'<button class="del" onclick="delE()">🗑 刪除</button>':''}${F.id?'編輯帳目✏️':'又亂使錢💸'}<button class="x" onclick="closeF()">✕</button></div>
+ $('#sh').innerHTML=`<div class="hd">${F.id?'<button class="del" onclick="delE()">🗑 刪除</button>':''}${F.id?'編輯帳目✏️':'Expenses💸'}<button class="x" onclick="closeF()">✕</button></div>
  <div class="gc">${all.map(([c,t])=>`<button class="gt ${t==='debit'?'dr':'cr'}${c[1]===F.cat?' on':''}" onclick="setC('${c[1]}','${t}')"><span>${c[0]}</span>${c[1]}</button>`).join('')}</div>
  <div class="disp"><label class="dchip">📅 <span id="dl">${dlab(F.date)}</span><input id="fd" type="date" value="${F.date}" onclick="try{this.showPicker()}catch(e){}" onchange="F.date=this.value||F.date;$('#dl').textContent=dlab(F.date)"></label>
  <input id="fn" placeholder="詳情" value="${esc(F.note)}" oninput="F.note=this.value">
