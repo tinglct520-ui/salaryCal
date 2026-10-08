@@ -1377,6 +1377,8 @@ const SUPABASE_URL = 'https://yrxhfimsulfxycyarmqp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyeGhmaW1zdWxmeHljeWFybXFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMzAyNDAsImV4cCI6MjEwNTgwNjI0MH0.0rSR_q270oik-8BmdKmcCt9s30X4HismVTJPGAlRa8c';
 
 let db = null; // 初始化爲 null，等 DOM 載入完成再建立 Client
+let cloudSig = null; // 最近一次同步時雲端資料嘅指紋，用嚟偵測「雲端有人改過」
+let cloudOK = false, cloudBusy = false, lastPull = 0; // cloudOK: 今次開頁已成功讀過雲端（未讀過就唔准寫，避免舊資料覆蓋雲端）
 
 let syncKey = localStorage.getItem('user_sync_key') || '';
 let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];
@@ -1468,11 +1470,20 @@ function promptChangeSyncKey() {
 
 async function loadShiftsFromCloud() {
   if (!syncKey || !db) return;
+  cloudBusy = true; lastPull = Date.now();
   updateSyncStatus('syncing', '正在讀取雲端資料...');
   try {
     const { data, error } = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
     if (error) throw error;
+    cloudOK = true; cloudSig = cloudSigOf(data);
     if (data && data.length > 0) {
+      if (localStorage.getItem('cloud_dirty') === '1') {
+        // 呢部機有改動未上傳：先自動備份，再問清楚點處理，避免靜靜雞蓋走
+        try { localStorage.setItem('local_backup_before_cloud', JSON.stringify({ time: new Date().toISOString(), shifts, budget: B, companyPaydays })); } catch (e) {}
+        const useCloud = confirm('⚠️ 呢部機有改動未上傳到雲端（例如之前離線或儲存失敗）。\n\n按「確定」＝以雲端為準（本機未上傳嘅改動會被取代，已自動備份）\n按「取消」＝保留呢部機嘅資料，並上傳去雲端（會覆蓋雲端）');
+        if (!useCloud) { cloudBusy = false; await saveData(); return; }
+        markDirty(false);
+      }
       parseBudgetRows(data);
       shifts = data.filter(item => !BT_TYPES.includes(item.type)).map(item => ({
         id: item.shift_id ? (isNaN(item.shift_id) ? item.shift_id : Number(item.shift_id)) : Date.now(),
@@ -1496,8 +1507,26 @@ async function loadShiftsFromCloud() {
     }
   } catch (err) {
     console.error('Cloud load error:', err);
-    updateSyncStatus('offline', '網絡連線問題 (使用本地紀錄)');
-  }
+    updateSyncStatus('offline', '讀取雲端失敗：' + ((err && err.message) || err) + '（暫時只存本機）');
+  } finally { cloudBusy = false; }
+}
+
+// 返到呢個頁面 / 切返 app / 網絡恢復 → 自動重新讀雲端，避免用舊資料
+function refreshCloud() {
+  if (!syncKey || !db || cloudBusy || Date.now() - lastPull < 4000) return;
+  if (document.getElementById('bt-ov').classList.contains('on') || document.getElementById('modal-overlay').classList.contains('active')) return;
+  loadShiftsFromCloud();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshCloud(); });
+window.addEventListener('focus', refreshCloud);
+window.addEventListener('online', refreshCloud);
+
+const markDirty = v => { try { v ? localStorage.setItem('cloud_dirty', '1') : localStorage.removeItem('cloud_dirty'); } catch (e) {} };
+// 第一次開呢個版本：唔知本機有冇未上傳改動，當作有，等第一次載入雲端時問清楚（一次性）
+try { if (!localStorage.getItem('cloud_dirty_init')) { localStorage.setItem('cloud_dirty_init', '1'); if (localStorage.getItem('budgetData') || localStorage.getItem('partTimeShifts')) markDirty(true); } } catch (e) {}
+function cloudSigOf(rows) {
+  return JSON.stringify((rows || []).map(r => [String(r.shift_id), r.type || '', String(r.date || '').slice(0, 10), r.company || '', r.event_name || '',
+    Number(r.rate) || 0, Number(r.allowance) || 0, (r.start_time || '').slice(0, 5), (r.end_time || '').slice(0, 5), Number(r.deduct_mins) || 0, Number(r.duration) || 0].join('|')).sort());
 }
 
 function saveDataToLocalOnly() {
@@ -1508,12 +1537,26 @@ function saveDataToLocalOnly() {
 
 async function saveData() {
   saveDataToLocalOnly();
+  markDirty(true); // 未確認上到雲端之前，視為「本機有未上傳改動」
   if (!syncKey || !db) return;
+  if (!cloudOK) { updateSyncStatus('offline', '未成功連到雲端，今次改動只存咗喺本機（開返頁面再試；之後會以雲端資料為準）'); return; }
+  cloudBusy = true;
   updateSyncStatus('syncing', '正在儲存到雲端...');
+  let backup = [];
   try {
+    // 0. 以雲端為準：先睇雲端自上次同步後有冇被改過（例如另一部機）。有 → 唔覆蓋，改為載入最新雲端資料
+    const chk = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
+    if (chk.error) throw chk.error;
+    backup = chk.data || [];
+    if (cloudSig !== null && cloudSigOf(backup) !== cloudSig) {
+      cloudBusy = false;
+      await loadShiftsFromCloud();
+      alert('☁️ 雲端資料喺你上次同步之後有更新（可能係另一部機改咗）。\n已載入最新雲端資料，你剛才嗰次改動未儲存，請重新做一次。');
+      return;
+    }
     // 1. 先清空雲端對應 sync_key 的紀錄
     const { error: delError } = await db.from('user_shifts').delete().eq('sync_key', syncKey);
-    if (delError) console.warn('Delete warning:', delError);
+    if (delError) throw delError; // 清唔到舊資料就唔好再寫，避免重覆
 
     // 2. 重新批次寫入最新資料
     const extraRows = budgetRows();
@@ -1533,14 +1576,23 @@ async function saveData() {
         duration: Number(s.duration) || 0
       }));
       const { error: insertError } = await db.from('user_shifts').insert(dbRows.concat(extraRows));
-      if (insertError) throw insertError;
+      if (insertError) {
+        // 寫入失敗但舊資料已清走 → 盡量還原返雲端原本資料，唔好留低空白
+        if (backup.length) await db.from('user_shifts').insert(backup.map(({ id, created_at, ...r }) => r));
+        throw insertError;
+      }
     }
+    // 3. 重讀雲端，更新指紋，確保本機同雲端一致
+    const aft = await db.from('user_shifts').select('*').eq('sync_key', syncKey);
+    if (!aft.error) cloudSig = cloudSigOf(aft.data);
+    markDirty(false);
     updateSyncStatus('online', `已同步 (${syncKey})`);
   } catch (err) {
     console.error('Cloud save error:', err);
-    updateSyncStatus('offline', '儲存失敗，已存在本地');
-  }
+    updateSyncStatus('offline', '儲存失敗：' + ((err && err.message) || err) + '（改動未入雲端；開返頁面會以雲端資料為準）');
+  } finally { cloudBusy = false; }
 }
+
 
 // ==================== Budget Tracker ====================
 const BT_TYPES = ['expense', 'sub', 'budget'];
@@ -2347,8 +2399,8 @@ alert('匯出失敗');
 }
 
 function exportJSON() {
-if (shifts.length === 0) { alert('沒有紀錄可匯出'); return; }
-const content = JSON.stringify(shifts, null, 2);
+if (shifts.length === 0 && !B.exp.length && !B.subs.length) { alert('沒有紀錄可匯出'); return; }
+const content = JSON.stringify({ version: 2, shifts, budget: B, companyPaydays }, null, 2);
 shareOrDownloadFile(`part_time_backup_${getLocalDateStr()}.json`, 'application/json', content);
 }
 
@@ -2361,8 +2413,9 @@ const reader = new FileReader();
 reader.onload = function(e) {
 try {
 const importedData = JSON.parse(e.target.result);
-if (Array.isArray(importedData)) {
-shifts = importedData;
+if (Array.isArray(importedData) || (importedData && Array.isArray(importedData.shifts))) {
+if (Array.isArray(importedData)) shifts = importedData;
+else { shifts = importedData.shifts; if (importedData.budget) B = importedData.budget; if (importedData.companyPaydays) companyPaydays = importedData.companyPaydays; }
 autoUpdatePastPlannedShifts();
 saveData();
 renderCurrentView();
