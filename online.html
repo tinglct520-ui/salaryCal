@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon.png">
 <title>努力賺錢錢 (Cloud Sync)</title>
 <!-- [CHANGE Z] Flaticon UIcons (regular rounded) for the bottom menu icons -->
-   <link rel='stylesheet' href='https://flaticon.com'>
+<link rel='stylesheet' href='https://flaticon.com'>
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -960,6 +960,12 @@ body.dark-mode .bt-pri,body.dark-mode .bt-cat.on{color:#2B1D18}
 /* [CHANGE G] end */
 .an-c .dn{font-size:.7rem;color:var(--text-main);font-weight:700;display:block}
 .an-i{color:var(--accent-price);display:block}.an-e{color:var(--danger);display:block}
+.an-leg2{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;margin-top:12px}
+.an-leg2 .an-leg{gap:6px;padding:4px 0;font-size:.8rem;min-width:0}
+.an-ln{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-lv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;flex-shrink:0}
+.an-lv b{font-weight:800}
+.an-lv small{font-size:.6rem;color:var(--text-sub)}
 .an-leg{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:.85rem}.an-leg i{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .an-bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:18px}
 .an-bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:.65rem;color:var(--text-sub);font-weight:700}
@@ -1112,7 +1118,7 @@ body { overflow-x: clip; }
 .cd-pad { padding: 16px 18px; margin: 12px 0 0; }
 .cd-pad:first-child { margin-top: 0; }
 .cd-pad .bt-it:last-child { border-bottom: 0; }
-#bt-sticky { position: sticky; top: var(--ts-h, 0px); z-index: 40; background: var(--bg-color); margin-top: -13px; padding-top: 13px; padding-bottom: 20px; transition: background-color 0.3s; }
+#bt-sticky { position: sticky; top: var(--ts-h, 0px); z-index: 40; background: var(--bg-color); margin-top: -13px; padding-top: 13px; padding-bottom: 12px; transition: background-color 0.3s; }
 #bt-sticky .cd-pad { margin: 0; }
 
 /* [CHANGE V] one shared size/weight for the big amounts: 每月預算餘額 / 本月儲蓄 / 追糧報表金額 */
@@ -1777,8 +1783,8 @@ function renderAnalysis() {
       else { const [x0, y0] = pt(a0), [x1, y1] = pt(a1); paths += `<path d="M60 60 L${x0} ${y0} A54 54 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1} ${y1} Z" fill="${col}"/>`; }
       a0 = a1;
     });
-    pie = `<svg viewBox="0 0 120 120" style="width:170px;height:170px;display:block;margin:0 auto">${paths}<circle cx="60" cy="60" r="30" fill="var(--primary-light)"/><text x="60" y="58" text-anchor="middle" font-size="7" fill="var(--text-sub)">總支出</text><text x="60" y="69" text-anchor="middle" font-size="9" font-weight="800" fill="var(--text-main)">$${anShort(tot)}</text></svg><div style="margin-top:10px">` +
-      arr.map(([c, v], i) => `<div class="an-leg"><i style="background:${AN_COLORS[i % AN_COLORS.length]}"></i><span>${btIcon(c)} ${btEsc(c)}</span><span style="margin-left:auto;font-weight:800">$${formatMoney(v)}</span><span class="bt-mu" style="width:42px;text-align:right">${fmt1(v / tot * 100)}%</span></div>`).join('') + '</div>';
+    pie = `<svg viewBox="0 0 120 120" style="width:170px;height:170px;display:block;margin:0 auto">${paths}<circle cx="60" cy="60" r="30" fill="var(--primary-light)"/><text x="60" y="58" text-anchor="middle" font-size="7" fill="var(--text-sub)">總支出</text><text x="60" y="69" text-anchor="middle" font-size="9" font-weight="800" fill="var(--text-main)">$${anShort(tot)}</text></svg><div class="an-leg2">` +
+      arr.map(([c, v], i) => `<div class="an-leg"><i style="background:${AN_COLORS[i % AN_COLORS.length]}"></i><span class="an-ln">${btIcon(c)} ${btEsc(c)}</span><span class="an-lv"><b>$${formatMoney(v)}</b><small>${fmt1(v / tot * 100)}%</small></span></div>`).join('') + '</div>';
   }
 
   const months = [];
