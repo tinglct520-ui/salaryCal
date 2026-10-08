@@ -11,7 +11,6 @@
 <link rel="apple-touch-icon" href="icon.png">
 <title>努力賺錢錢 (Cloud Sync)</title>
 <!-- [CHANGE Z] Flaticon UIcons (regular rounded) for the bottom menu icons -->
-   <link rel='stylesheet' href='https://flaticon.com'>
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1123,7 +1122,7 @@ body.no-fab .fab-add { display: none; }
 .an-bars.mom .an-bar div{background:var(--primary)}
 .an-bars.mom .an-bar.cur div{background:var(--primary-dark)}
 /* [CHANGE Z] */
-.nav-item i { font-size: 18px; line-height: 25px; height: 22px; display: block; }
+.nav-item i { font-size: 18px; line-height: 25px; height: 25px; display: block; }
 .nav-item:not(.active) i { color: #444444; }
 body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 .nav-item.active i { color: var(--primary-dark); }
@@ -1799,9 +1798,12 @@ function renderAnalysis() {
   const momMonths = months.map(x => ({ ...x, mv: momSum(x.k) })), momMx = Math.max(...momMonths.map(x => x.mv), 1);
   const mom6 = momMonths.reduce((a, x) => a + x.mv, 0);
   const momRows = B.exp.filter(e => e.cat === MOM && e.date.startsWith(ym)).sort((a, b) => b.date.localeCompare(a.date));
-  const momCard = momAll > 0 ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div class="bt-mu">累積代儲</div><div class="bt-big" style="color:var(--primary-dark)">$${formatMoney(momAll)}</div></div><div><div class="bt-mu">本月代儲</div><div class="bt-big">$${formatMoney(momM)}</div></div></div>
-    <div class="an-bars mom">${momMonths.map((x, i) => `<div class="an-bar${i === 5 ? ' cur' : ''}">${x.mv ? '$' + anShort(x.mv) : ''}<div style="height:${x.mv / momMx * 100}%"></div><span style="margin-top:4px">${x.m}月</span></div>`).join('')}</div>
-    <div class="bt-mu" style="margin:10px 0 2px;font-weight:700">${currentMonth + 1}月明細</div>${momRows.length ? momRows.map(e => `<div class="bt-it"><div class="bt-ic">🐷</div><div class="bt-m"><b>${+e.date.slice(5, 7)}月${+e.date.slice(8)}日</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--primary-dark)">$${formatMoney(e.amt)}</b></div>`).join('') : '<div class="bt-mu" style="padding:8px 0">呢個月未有代儲記錄</div>'}`
+  const momList = B.exp.filter(e => e.cat === MOM).sort((a, b) => a.date.localeCompare(b.date));
+  const momYear = momList.filter(e => e.date.startsWith(String(currentYear))).reduce((a, e) => a + e.amt, 0);
+  const momFirst = momList.length ? momList[0].date : '';
+  const momCard = momAll > 0 ? `<div class="bt-mu">累積代儲</div><div class="bt-big" style="color:var(--primary-dark)">$${formatMoney(momAll)}</div>
+    <div class="bt-mu" style="margin-top:2px">共 ${momList.length} 筆 · 由 ${momFirst.slice(0, 4)}年${+momFirst.slice(5, 7)}月 開始</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div class="bt-box" style="margin:0"><div class="bt-mu">${currentMonth + 1}月新增</div><b>$${formatMoney(momM)}</b></div><div class="bt-box" style="margin:0"><div class="bt-mu">${currentYear}年累計</div><b>$${formatMoney(momYear)}</b></div></div>`
     : '<div class="empty-msg">未有盧媽儲錢記錄<br>喺支出新增時揀 🐷 盧媽儲錢</div>';
   const svMax = Math.max(0, ...sm.map(x => x.net)), svMin = Math.max(0, ...sm.map(x => -x.net)), svT = (svMax + svMin) || 1, svH = 110, svTop = 22, svBase = svTop + svMax / svT * svH;
   let svg = '<svg viewBox="0 0 300 170" style="width:100%;display:block;margin-top:8px">' + `<line x1="0" x2="300" y1="${svBase}" y2="${svBase}" stroke="var(--border-color)" stroke-width="1.5"/>`;
