@@ -11,7 +11,6 @@
 <link rel="apple-touch-icon" href="icon.png">
 <title>努力賺錢錢 (Cloud Sync)</title>
 <!-- [CHANGE Z] Flaticon UIcons (regular rounded) for the bottom menu icons -->
-   <link rel='stylesheet' href='https://flaticon.com'>
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1729,18 +1728,45 @@ function btOpenBudget() {
   btSheet(`<h3>每月預算</h3><input id="bt-b" type="number" inputmode="decimal" value="${B.budget || ''}" placeholder="每月預算金額"><div class="bt-mu" style="margin-bottom:10px">每個月都用同一個預算</div><button class="bt-pri" onclick="btSaveBudget()">儲存</button>`);
 }
 function btSaveBudget() { B.budget = parseFloat(document.getElementById('bt-b').value) || 0; saveData(); btClose(); renderListView(); }
-function btOpenSubs() {
-  let h = '<h3>🔁 訂閱 / 固定支出</h3><div class="bt-mu" style="margin-bottom:8px">每月自動計入支出</div>';
-  B.subs.forEach(s => h += `<div class="bt-it"><div class="bt-ic">🔁</div><div class="bt-m"><b>${btEsc(s.name)}</b><span>每月 ${s.day} 號 · 由 ${s.start} 起${s.end ? ' 至 ' + s.end : ''}</span></div><b>$${formatMoney(s.amt)}</b><button class="bt-x" onclick="btDelSub('${btEsc(s.id)}')">✕</button></div>`);
+let btEditSub = null;
+const btAddM = (ym, n) => { const d = new Date(+ym.slice(0, 4), +ym.slice(5) - 1 + n, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+const btMDiff = (a, b) => (+b.slice(0, 4) - +a.slice(0, 4)) * 12 + (+b.slice(5) - +a.slice(5));
+const btYMc = ym => ym.slice(0, 4) + '年' + (+ym.slice(5)) + '月';
+function btOpenSubs(editId) {
+  const ed = editId ? B.subs.find(x => String(x.id) === String(editId)) : null;
+  btEditSub = ed ? ed.id : null;
+  let h = `<div class="modal-header"><div class="bt-hl">${ed ? '<button type="button" class="bt-del" onclick="btDelSub(btEditSub)">🗑 刪除</button>' : ''}<h2>🔁 訂閱 / 固定支出</h2></div><button class="close-btn" onclick="btClose()">✕</button></div><div class="bt-mu" style="margin-bottom:8px">每月自動計入支出 · 撳一項可以修改 / 刪除</div>`;
+  B.subs.forEach(s => {
+    const term = s.end ? btMDiff(s.start, s.end) + 1 : 0;
+    h += `<div class="bt-it" style="cursor:pointer;${ed && ed.id === s.id ? 'background:var(--primary-light);border-radius:12px;padding-left:8px;padding-right:8px' : ''}" onclick="btOpenSubs('${btEsc(s.id)}')"><div class="bt-ic">🔁</div><div class="bt-m"><b>${btEsc(s.name)}</b><span>每月 ${s.day} 號扣款 · ${btYMc(s.start)}起${s.end ? ' 至 ' + btYMc(s.end) + '（共 ' + term + ' 期）' : ' · 持續'}</span></div><b style="color:var(--danger)">-$${formatMoney(s.amt)}</b></div>`;
+  });
   if (!B.subs.length) h += '<div class="empty-msg">未有訂閱</div>';
-  h += `<div style="height:10px"></div><input id="bt-sn" placeholder="名稱（Netflix / Spotify…）"><input id="bt-sa" type="number" inputmode="decimal" placeholder="每月金額"><input id="bt-sd" type="number" min="1" max="31" value="1" placeholder="每月幾號扣款"><button class="bt-pri" onclick="btAddSub()">新增訂閱（由本月起）</button>`;
+  const curTerm = ed && ed.end ? btMDiff(ed.start, ed.end) + 1 : '';
+  h += `<div style="height:10px"></div><div class="bt-mu" style="font-weight:800">${ed ? '✏️ 修改訂閱' : '➕ 新增訂閱'}</div>
+    <div class="bt-mu" style="margin-top:6px">名稱</div><input id="bt-sn" placeholder="Netflix / Spotify…" value="${ed ? btEsc(ed.name) : ''}">
+    <div class="bt-mu">每月金額 ($)</div><input id="bt-sa" type="number" inputmode="decimal" placeholder="例如 98" value="${ed ? ed.amt : ''}">
+    <div class="bt-mu">每月扣款日（1–31 號）</div><input id="bt-sd" type="number" inputmode="numeric" min="1" max="31" placeholder="例如 15 = 每月 15 號" value="${ed ? ed.day : 1}">
+    <div class="bt-mu">期數（月）${ed ? '· 由 ' + btYMc(ed.start) + ' 起計' : '· 由本月起計'}</div><input id="bt-st" type="number" inputmode="numeric" min="1" placeholder="留空 = 持續每月扣，唔會停" value="${curTerm}">
+    <div class="bt-mu" style="margin:-4px 0 10px">${ed ? '改金額 / 扣款日由本月起生效，之前月份保留原本數字' : '例如分期 12 個月就填 12，扣完自動停'}</div>
+    <button class="bt-pri" onclick="btAddSub()">${ed ? '更新訂閱' : '新增訂閱（由本月起）'}</button>${ed ? '<button class="bt-btn" style="width:100%;margin-top:8px;padding:11px" onclick="btOpenSubs()">取消修改</button>' : ''}`;
   btSheet(h);
 }
 function btAddSub() {
   const n = document.getElementById('bt-sn').value.trim(), a = parseFloat(document.getElementById('bt-sa').value);
   const d = Math.min(31, Math.max(1, parseInt(document.getElementById('bt-sd').value) || 1));
+  const t = Math.max(0, parseInt(document.getElementById('bt-st').value) || 0);
   if (!n || !(a > 0)) return alert('請填名稱同金額');
-  B.subs.push({ id: btUid(), name: n, amt: a, day: d, cat: '訂閱', start: btYM(), end: '' });
+  const s = btEditSub ? B.subs.find(x => String(x.id) === String(btEditSub)) : null;
+  if (s) {
+    const cur = btYM(), endNew = t ? btAddM(s.start, t - 1) : '';
+    if ((s.amt !== a || s.day !== d) && s.start < cur && (!s.end || s.end >= cur)) {
+      // amount / day changed: close old record last month, start a new one this month (history kept)
+      const p = new Date(currentYear, currentMonth - 1, 1), prev = p.getFullYear() + '-' + String(p.getMonth() + 1).padStart(2, '0');
+      s.end = prev; s.name = n;
+      B.subs.push({ id: btUid(), name: n, amt: a, day: d, cat: s.cat || '訂閱', start: cur, end: endNew && endNew < cur ? cur : endNew });
+    } else { s.name = n; s.amt = a; s.day = d; s.end = endNew; }
+  } else B.subs.push({ id: btUid(), name: n, amt: a, day: d, cat: '訂閱', start: btYM(), end: t ? btAddM(btYM(), t - 1) : '' });
+  btEditSub = null;
   saveData(); renderListView(); btOpenSubs();
 }
 function btDelSub(id) {
