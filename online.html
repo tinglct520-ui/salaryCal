@@ -32,6 +32,7 @@
 --accent-price: #AAA648; /* green (income / good) */
 --plan-bg: #F7D89A; /* yellow */
 --plan-border: #E5BC62; /* was #DF6F41 */
+--olive: #7A8B2E; /* olive green (positive amounts) */
 --danger: #E8636F; /* coral pink (expense / over budget); was #e53935 */
 --holiday-red: #E8636F; /* coral pink; was #e53935 */
 --nav-height: 50px;
@@ -54,6 +55,7 @@ body.dark-mode {
 --accent-price: #81c784;
 --plan-bg: #4E352C;
 --plan-border: #8A5A4A;
+--olive: #A8B85A;
 --danger: #ef5350;
 --holiday-red: #ef5350;
 --input-bg: #4E352C;
@@ -1109,7 +1111,7 @@ body { overflow-x: clip; }
 .cd-pad { padding: 16px 18px; margin: 12px 0 0; }
 .cd-pad:first-child { margin-top: 0; }
 .cd-pad .bt-it:last-child { border-bottom: 0; }
-#bt-sticky { position: sticky; top: var(--ts-h, 0px); z-index: 40; background: var(--bg-color); padding-bottom: 12px; transition: background-color 0.3s; }
+#bt-sticky { position: sticky; top: var(--ts-h, 0px); z-index: 40; background: var(--bg-color); margin-top: -13px; padding-top: 13px; padding-bottom: 12px; transition: background-color 0.3s; }
 #bt-sticky .cd-pad { margin: 0; }
 
 /* [CHANGE V] one shared size/weight for the big amounts: 每月預算餘額 / 本月儲蓄 / 追糧報表金額 */
@@ -1221,7 +1223,7 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 
 <!-- VIEW 3b: Income report / statement -->
 <div id="analytics-view" style="display: none;">
-<div class="card cd-pad">
+<div class="card cd-pad" style="display:none"><!-- 收入報表 hidden for now (ids kept for JS) -->
 <div class="analytics-section-title" style="margin:0 0 10px"><span>💼 收入報表</span></div>
 <div class="analytics-summary-grid">
 <div class="stat-box">
@@ -1599,7 +1601,7 @@ function renderListView() {
   const col = p >= 100 ? 'var(--danger)' : p >= 80 ? '#f59e0b' : 'var(--accent-price)';
   const subT = ex.filter(e => e.sub).reduce((a, e) => a + e.amt, 0);
   // [CHANGE U] 每月預算餘額 = its own (sticky) card
-  let top = `<div class="card cd-pad"><div class="bt-row"><span class="bt-mu">每月預算餘額</span>${b ? `<span class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--text-main)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</span>` : ''}</div>`;
+  let top = `<div class="card cd-pad"><div class="analytics-section-title" style="margin:0 0 10px"><span>👛 每月預算餘額</span>${b ? `<span class="bt-big" style="color:${left < 0 ? 'var(--danger)' : 'var(--olive)'}">${left < 0 ? '-' : ''}$${formatMoney(Math.abs(left))}</span>` : ''}</div>`;
   if (b) {
     top += `<div class="bt-bar"><i style="width:${Math.min(p, 100)}%;background:${col}"></i></div>
     <div class="bt-row bt-mu"><span>已用 $${formatMoney(spent)} / $${formatMoney(b)}</span><b style="color:${col}">${fmt1(p)}%</b></div>
@@ -1613,7 +1615,7 @@ function renderListView() {
   let h = '';
   Object.keys(g).forEach(d => {
     const tot = g[d].reduce((a, e) => a + e.amt, 0);
-    h += `<div class="card cd-pad"><div class="bt-day" style="padding:0 0 6px"><span>${wdE[new Date(d + 'T00:00:00').getDay()]} ${+d.slice(5, 7)}月${+d.slice(8)}日</span><span>今日支出 $${formatMoney(tot)}</span></div>`;
+    h += `<div class="card cd-pad"><div class="bt-day" style="padding:0 0 6px"><span>${wdE[new Date(d + 'T00:00:00').getDay()]} ${+d.slice(5, 7)}月${+d.slice(8)}日</span><span>$${formatMoney(tot)}</span></div>`;
     g[d].forEach(e => h += `<div class="bt-it"><div class="bt-ic">${btIcon(e.cat)}</div><div class="bt-m"><b>${btEsc(e.cat)}${e.sub ? ' · 訂閱' : ''}</b><span>${btEsc(e.note) || '—'}</span></div><b style="color:var(--danger)">-$${formatMoney(e.amt)}</b>${e.sub ? '' : `<button class="bt-x" onclick="btDelExp('${btEsc(e.id)}')">✕</button>`}</div>`);
     h += '</div>';
   });
@@ -1801,9 +1803,10 @@ function renderAnalysis() {
   const momList = B.exp.filter(e => e.cat === MOM).sort((a, b) => a.date.localeCompare(b.date));
   const momYear = momList.filter(e => e.date.startsWith(String(currentYear))).reduce((a, e) => a + e.amt, 0);
   const momFirst = momList.length ? momList[0].date : '';
-  const momCard = momAll > 0 ? `<div class="bt-mu">累積代儲</div><div class="bt-big" style="color:var(--primary-dark)">$${formatMoney(momAll)}</div>
-    <div class="bt-mu" style="margin-top:2px">共 ${momList.length} 筆 · 由 ${momFirst.slice(0, 4)}年${+momFirst.slice(5, 7)}月 開始</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div class="bt-box" style="margin:0"><div class="bt-mu">${currentMonth + 1}月新增</div><b>$${formatMoney(momM)}</b></div><div class="bt-box" style="margin:0"><div class="bt-mu">${currentYear}年累計</div><b>$${formatMoney(momYear)}</b></div></div>`
+  const momPast = momList.filter(e => e.date.slice(0, 4) < String(currentYear)).reduce((a, e) => a + e.amt, 0);
+  const momCard = momAll > 0 ? `<div class="bt-row"><span class="bt-mu">累積代儲</span><b class="bt-big" style="color:var(--primary-dark)">$${formatMoney(momAll)}</b></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div class="bt-box" style="margin:0"><div class="bt-mu">本年度（${currentYear}年）累計</div><b>$${formatMoney(momYear)}</b></div><div class="bt-box" style="margin:0"><div class="bt-mu">過往年度累計</div><b>$${formatMoney(momPast)}</b></div></div>
+    <div class="bt-mu" style="margin-top:10px">共 ${momList.length} 筆 · 由 ${momFirst.slice(0, 4)}年${+momFirst.slice(5, 7)}月 開始</div>`
     : '<div class="empty-msg">未有盧媽儲錢記錄<br>喺支出新增時揀 🐷 盧媽儲錢</div>';
   const svMax = Math.max(0, ...sm.map(x => x.net)), svMin = Math.max(0, ...sm.map(x => -x.net)), svT = (svMax + svMin) || 1, svH = 110, svTop = 22, svBase = svTop + svMax / svT * svH;
   let svg = '<svg viewBox="0 0 300 170" style="width:100%;display:block;margin-top:8px">' + `<line x1="0" x2="300" y1="${svBase}" y2="${svBase}" stroke="var(--border-color)" stroke-width="1.5"/>`;
