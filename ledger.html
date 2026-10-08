@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#EEF5FF">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<title>借貸帳簿 · Debit & Credit</title>
+<title>我嘅帳簿</title>
 <style>
 :root{color-scheme:light;--bg:#EEF5FF;--card:#FFFFFF;--soft:#E5F0FF;--text:#444444;--sub:#8A8A8A;--line:#E9F2FF;--pri:#3D72B4;--dr:#E8636F;--cr:#7A8B2E;--inp:#EFF5FF;--nav:50px;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
@@ -88,6 +88,24 @@ input{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);
 .mt{display:grid;grid-template-columns:44px 1fr 1fr 1fr;gap:6px;text-align:right;font-size:.8rem;padding:6px 0;border-top:1px solid var(--line)}
 .mt span:first-child{text-align:left;font-weight:800}
 .note{font-size:.8rem;color:var(--sub);margin-top:10px}
+.gc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.gt{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 2px;border-radius:14px;border:2px solid transparent;background:var(--soft);font:800 .75rem "Nunito","Noto Sans TC",sans-serif;cursor:pointer}
+.gt span{font-size:1.7rem;line-height:1.1}
+.gt.dr{color:var(--dr)}.gt.cr{color:var(--cr)}
+.gt.on{background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.gt.on.dr{border-color:var(--dr)}.gt.on.cr{border-color:var(--cr)}
+.disp{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.dchip{position:relative;flex-shrink:0;margin:0;background:var(--soft);border-radius:10px;padding:10px 8px;font-size:.8rem;font-weight:800;color:var(--pri);white-space:nowrap;cursor:pointer}
+.dchip input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;padding:0;cursor:pointer}
+.disp>input{flex:1;min-width:0;margin:0;padding:10px}
+.av{text-align:right;min-width:0;max-width:44%;overflow:hidden}
+.av b{display:block;font-size:1.5rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.av small{color:var(--sub);font-size:.8rem}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pad button{height:50px;border:0;border-radius:12px;background:var(--soft);color:var(--text);font:800 1.3rem "Nunito",sans-serif;cursor:pointer}
+.pad button:active{filter:brightness(.92)}
+.pad .op{background:var(--line)}
+.pad .ok{grid-column:4;grid-row:3 / span 2;height:auto;background:var(--pri);color:#fff;font-size:1.1rem}
 </style>
 </head>
 <body>
@@ -96,7 +114,7 @@ input{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);
   <div class="mr"><button class="nb" onclick="mv(-1)" aria-label="上個月">‹</button>
   <button class="tm" onclick="openMP()"><span id="mon"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
   <button class="nb" onclick="mv(1)" aria-label="下個月">›</button></div>
-  <div class="msc"><div class="sb cr"><span>貸方 Credit ▲</span><strong id="sc"></strong></div><div class="dv"></div><div class="sb dr"><span>借方 Debit ▼</span><strong id="sd"></strong></div><div class="dv"></div><div class="sb"><span>淨額 Net</span><strong id="sn"></strong></div></div>
+  <div class="msc"><div class="sb cr"><span>入數 Debit ▲</span><strong id="sc"></strong></div><div class="dv"></div><div class="sb dr"><span>支出 Expenses ▼</span><strong id="sd"></strong></div><div class="dv"></div><div class="sb"><span>淨額 Net</span><strong id="sn"></strong></div></div>
  </div>
  <div id="v"></div>
 </div>
@@ -104,7 +122,7 @@ input{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--line);
 <nav class="nav"><button class="ni" id="t0" onclick="tab(0)"><svg viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm1 4v2h9V7H7zm0 4v2h9v-2H7zm0 4v2h6v-2H7z"/></svg><span>帳簿</span></button><button class="ni" id="t1" onclick="tab(1)"><svg viewBox="0 0 24 24"><path d="M4 20V10h4v10H4zm6 0V4h4v16h-4zm6 0v-7h4v7h-4z"/></svg><span>分析</span></button></nav>
 <div class="ov" id="ov" onclick="if(event.target===this)closeF()"><div class="sh" id="sh"></div></div>
 <script>
-const CATS={debit:[['🍜','餐飲'],['🛒','買餸'],['🚇','交通'],['🏠','住屋'],['👕','衫衫'],['💊','醫療'],['🎮','娛樂'],['📦','其他']],credit:[['💼','薪金'],['🧧','利是'],['📈','投資'],['🎁','獎金'],['💰','其他']]};
+const CATS={debit:[['⭐','星星'],['🧹','工人姐姐'],['📦','其他']],credit:[['💰','入數']]};
 const COL=['#E8636F','#42a5f5','#66bb6a','#ffa726','#ab47bc','#26c6da','#8d6e63','#9e9e9e'];
 const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -132,8 +150,8 @@ function ledger(){
  const dr=amt(L,'debit'),cr=amt(L,'credit');
  const open=E.filter(e=>e.date<ym+'-01').reduce((a,e)=>a+(e.type==='credit'?e.amt:-e.amt),0);
  let bal=open;
- let h=`<div class="card" style="padding:10px 16px"><div class="net" style="margin:0"><span>本月淨額（貸方 − 借方）</span><b class="${cls(cr-dr)}">${sgn(cr-dr)}</b></div></div>`;
- h+=`<div class="card"><div class="ttl"><span>📒 分類帳</span><small>撳一筆可修改 / 刪除</small></div><div class="row h"><span>日期</span><span>項目</span><span class="dr">借方 Dr</span><span class="cr">貸方 Cr</span></div>`;
+ let h=`<div class="card" style="padding:10px 16px"><div class="net" style="margin:0"><span>本月淨額（入數 − 支出）</span><b class="${cls(cr-dr)}">${sgn(cr-dr)}</b></div></div>`;
+ h+=`<div class="card"><div class="ttl"><span>📒 分類帳</span><small>撳一筆可修改 / 刪除</small></div><div class="row h"><span>日期</span><span>項目</span><span class="dr">支出</span><span class="cr">入數 Dr</span></div>`;
  h+=`<div class="row op"><span></span><span>承上結餘</span><span></span><span class="a ${cls(open)}">${sgn(open)}</span></div>`;
  if(!L.length&&!E.length)h+=`<div class="empty">未有帳目<br><button class="btn" style="margin-top:10px" onclick="demo()">載入示範資料</button></div>`;
  else if(!L.length)h+='<div class="empty">呢個月未有帳目 · 撳右下角 +</div>';
@@ -160,17 +178,48 @@ function analysis(){
  const rows=ms.slice().reverse().map(x=>{const n=x.cr-x.dr;return `<div class="mt"><span>${x.m}月</span><span class="neg">-${fm(x.dr)}</span><span class="pos">+${fm(x.cr)}</span><b class="${cls(n)}">${n<0?'-':''}${fm(Math.abs(n))}</b></div>`}).join('');
  const t6=ms.reduce((a,x)=>a+x.cr-x.dr,0);
  return `<div class="card"><div class="ttl"><span>⚖️ 本月借貸對照</span></div>
- <div class="net" style="margin:0"><span>貸方 $${fm(cr)} − 借方 $${fm(dr)}${cr>0?' · 儲蓄率 '+((cr-dr)/cr*100).toFixed(1)+'%':''}</span><b class="${cls(cr-dr)}">${sgn(cr-dr)}</b></div></div>
- <div class="card"><div class="ttl"><span>📊 近 6 個月</span><small><span class="neg">■</span> 借方 <span class="pos">■</span> 貸方</small></div>${s}
- <div class="mt" style="border:0;color:var(--sub)"><span></span><span>借方</span><span>貸方</span><span>淨額</span></div>${rows}
+ <div class="net" style="margin:0"><span>入數 $${fm(cr)} − 支出 $${fm(dr)}${cr>0?' · 儲蓄率 '+((cr-dr)/cr*100).toFixed(1)+'%':''}</span><b class="${cls(cr-dr)}">${sgn(cr-dr)}</b></div></div>
+ <div class="card"><div class="ttl"><span>📊 近 6 個月</span><small><span class="neg">■</span> 支出 <span class="pos">■</span> 入數</small></div>${s}
+ <div class="mt" style="border:0;color:var(--sub)"><span></span><span>支出</span><span>入數</span><span>淨額</span></div>${rows}
  <div class="note">近 6 個月累計淨額 <b class="${cls(t6)}">${sgn(t6)}</b></div></div>
- <div class="card"><div class="ttl"><span style="color:var(--dr)">🔻 借方 Debit · 支出分類</span></div>${cat(L,'debit')}</div>
- <div class="card"><div class="ttl"><span style="color:var(--cr)">🔺 貸方 Credit · 收入來源</span></div>${cat(L,'credit')}</div>`;
+ <div class="card"><div class="ttl"><span style="color:var(--dr)">🔻 支出 Expenses · 分類</span></div>${cat(L,'debit')}</div>
+ <div class="card"><div class="ttl"><span style="color:var(--cr)">🔺 入數 Debit · 來源</span></div>${cat(L,'credit')}</div>`;
 }
+const KEYS=['7','8','9','del','4','5','6','+','1','2','3','OK','.','0','00'];
+const dlab=d=>(+d.slice(5,7))+'/'+(+d.slice(8))+(d===today?' 今日':'');
+const tot=()=>String(F.amt).split('+').reduce((a,x)=>a+(parseFloat(x)||0),0);
 function openF(id){
  const e=id?E.find(x=>x.id===id):null;
- F=e?{...e}:{id:0,type:'debit',cat:CATS.debit[0][1],date:ym===today.slice(0,7)?today:ym+'-01',note:'',amt:''};
+ F=e?{...e,amt:String(e.amt)}:{id:0,type:'debit',cat:CATS.debit[0][1],date:ym===today.slice(0,7)?today:ym+'-01',note:'',amt:''};
  drawF();$('#ov').classList.add('on');
+}
+function closeF(){$('#ov').classList.remove('on')}
+function drawF(){
+ const all=[...CATS.debit.map(c=>[c,'debit']),...CATS.credit.map(c=>[c,'credit'])];
+ $('#sh').innerHTML=`<div class="hd">${F.id?'<button class="del" onclick="delE()">🗑 刪除</button>':''}${F.id?'編輯帳目✏️':'又亂使錢💸'}<button class="x" onclick="closeF()">✕</button></div>
+ <div class="gc">${all.map(([c,t])=>`<button class="gt ${t==='debit'?'dr':'cr'}${c[1]===F.cat?' on':''}" onclick="setC('${c[1]}','${t}')"><span>${c[0]}</span>${c[1]}</button>`).join('')}</div>
+ <div class="disp"><label class="dchip">📅 <span id="dl">${dlab(F.date)}</span><input id="fd" type="date" value="${F.date}" onchange="F.date=this.value||F.date;$('#dl').textContent=dlab(F.date)"></label>
+ <input id="fn" placeholder="詳情" value="${esc(F.note)}" oninput="F.note=this.value">
+ <div class="av"><b id="av" class="${F.type==='debit'?'neg':'pos'}">$0</b><small id="as"></small></div></div>
+ <div class="pad">${KEYS.map(k=>k==='OK'?'<button class="ok" onclick="saveE()">儲存</button>':`<button class="${k==='del'||k==='+'?'op':''}" onclick="kp('${k}')">${k==='del'?'⌫':k}</button>`).join('')}</div>`;
+ ra();
+}
+function ra(){$('#av').textContent='$'+(F.amt||'0');$('#as').textContent=String(F.amt).includes('+')?'= $'+fm(tot()):''}
+function kp(k){
+ let a=String(F.amt);
+ if(k==='del')a=a.slice(0,-1);
+ else if(k==='+'){if(a&&!a.endsWith('+')&&!a.endsWith('.'))a+='+'}
+ else if(k==='.'){const l=a.split('+').pop();if(!l.includes('.'))a+=l===''?'0.':'.'}
+ else{const l=a.split('+').pop();if(l==='0'&&k!=='00')a=a.slice(0,-1);if(k==='00'&&(l===''||l==='0'))return;if(l.includes('.')&&l.split('.')[1].length>=2)return;if(a.length<14)a+=k}
+ F.amt=a;ra();
+}
+function setC(c,t){F.cat=c;F.type=t;document.querySelectorAll('.gt').forEach(b=>b.classList.toggle('on',b.textContent.trim().endsWith(c)&&b.classList.contains(t==='debit'?'dr':'cr')));$('#av').className=t==='debit'?'neg':'pos'}
+function saveE(){
+ const a=Math.round(tot()*100)/100;
+ if(!(a>0))return alert('請輸入金額');if(!F.date)return alert('請揀日期');
+ const r={type:F.type,cat:F.cat,date:F.date,note:(F.note||'').trim(),amt:a};
+ if(F.id)Object.assign(E.find(x=>x.id===F.id),r);else E.push({id:Date.now(),...r});
+ ym=F.date.slice(0,7);save();closeF();render();
 }
 let mpY=0;
 function openMP(){mpY=+ym.slice(0,4);drawMP();$('#ov').classList.add('on')}
@@ -180,31 +229,10 @@ function drawMP(){
  $('#sh').innerHTML=`<div class="hd">選擇月份<button class="x" onclick="closeF()">✕</button></div><div class="mpy"><button onclick="mpS(-1)">‹</button><span>${mpY}年</span><button onclick="mpS(1)">›</button></div><div class="mpg">${g}</div><button class="btn" style="width:100%;margin-top:14px;background:var(--soft);color:var(--pri)" onclick="mpP('${today.slice(0,7)}')">回到今個月</button>`;
 }
 function mpP(k){ym=k;closeF();render()}
-function closeF(){$('#ov').classList.remove('on')}
-function drawF(){
- const t=F.type;
- $('#sh').innerHTML=`<div class="hd">${F.id?'<button class="del" onclick="delE()">🗑 刪除</button>':''}${F.id?'編輯帳目✏️':'新增帳目'}<button class="x" onclick="closeF()">✕</button></div>
- <div class="tg"><button class="dr${t==='debit'?' on':''}" onclick="setT('debit')">借方 Debit<small>支出 · 錢出</small></button><button class="cr${t==='credit'?' on':''}" onclick="setT('credit')">貸方 Credit<small>收入 · 錢入</small></button></div>
- <div class="chips">${CATS[t].map(c=>`<button class="chip${c[1]===F.cat?' on':''}" onclick="setC('${c[1]}')">${c[0]} ${c[1]}</button>`).join('')}</div>
- <label>金額 ($)</label><input id="fa" type="number" inputmode="decimal" placeholder="0" value="${F.amt}" style="font-size:1.4rem;font-weight:800;color:var(--${t==='debit'?'dr':'cr'})">
- <label>日期</label><input id="fd" type="date" value="${F.date}">
- <label>詳情</label><input id="fn" placeholder="輸入詳情…" value="${esc(F.note)}">
- <button class="btn" style="width:100%;margin-top:14px;padding:13px" onclick="saveE()">儲存</button>`;
-}
-function keep(){F.amt=$('#fa').value;F.date=$('#fd').value;F.note=$('#fn').value}
-function setT(t){keep();F.type=t;if(!CATS[t].some(c=>c[1]===F.cat))F.cat=CATS[t][0][1];drawF()}
-function setC(c){keep();F.cat=c;drawF()}
-function saveE(){
- keep();const a=Math.round(parseFloat(F.amt)*100)/100;
- if(!(a>0))return alert('請輸入金額');if(!F.date)return alert('請揀日期');
- const r={type:F.type,cat:F.cat,date:F.date,note:F.note.trim(),amt:a};
- if(F.id)Object.assign(E.find(x=>x.id===F.id),r);else E.push({id:Date.now(),...r});
- ym=F.date.slice(0,7);save();closeF();render();
-}
 function delE(){if(!confirm('刪除呢筆帳目？'))return;E=E.filter(x=>x.id!==F.id);save();closeF();render()}
 function demo(){
  const m=ym,d=n=>m+'-'+pad(n);let i=1;
- [['credit','薪金','月薪',1,18000],['debit','住屋','租金',2,6500],['debit','餐飲','晚餐',5,120],['debit','交通','八達通增值',6,200],['debit','買餸','超市',8,350],['credit','投資','股息',12,420],['debit','娛樂','電影',14,160]]
+ [['credit','入數','月薪',1,18000],['debit','工人姐姐','工資',2,4500],['debit','星星','生活費',5,1200],['debit','其他','雜項',6,200],['credit','入數','股息',12,420],['debit','星星','學費',14,800]]
  .forEach(x=>E.push({id:Date.now()+i++,type:x[0],cat:x[1],note:x[2],date:d(x[3]),amt:x[4]}));
  save();render();
 }
