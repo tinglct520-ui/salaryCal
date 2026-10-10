@@ -13,6 +13,7 @@
 <!-- [CHANGE Z] Flaticon UIcons (regular rounded) for the bottom menu icons -->
    <link rel='stylesheet' href='https://flaticon.com'>
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-thin-rounded/css/uicons-thin-rounded.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1138,6 +1139,22 @@ body.no-fab .fab-add { display: none; }
 .nav-item:not(.active) i { color: #444444; }
 body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 .nav-item.active i { color: var(--primary-dark); }
+.settings-btn i,.subs-btn i{display:block;font-size:18px;line-height:1}
+/* ===== 超市格價 page ===== */
+body.price-open .month-salary-card,body.price-open .top-month{display:none}
+body.price-open .top-title{display:block}
+.pt-seg{display:flex;gap:8px;margin:0 0 10px}.pt-seg button{flex:1;padding:9px 0;border:0;border-radius:12px;background:var(--card-bg);color:var(--text-sub);font-weight:800;font-size:.9rem;cursor:pointer;font-family:inherit}.pt-seg button.on{background:var(--primary-dark);color:#fff}
+.pt-q{width:100%;padding:11px 14px;border-radius:14px;border:0;background:var(--card-bg);color:var(--text-main);font-size:16px;margin-bottom:12px;font-family:inherit;outline:none}
+.pt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pt-cc{background:var(--card-bg);border-radius:18px;padding:16px 4px;text-align:center;font-weight:800;font-size:.8rem;color:var(--primary-dark);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.05)}.pt-cc span{display:block;font-size:2.1rem;margin-bottom:4px}.pt-cc:active{transform:scale(.96)}
+.pt-back{display:flex;gap:8px;margin-bottom:10px}.pt-back button{border:0;border-radius:16px;padding:7px 12px;background:var(--card-bg);color:var(--text-main);font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit}.pt-back .on{background:var(--primary-dark);color:#fff}
+.pt-tag{background:var(--olive);color:#fff;border-radius:8px;font-size:.62rem;padding:1px 6px;margin-left:6px;font-weight:800;font-style:normal;display:inline-block}
+.pt-dot{display:inline-block;width:14px;height:14px;border-radius:50%}
+.pt-shops{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px}.pt-shops button{flex:none;border:0;border-radius:12px;padding:8px 11px;background:var(--primary-light);color:var(--text-main);font-size:.78rem;font-weight:800;cursor:pointer;font-family:inherit}.pt-shops button.on{background:var(--primary-dark);color:#fff}
+.pt-meta{display:flex;gap:8px;margin-bottom:8px}.pt-meta input{margin:0;flex:1;min-width:0;padding:9px;font-size:14px}
+.bt-sheet .bt-disp input#pt-n{background:transparent;border:0;border-radius:0;padding:6px 4px;outline:none;box-shadow:none}
+.pt-pad .ok{grid-row:2 / span 3}
+body.dark-mode .pt-seg button.on,body.dark-mode .pt-back .on,body.dark-mode .pt-shops button.on{color:#2B1D18}
 </style>
 </head>
 <body>
@@ -1145,10 +1162,10 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 <!-- [CHANGE S] month bar + 3-number card stay fixed at the top while scrolling -->
 <div id="top-sticky">
 <div class="top-header">
-<button class="settings-btn" id="settings-btn" onclick="settingsBtn()" aria-label="設定">⚙️</button>
+<button class="settings-btn" id="settings-btn" onclick="settingsBtn()" aria-label="設定"><i class="fi fi-rr-settings-sliders"></i></button>
 <button class="top-month" id="top-month" onclick="openMonthPicker()"></button>
 <!-- [CHANGE C] subscription button (top-right, only shown on budget page) -->
-<button class="subs-btn" id="subs-btn" onclick="btOpenSubs()" aria-label="訂閱管理" style="display:none">🔁</button>
+<button class="subs-btn" id="subs-btn" onclick="btOpenSubs()" aria-label="訂閱管理" style="display:none"><i class="fi fi-tr-subscription-plan"></i></button>
 <div class="top-title" id="top-title">設定</div>
 </div>
 
@@ -1159,6 +1176,13 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 <div class="salary-divider"></div>
 <div class="salary-box"><span>本月現有身家</span><strong id="month-balance">$ 0</strong></div>
 </div>
+</div>
+
+<!-- 分析 / 儲蓄 / 糧單 sub navigation -->
+<div id="sub-nav" class="pt-seg" style="display:none">
+<button data-v="analysis-view" onclick="switchNav('analysis-view')">支出分析</button>
+<button data-v="overall-view" onclick="switchNav('overall-view')">儲蓄</button>
+<button data-v="analytics-view" onclick="switchNav('analytics-view')">糧單</button>
 </div>
 
 <!-- SETTINGS VIEW -->
@@ -1247,9 +1271,16 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 </div>
 </div>
 <div class="card cd-pad">
-<div class="analytics-section-title" style="margin:0 0 10px"><span>🏢 追糧報表</span><button type="button" onclick="openCutoffSheet()" style="border:1px solid var(--border-color);background:transparent;color:var(--text-sub);border-radius:8px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;">設定截數日</button></div>
+<div class="analytics-section-title" style="margin:0 0 10px"><span>🏢 追糧報表</span><button type="button" onclick="openCutoffSheet()" style="margin:-4px 0;line-height:1.2;border:1px solid var(--border-color);background:transparent;color:var(--text-sub);border-radius:8px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;">設定截數日</button></div>
 <div id="company-breakdown-container"></div>
 </div>
+</div>
+
+<!-- VIEW: 超市格價 -->
+<div id="price-view" style="display:none;">
+<div class="pt-seg" id="pt-seg"><button data-m="home" onclick="ptMode('home')">💰 比價</button><button data-m="log" onclick="ptMode('log')">🧾 紀錄</button><button data-m="shops" onclick="ptMode('shops')">🏪 超市</button></div>
+<input class="pt-q" id="pt-q" placeholder="🔍 搜尋產品…" oninput="ptQ=this.value;renderPrice()">
+<div id="pt-body"></div>
 </div>
 </div>
 
@@ -1263,17 +1294,25 @@ body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 <i class="fi fi-rr-shopping-cart-add"></i>
 <span>支出</span>
 </button>
-<button class="nav-item" id="nav-analysis" onclick="switchNav('analysis-view')">
+<button class="nav-item" id="nav-analysis" style="display:none" onclick="switchNav('analysis-view')">
 <i class="fi fi-rr-chart-histogram"></i>
 <span>支出分析</span>
 </button>
-<button class="nav-item" id="nav-overall" onclick="switchNav('overall-view')">
+<button class="nav-item" id="nav-overall" style="display:none" onclick="switchNav('overall-view')">
 <i class="fi fi-rr-piggy-bank"></i>
 <span>儲蓄</span>
 </button>
-<button class="nav-item" id="nav-analytics" onclick="switchNav('analytics-view')">
+<button class="nav-item" id="nav-analytics" style="display:none" onclick="switchNav('analytics-view')">
 <i class="fi fi-rr-document"></i>
 <span>糧單</span>
+</button>
+<button class="nav-item" id="nav-stats" onclick="switchNav(lastStat)">
+<i class="fi fi-rr-chart-histogram"></i>
+<span>分析</span>
+</button>
+<button class="nav-item" id="nav-price" onclick="switchNav('price-view')">
+<i class="fi fi-rr-tags"></i>
+<span>格價</span>
 </button>
 <!-- [CHANGE O] 備份 tab removed from bottom nav (moved into Settings page) -->
 </nav>
@@ -1384,6 +1423,10 @@ let syncKey = localStorage.getItem('user_sync_key') || '';
 let shifts = JSON.parse(localStorage.getItem('partTimeShifts')) || [];
 let companyPaydays = JSON.parse(localStorage.getItem('companyPaydays')) || {};
 let B = JSON.parse(localStorage.getItem('budgetData') || 'null') || { exp: [], subs: [], budget: 0 };
+// 超市格價資料（跟支出一樣，用 user_shifts 表嘅 type 欄位區分：'pshop' 超市 / 'price' 價錢）
+const PT_CATS = [['🍗','雞肉'],['🥛','鈣思寶'],['🍲','豆腐'],['🏠','屋企用品'],['☀️','防曬'],['🚿','沖涼用品'],['🧴','skin care'],['💄','makeup'],['📦','others']];
+const ptDefShops = () => [['百佳','#e5393f'],['惠康','#f28c00'],['AEON','#c2185b'],['大昌食品','#1e88e5'],['759阿信屋','#43a047']].map((x, i) => ({ id: 's' + i, name: x[0], color: x[1] }));
+let P = JSON.parse(localStorage.getItem('priceData') || 'null') || { shops: ptDefShops(), recs: [] };
 let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth();
@@ -1484,7 +1527,7 @@ async function loadShiftsFromCloud() {
         if (!useCloud) { cloudBusy = false; await saveData(); return; }
         markDirty(false);
       }
-      parseBudgetRows(data);
+      parseBudgetRows(data); parsePriceRows(data);
       shifts = data.filter(item => !BT_TYPES.includes(item.type)).map(item => ({
         id: item.shift_id ? (isNaN(item.shift_id) ? item.shift_id : Number(item.shift_id)) : Date.now(),
         type: item.type || 'completed',
@@ -1533,6 +1576,7 @@ function saveDataToLocalOnly() {
   localStorage.setItem('partTimeShifts', JSON.stringify(shifts));
   localStorage.setItem('companyPaydays', JSON.stringify(companyPaydays));
   localStorage.setItem('budgetData', JSON.stringify(B));
+  localStorage.setItem('priceData', JSON.stringify(P));
 }
 
 async function saveData() {
@@ -1595,7 +1639,7 @@ async function saveData() {
 
 
 // ==================== Budget Tracker ====================
-const BT_TYPES = ['expense', 'sub', 'budget'];
+const BT_TYPES = ['expense', 'sub', 'budget', 'price', 'pshop'];
 const BT_CATS = [['🍜','食飯'],['🚇','八達通'],['🛒','買餸'],['🧴','日用品'],['💄','扮靚靚'],['🎮','娛樂'],['🩺','睇醫生'],['✈️','旅行'],['🏠','家用'],['🐷','盧媽儲錢']]; // [CHANGE I] reordered; 交通 renamed 八達通
 // [CHANGE H] BT_CATS: ['🔁','訂閱'] -> ['🛒','買餸'] (above). 訂閱 moved into BT_LEGACY so old records + 訂閱管理 entries keep their 🔁 icon
 const BT_LEGACY = [['🔁','訂閱'],['🚇','交通'],['👕','衫衫'],['🍜','餐飲'],['🛒','購物'],['🏠','住屋'],['💊','醫療'],['📦','其他']];
@@ -1630,7 +1674,7 @@ function budgetRows() {
   B.exp.forEach(e => r.push({ ...base, shift_id: String(e.id), type: 'expense', date: e.date, company: e.cat, event_name: e.note || '', rate: e.amt }));
   B.subs.forEach(s => r.push({ ...base, shift_id: String(s.id), type: 'sub', date: s.start + '-01', company: s.cat || '訂閱', event_name: s.name, rate: s.amt, deduct_mins: s.day, duration: s.end ? Number(s.end.replace('-', '')) : 0 }));
   if (B.budget) r.push({ ...base, shift_id: 'budget', type: 'budget', date: '2000-01-01', rate: B.budget });
-  return r;
+  return r.concat(priceRows());
 }
 function parseBudgetRows(data) {
   const nb = { exp: [], subs: [], budget: 0 };
@@ -1647,6 +1691,7 @@ function parseBudgetRows(data) {
 }
 
 function onAddBtn() {
+  if (currentView === 'price-view') { ptOpen(); return; }
   if (currentView === 'list-view') btOpenExp();
   else if (currentView === 'analytics-view' || currentView === 'analysis-view' || currentView === 'overall-view') btSheet('<h3>新增</h3><button class="bt-pri" style="margin-bottom:10px" onclick="btClose();btOpenExp()">💸 新增支出</button><button class="bt-pri" onclick="btClose();openModal()">💼 新增排班 / 打工紀錄</button>');
   else openModal();
@@ -1941,16 +1986,172 @@ function anDay(ds) {
   btSheet(h);
 }
 
+// ==================== 超市格價 ====================
+// PT-BEGIN
+let lastStat = 'analysis-view';
+let ptM = 'home', ptCat = 0, ptShopSel = null, ptQ = '', ptEditId = null, ptCatSel = 'others', ptShopPick = '';
+const ptShop = id => P.shops.find(s => s.id === id) || { name: '(已刪除)', color: '#999' };
+const ptLatest = a => { const m = {}; a.forEach(r => { if (!m[r.shop] || r.date >= m[r.shop].date) m[r.shop] = r; }); return Object.values(m); };
+const ptCatOf = a => { let m = a[0]; a.forEach(r => { if (r.date >= m.date) m = r; }); return m.cat || 'others'; };
+const ptMin = a => Math.min(...ptLatest(a).map(r => r.price));
+const ptIco = c => (PT_CATS.find(x => x[1] === c) || ['📦'])[0];
+const ptCI = c => { const i = PT_CATS.findIndex(x => x[1] === c); return i < 0 ? 99 : i; };
+function ptGroup() { const g = {}; P.recs.forEach(r => (g[r.product] = g[r.product] || []).push(r)); return g; }
+
+function priceRows() {
+  const base = { sync_key: syncKey, allowance: 0, start_time: '', end_time: '', deduct_mins: 0, duration: 1, rate: 0, event_name: '', company: '' };
+  const r = [];
+  P.shops.forEach(s => r.push({ ...base, shift_id: String(s.id), type: 'pshop', date: '2000-01-01', company: s.name, event_name: s.color }));
+  P.recs.forEach(x => r.push({ ...base, shift_id: String(x.id), type: 'price', date: x.date, company: x.product, rate: x.price,
+    event_name: JSON.stringify({ c: x.cat, s: x.shop, q: x.qty || '', n: x.note || '' }) }));
+  return r;
+}
+function parsePriceRows(data) {
+  const np = { shops: [], recs: [] };
+  data.forEach(i => {
+    if (i.type === 'pshop') np.shops.push({ id: String(i.shift_id), name: i.company, color: i.event_name || '#5E94D4' });
+    else if (i.type === 'price') {
+      let m = {}; try { m = JSON.parse(i.event_name || '{}'); } catch (e) {}
+      np.recs.push({ id: String(i.shift_id), date: String(i.date).slice(0, 10), product: i.company, cat: m.c || 'others', shop: m.s || '', qty: m.q || '', note: m.n || '', price: Number(i.rate) || 0 });
+    }
+  });
+  if (np.shops.length || np.recs.length || !P.recs.length) { if (!np.shops.length) np.shops = ptDefShops(); P = np; }
+}
+
+function ptMode(m) { ptM = m; ptCat = 0; ptShopSel = null; renderPrice(); }
+function ptSetCat(i) { ptCat = i; renderPrice(); window.scrollTo(0, 0); }
+function ptShopOpen(id) { ptShopSel = id; renderPrice(); window.scrollTo(0, 0); }
+
+function ptCmpRow(r, best) {
+  const s = ptShop(r.shop), sub = [r.qty, r.note, r.date].filter(Boolean).map(btEsc).join(' · ');
+  return `<div class="bt-it" style="cursor:pointer" onclick="ptOpen('${r.id}')"><div class="bt-ic"><i class="pt-dot" style="background:${s.color}"></i></div><div class="bt-m"><b>${btEsc(s.name)}${best ? '<i class="pt-tag">最平</i>' : ''}</b><span>${sub}</span></div><b style="color:${best ? 'var(--olive)' : 'var(--text-main)'}">$${formatMoney(r.price)}</b></div>`;
+}
+function ptLogRow(r) {
+  const s = ptShop(r.shop), sub = [s.name, r.qty, r.note].filter(Boolean).map(btEsc).join(' · ');
+  return `<div class="bt-it" style="cursor:pointer" onclick="ptOpen('${r.id}')"><div class="bt-ic">${ptIco(r.cat)}</div><div class="bt-m"><b>${btEsc(r.product)}</b><span>${sub}</span></div><b style="color:var(--danger)">$${formatMoney(r.price)}</b></div>`;
+}
+
+function renderPrice() {
+  document.querySelectorAll('#pt-seg button').forEach(b => b.classList.toggle('on', b.dataset.m === ptM));
+  document.getElementById('pt-q').style.display = (ptM === 'shops') ? 'none' : '';
+  const q = ptQ.trim().toLowerCase(), g = ptGroup(), wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const names = Object.keys(g).filter(p => p.toLowerCase().includes(q));
+  let h = '';
+  if (ptM === 'home') {
+    if (!ptCat && !q) {
+      h = `<div class="pt-grid">${PT_CATS.map((c, i) => `<div class="pt-cc" onclick="ptSetCat(${i + 1})"><span>${c[0]}</span>${c[1]}</div>`).join('')}</div>`;
+    } else {
+      if (ptCat) h += `<div class="pt-back"><button onclick="ptSetCat(0)">‹ 返回</button><button class="on">${PT_CATS[ptCat - 1][0]} ${PT_CATS[ptCat - 1][1]}</button></div>`;
+      const list = names.filter(p => !ptCat || ptCatOf(g[p]) === PT_CATS[ptCat - 1][1])
+        .sort((a, b) => ptCI(ptCatOf(g[a])) - ptCI(ptCatOf(g[b])) || ptMin(g[a]) - ptMin(g[b]));
+      let last = '';
+      list.forEach(p => {
+        const l = ptLatest(g[p]).sort((a, b) => a.price - b.price), min = l[0].price, c = ptCatOf(g[p]);
+        if (!ptCat && c !== last) { h += `<div class="bt-day"><span>${ptIco(c)} ${btEsc(c)}</span></div>`; last = c; }
+        h += `<div class="card cd-pad"><div class="analytics-section-title" style="margin:0 0 6px"><span>${btEsc(p)}</span><small>${l.length} 間超市</small></div>${l.map(r => ptCmpRow(r, r.price === min && l.length > 1)).join('')}</div>`;
+      });
+      if (!list.length) h += '<div class="card cd-pad"><div class="empty-msg">仲未有紀錄<br>㩒右下角 + 新增</div></div>';
+    }
+  } else if (ptM === 'log') {
+    const d = {};
+    P.recs.filter(r => r.product.toLowerCase().includes(q)).sort((a, b) => b.date.localeCompare(a.date)).forEach(r => (d[r.date] = d[r.date] || []).push(r));
+    Object.keys(d).forEach(k => {
+      const tot = d[k].reduce((a, r) => a + r.price, 0);
+      h += `<div class="card cd-pad"><div class="bt-day" style="padding:0 0 6px"><span>${wd[new Date(k + 'T00:00:00').getDay()]} ${+k.slice(5, 7)}月${+k.slice(8)}日</span><span>$${formatMoney(tot)}</span></div>${d[k].map(ptLogRow).join('')}</div>`;
+    });
+    if (!h) h = '<div class="card cd-pad"><div class="empty-msg">冇紀錄<br>㩒右下角 + 新增</div></div>';
+  } else if (ptShopSel) {
+    const s = ptShop(ptShopSel);
+    h = `<div class="pt-back"><button onclick="ptShopOpen(null)">‹ 返回</button><button class="on">${btEsc(s.name)} 最平</button></div>`;
+    const items = [];
+    Object.keys(g).forEach(p => {
+      const l = ptLatest(g[p]); if (l.length < 2) return;
+      const x = l.find(r => r.shop === ptShopSel);
+      if (x && x.price === ptMin(g[p])) items.push({ x, c: ptCatOf(g[p]) });
+    });
+    items.sort((a, b) => ptCI(a.c) - ptCI(b.c) || a.x.price - b.x.price);
+    let last = '';
+    items.forEach(i => {
+      if (i.c !== last) { h += `<div class="bt-day"><span>${ptIco(i.c)} ${btEsc(i.c)}</span></div>`; last = i.c; }
+      h += `<div class="card cd-pad">${ptLogRow(i.x)}</div>`;
+    });
+    if (!items.length) h += '<div class="card cd-pad"><div class="empty-msg">呢間超市暫時冇最平嘅產品<br>（同一產品要有 2 間或以上超市價錢先比較到）</div></div>';
+  } else {
+    h = `<div class="card cd-pad">${P.shops.map(s => `<div class="bt-it" style="cursor:pointer" onclick="ptShopOpen('${s.id}')"><div class="bt-ic"><i class="pt-dot" style="background:${s.color}"></i></div><div class="bt-m"><b>${btEsc(s.name)}</b><span>${P.recs.filter(r => r.shop === s.id).length} 筆紀錄 · 撳入去睇最平嘅產品</span></div><button class="bt-btn" onclick="event.stopPropagation();ptDelShop('${s.id}')">🗑</button></div>`).join('')}</div><button class="bt-pri" onclick="ptAddShop()">＋ 新增超市</button>`;
+  }
+  document.getElementById('pt-body').innerHTML = h;
+}
+
+function ptAddShop(inSheet) {
+  const n = (prompt('新超市名稱：') || '').trim(); if (!n) return;
+  const cols = ['#e5393f','#f28c00','#c2185b','#1e88e5','#43a047','#8e24aa','#00897b','#6d4c41'];
+  const s = { id: btUid(), name: n, color: cols[P.shops.length % cols.length] };
+  P.shops.push(s); saveData();
+  if (inSheet) { ptShopPick = s.id; ptRefreshShops(); } else renderPrice();
+}
+function ptDelShop(id) {
+  const n = P.recs.filter(r => r.shop === id).length;
+  if (!confirm('刪除呢間超市' + (n ? '（連同 ' + n + ' 筆價錢紀錄）' : '') + '？')) return;
+  P.shops = P.shops.filter(s => s.id !== id); P.recs = P.recs.filter(r => r.shop !== id);
+  saveData(); renderPrice();
+}
+function ptShopsHtml() {
+  return P.shops.map(s => `<button type="button" class="${s.id === ptShopPick ? 'on' : ''}" onclick="ptPickShop('${s.id}')">${btEsc(s.name)}</button>`).join('')
+    + '<button type="button" style="border:1px dashed var(--primary-dark);background:none;color:var(--primary-dark)" onclick="ptAddShop(true)">＋ 新增超市</button>';
+}
+function ptRefreshShops() { const e = document.getElementById('pt-sh'); if (e) e.innerHTML = ptShopsHtml(); }
+function ptPickShop(id) { ptShopPick = id; ptRefreshShops(); }
+function ptPickCat(c) { ptCatSel = c; document.querySelectorAll('#pt-g .bt-gc').forEach(b => b.classList.toggle('on', b.dataset.c === c)); }
+function ptAutoCat() {
+  const n = document.getElementById('pt-n').value.trim(), a = P.recs.filter(r => r.product === n);
+  if (a.length) ptPickCat(ptCatOf(a));
+}
+function ptOpen(editId) {
+  const ed = editId ? P.recs.find(r => String(r.id) === String(editId)) : null;
+  ptEditId = ed ? ed.id : null;
+  ptCatSel = ed ? ed.cat : (ptCat ? PT_CATS[ptCat - 1][1] : 'others');
+  ptShopPick = ed ? ed.shop : (P.shops[0] || {}).id;
+  btAmt = ed ? String(ed.price) : '';
+  const d = ed ? ed.date : getLocalDateStr();
+  const pad = ['7','8','9','del','4','5','6','1','2','3','.','0','00'].map(k => `<button class="${k === 'del' ? 'op' : ''}" onclick="btKey('${k}')">${k === 'del' ? '⌫' : k}</button>`).join('') + '<button class="ok" onclick="ptSave()">儲存</button>';
+  const names = [...new Set(P.recs.map(r => r.product))].map(n => `<option value="${btEsc(n)}">`).join('');
+  btSheet(`<div class="modal-header"><div class="bt-hl">${ed ? '<button type="button" class="bt-del" onclick="ptDel()">🗑 刪除</button>' : ''}<h2>${ed ? '編輯價錢✏️' : '記低價錢🏷️'}</h2></div><button class="close-btn" onclick="btClose()">✕</button></div>`
+    + `<div class="bt-g" id="pt-g">${PT_CATS.map(c => `<button type="button" class="bt-gc${c[1] === ptCatSel ? ' on' : ''}" data-c="${c[1]}" onclick="ptPickCat(this.dataset.c)"><span>${c[0]}</span>${c[1]}</button>`).join('')}</div>`
+    + `<div class="pt-shops" id="pt-sh">${ptShopsHtml()}</div>`
+    + `<div class="pt-meta"><input id="pt-qty" placeholder="規格 (1L / 500g)" value="${ed ? btEsc(ed.qty || '') : ''}"><input id="pt-note" placeholder="備註 / 優惠" value="${ed ? btEsc(ed.note || '') : ''}"></div>`
+    + `<div class="bt-disp"><button type="button" class="bt-chip" onclick="btToggleDP()">📅 <span id="bt-dtl">${btShortDate(d)}</span></button><input id="bt-d" type="hidden" value="${d}"><input id="pt-n" list="pt-dl" placeholder="輸入產品名稱…" value="${ed ? btEsc(ed.product) : ''}" onchange="ptAutoCat()"><datalist id="pt-dl">${names}</datalist><div class="v"><b id="bt-dv">$0</b><small id="bt-ds"></small></div></div>`
+    + `${btDPHtml()}<div class="bt-pad4 pt-pad" id="bt-pad">${pad}</div>`);
+  btRefreshAmt();
+}
+function ptSave() {
+  const name = document.getElementById('pt-n').value.trim(), a = btTotal(), d = document.getElementById('bt-d').value;
+  if (!name) return alert('請輸入產品名稱');
+  if (!(a > 0)) return alert('請輸入價錢');
+  if (!ptShopPick) return alert('請揀超市');
+  const rec = { date: d, product: name, cat: ptCatSel, shop: ptShopPick, qty: document.getElementById('pt-qty').value.trim(), note: document.getElementById('pt-note').value.trim(), price: Math.round(a * 10) / 10 };
+  const ex = ptEditId ? P.recs.find(r => String(r.id) === String(ptEditId)) : null;
+  if (ex) Object.assign(ex, rec); else P.recs.push({ id: btUid(), ...rec });
+  ptEditId = null; saveData(); btClose(); renderPrice();
+}
+function ptDel() {
+  if (!confirm('刪除呢筆價錢紀錄？')) return;
+  P.recs = P.recs.filter(r => String(r.id) !== String(ptEditId)); ptEditId = null; saveData(); btClose(); renderPrice();
+}
+// PT-END
+
 // ==================== Settings & Month picker ====================
 let prevView = 'calendar-view', mpY = 2026;
 function settingsBtn() { if (currentView === 'settings-view') closeSettings(); else openSettings(); }
 function openSettings() {
   if (currentView !== 'settings-view') prevView = currentView;
-  ['calendar-view','list-view','analytics-view','analysis-view','overall-view'].forEach(v => document.getElementById(v).style.display = 'none');
-  ['nav-calendar','nav-list','nav-analysis','nav-analytics','nav-overall'].forEach(n => document.getElementById(n).classList.remove('active'));
+  ['calendar-view','list-view','analytics-view','analysis-view','overall-view','price-view'].forEach(v => document.getElementById(v).style.display = 'none');
+  ['nav-calendar','nav-list','nav-analysis','nav-analytics','nav-overall','nav-price','nav-stats'].forEach(n => document.getElementById(n).classList.remove('active'));
   document.getElementById('settings-view').style.display = 'block';
   document.getElementById('subs-btn').style.display = 'none'; // [CHANGE C]
   document.body.classList.add('settings-open');
+  document.body.classList.remove('price-open');
+  document.getElementById('top-title').textContent = '設定';
+  document.getElementById('sub-nav').style.display = 'none';
   document.getElementById('settings-btn').textContent = '‹';
   currentView = 'settings-view';
   renderSettings();
@@ -2078,8 +2279,12 @@ document.getElementById('analytics-view').style.display = 'none';
 document.getElementById('analysis-view').style.display = 'none';
 document.getElementById('overall-view').style.display = 'none';
 document.getElementById('settings-view').style.display = 'none';
+document.getElementById('price-view').style.display = 'none';
+document.getElementById('nav-price').classList.remove('active');
+document.body.classList.remove('price-open');
+document.getElementById('top-title').textContent = '設定';
 document.body.classList.remove('settings-open');
-document.getElementById('settings-btn').textContent = '⚙️';
+document.getElementById('settings-btn').innerHTML = '<i class="fi fi-rr-settings-sliders"></i>';
 // [CHANGE C] show subs button only on budget page
 document.getElementById('subs-btn').style.display = (viewId === 'list-view') ? 'flex' : 'none';
 document.getElementById('nav-analysis').classList.remove('active');
@@ -2087,6 +2292,11 @@ document.getElementById('nav-calendar').classList.remove('active');
 document.getElementById('nav-list').classList.remove('active');
 document.getElementById('nav-analytics').classList.remove('active');
 document.getElementById('nav-overall').classList.remove('active');
+document.getElementById('nav-stats').classList.remove('active');
+const _grp = ['analysis-view', 'overall-view', 'analytics-view'].includes(viewId);
+if (_grp) { lastStat = viewId; document.getElementById('nav-stats').classList.add('active'); }
+document.getElementById('sub-nav').style.display = _grp ? 'flex' : 'none';
+document.querySelectorAll('#sub-nav button').forEach(b => b.classList.toggle('on', b.dataset.v === viewId));
 document.getElementById(viewId).style.display = 'block';
 if (viewId === 'calendar-view') {
 document.getElementById('nav-calendar').classList.add('active');
@@ -2103,6 +2313,11 @@ renderOverall();
 } else if (viewId === 'analytics-view') {
 document.getElementById('nav-analytics').classList.add('active');
 renderAnalytics();
+} else if (viewId === 'price-view') {
+document.getElementById('nav-price').classList.add('active');
+document.body.classList.add('price-open');
+document.getElementById('top-title').textContent = '格價🏷️';
+renderPrice();
 }
 }
 
@@ -2367,6 +2582,7 @@ else if (currentView === 'settings-view') { renderSettings(); }
 else if (currentView === 'analysis-view') { renderAnalysis(); }
 else if (currentView === 'overall-view') { renderOverall(); }
 else if (currentView === 'analytics-view') { renderAnalytics(); }
+else if (currentView === 'price-view') { renderPrice(); }
 else { renderCalendar(); }
 if (currentView !== 'calendar-view') { updateMonthSalaryCard(); }
 }
@@ -2399,8 +2615,8 @@ alert('匯出失敗');
 }
 
 function exportJSON() {
-if (shifts.length === 0 && !B.exp.length && !B.subs.length) { alert('沒有紀錄可匯出'); return; }
-const content = JSON.stringify({ version: 2, shifts, budget: B, companyPaydays }, null, 2);
+if (shifts.length === 0 && !B.exp.length && !B.subs.length && !P.recs.length) { alert('沒有紀錄可匯出'); return; }
+const content = JSON.stringify({ version: 2, shifts, budget: B, companyPaydays, price: P }, null, 2);
 shareOrDownloadFile(`part_time_backup_${getLocalDateStr()}.json`, 'application/json', content);
 }
 
@@ -2415,7 +2631,7 @@ try {
 const importedData = JSON.parse(e.target.result);
 if (Array.isArray(importedData) || (importedData && Array.isArray(importedData.shifts))) {
 if (Array.isArray(importedData)) shifts = importedData;
-else { shifts = importedData.shifts; if (importedData.budget) B = importedData.budget; if (importedData.companyPaydays) companyPaydays = importedData.companyPaydays; }
+else { shifts = importedData.shifts; if (importedData.budget) B = importedData.budget; if (importedData.companyPaydays) companyPaydays = importedData.companyPaydays; if (importedData.price && importedData.price.recs) P = importedData.price; }
 autoUpdatePastPlannedShifts();
 saveData();
 renderCurrentView();
