@@ -1286,33 +1286,26 @@ body.dark-mode .pt-seg button.on,body.dark-mode .pt-back .on,body.dark-mode .pt-
 
 <!-- FIXED BOTTOM MENU BAR -->
 <nav class="fixed-bottom-nav">
-<button class="nav-item active" id="nav-calendar" onclick="switchNav('calendar-view')">
+<button aria-label="更表" class="nav-item active" id="nav-calendar" onclick="switchNav('calendar-view')">
 <i class="fi fi-rr-briefcase"></i>
-<span>更表</span>
 </button>
-<button class="nav-item" id="nav-list" onclick="switchNav('list-view')">
+<button aria-label="支出" class="nav-item" id="nav-list" onclick="switchNav('list-view')">
 <i class="fi fi-rr-shopping-cart-add"></i>
-<span>支出</span>
 </button>
-<button class="nav-item" id="nav-analysis" style="display:none" onclick="switchNav('analysis-view')">
+<button aria-label="支出分析" class="nav-item" id="nav-analysis" style="display:none" onclick="switchNav('analysis-view')">
 <i class="fi fi-rr-chart-histogram"></i>
-<span>支出分析</span>
 </button>
-<button class="nav-item" id="nav-overall" style="display:none" onclick="switchNav('overall-view')">
+<button aria-label="儲蓄" class="nav-item" id="nav-overall" style="display:none" onclick="switchNav('overall-view')">
 <i class="fi fi-rr-piggy-bank"></i>
-<span>儲蓄</span>
 </button>
-<button class="nav-item" id="nav-analytics" style="display:none" onclick="switchNav('analytics-view')">
+<button aria-label="糧單" class="nav-item" id="nav-analytics" style="display:none" onclick="switchNav('analytics-view')">
 <i class="fi fi-rr-document"></i>
-<span>糧單</span>
 </button>
-<button class="nav-item" id="nav-stats" onclick="switchNav(lastStat)">
+<button aria-label="分析" class="nav-item" id="nav-stats" onclick="switchNav(lastStat)">
 <i class="fi fi-rr-chart-histogram"></i>
-<span>分析</span>
 </button>
-<button class="nav-item" id="nav-price" onclick="switchNav('price-view')">
+<button aria-label="格價" class="nav-item" id="nav-price" onclick="switchNav('price-view')">
 <i class="fi fi-rr-tags"></i>
-<span>格價</span>
 </button>
 <!-- [CHANGE O] 備份 tab removed from bottom nav (moved into Settings page) -->
 </nav>
