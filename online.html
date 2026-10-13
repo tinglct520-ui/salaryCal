@@ -353,7 +353,7 @@ outline: 2px dashed var(--primary);
 outline-offset: -3px;
 background: var(--primary-light) !important;
 }
-#calendar-view, #list-view, #analytics-view, #analysis-view, #overall-view {
+#calendar-view, #list-view, #analytics-view, #analysis-view, #overall-view, #price-view {
 margin-bottom: calc(var(--nav-height) + var(--safe-bottom) + 42px);
 }
 .list-filter-bar {
@@ -1278,7 +1278,7 @@ body.dark-mode .pt-seg button.on,body.dark-mode .pt-back .on,body.dark-mode .pt-
 
 <!-- VIEW: 超市格價 -->
 <div id="price-view" style="display:none;">
-<div class="pt-seg" id="pt-seg"><button data-m="home" onclick="ptMode('home')">💰 比價</button><button data-m="log" onclick="ptMode('log')">🧾 紀錄</button><button data-m="shops" onclick="ptMode('shops')">🏪 超市</button></div>
+<div class="pt-seg" id="pt-seg"><button data-m="home" onclick="ptMode('home')">💰 比價</button><button data-m="shops" onclick="ptMode('shops')">🏪 超市</button><button data-m="log" onclick="ptMode('log')">🧾 紀錄</button></div>
 <input class="pt-q" id="pt-q" placeholder="🔍 搜尋產品…" oninput="ptQ=this.value;renderPrice()">
 <div id="pt-body"></div>
 </div>
@@ -2017,7 +2017,7 @@ function ptShopOpen(id) { ptShopSel = id; renderPrice(); window.scrollTo(0, 0); 
 
 function ptCmpRow(r, best) {
   const s = ptShop(r.shop), sub = [r.qty, r.note, r.date].filter(Boolean).map(btEsc).join(' · ');
-  return `<div class="bt-it" style="cursor:pointer" onclick="ptOpen('${r.id}')"><div class="bt-ic"><i class="pt-dot" style="background:${s.color}"></i></div><div class="bt-m"><b>${btEsc(s.name)}${best ? '<i class="pt-tag">最平</i>' : ''}</b><span>${sub}</span></div><b style="color:${best ? 'var(--olive)' : 'var(--text-main)'}">$${formatMoney(r.price)}</b></div>`;
+  return `<div class="bt-it" style="cursor:pointer" onclick="ptOpen('${r.id}')"><div class="bt-m"><b>${btEsc(s.name)}${best ? '<i class="pt-tag">最平</i>' : ''}</b><span>${sub}</span></div><b style="color:${best ? 'var(--olive)' : 'var(--text-main)'}">$${formatMoney(r.price)}</b></div>`;
 }
 function ptLogRow(r) {
   const s = ptShop(r.shop), sub = [s.name, r.qty, r.note].filter(Boolean).map(btEsc).join(' · ');
@@ -2070,7 +2070,7 @@ function renderPrice() {
     });
     if (!items.length) h += '<div class="card cd-pad"><div class="empty-msg">呢間超市暫時冇最平嘅產品<br>（同一產品要有 2 間或以上超市價錢先比較到）</div></div>';
   } else {
-    h = `<div class="card cd-pad">${P.shops.map(s => `<div class="bt-it" style="cursor:pointer" onclick="ptShopOpen('${s.id}')"><div class="bt-ic"><i class="pt-dot" style="background:${s.color}"></i></div><div class="bt-m"><b>${btEsc(s.name)}</b><span>${P.recs.filter(r => r.shop === s.id).length} 筆紀錄 · 撳入去睇最平嘅產品</span></div><button class="bt-btn" onclick="event.stopPropagation();ptDelShop('${s.id}')">🗑</button></div>`).join('')}</div><button class="bt-pri" onclick="ptAddShop()">＋ 新增超市</button>`;
+    h = `<div class="card cd-pad">${P.shops.map(s => `<div class="bt-it" style="cursor:pointer" onclick="ptShopOpen('${s.id}')"><div class="bt-m"><b>${btEsc(s.name)}</b><span>${P.recs.filter(r => r.shop === s.id).length} 筆紀錄 · 撳入去睇最平嘅產品</span></div><button class="bt-btn" onclick="event.stopPropagation();ptDelShop('${s.id}')">🗑</button></div>`).join('')}</div><button class="bt-pri" onclick="ptAddShop()">＋ 新增超市</button>`;
   }
   document.getElementById('pt-body').innerHTML = h;
 }
