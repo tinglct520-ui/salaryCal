@@ -242,9 +242,9 @@ grid-template-columns: repeat(7, 1fr);
 grid-auto-rows: minmax(88px, auto);
 }
 .day-cell {
-min-height: 100px;
-max-height: 140px;
-padding: 5px 0 3px;
+min-height: 88px;
+max-height: 132px;
+padding: 3px 0;
 display: flex;
 flex-direction: column;
 align-items: center;
@@ -274,8 +274,9 @@ flex-shrink: 0;
 .day-cell.today {
 background-color: var(--card-border);
 }
-.shift-dot-item.planned { outline: 1.5px dashed var(--chip-b, var(--primary)); outline-offset: -1.5px; }
-.day-cell.today .day-number { background: var(--primary-dark); color: #fff !important; border-radius: 12px; min-width: 24px; padding: 0 7px; }
+.shift-dot-item.planned { opacity: 0.8; }
+.day-cell.today .day-number { position: relative; z-index: 0; color: #fff !important; }
+.day-cell.today .day-number::before { content: ''; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; transform: translate(-50%, -50%); border-radius: 50%; background: var(--primary-dark); z-index: -1; }
 body.dark-mode .day-cell.today .day-number { color: #1F2619 !important; }
 .day-cell.is-holiday .day-number,
 .day-cell.is-holiday.today .day-number {
@@ -310,10 +311,10 @@ user-select: none !important;
 -webkit-touch-callout: none !important;
 touch-action: none !important;
 background-color: var(--primary-light);
-padding: 4px 0;
-width: calc(100% - 10px);
-margin: 3px 5px 0;
-border-radius: 8px;
+padding: 0;
+width: 100%;
+margin: 0;
+border-radius: 0;
 text-align: center;
 cursor: pointer;
 transition: background-color 0.2s;
@@ -1474,7 +1475,7 @@ const companyColorPalette = [
 ];
 const companyBrand = {
   'stylevana': { bg: '#bc4962', chipBg: '#bc4962', text: '#ffffff', border: '#bc4962', dot: '#bc4962', tint: '#F3DADF', active: '#8E3249', ob: '#ffffff' },
-  'ul': { bg: '#4badd6', chipBg: 'linear-gradient(135deg, #4badd6, #00cc8f)', text: '#06303a', border: '#00cc8f', dot: '#00cc8f', tint: '#D5EEF7', active: '#06303a', ob: '#ffffff' }
+  'ul': { bg: '#4badd6', chipBg: '#4badd6', text: '#ffffff', border: '#4badd6', dot: '#4badd6', tint: '#D5EEF7', active: '#2F8DB5', ob: '#4badd6' }
 };
 function companyColor(name) {
   const all = [...new Set(shifts.map(s => s.company))];
