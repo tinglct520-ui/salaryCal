@@ -14,6 +14,7 @@
    <link rel='stylesheet' href='https://flaticon.com'>
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-thin-rounded/css/uicons-thin-rounded.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -28,6 +29,7 @@
 --primary-dark: #4A6B2A; /* deep matcha for text / emphasis */
 --primary-hover: #4A6B2A;
 --primary-light: #DDE8C8;
+--card-border: #E8EFD8; /* lighter border for cards + today cell */
 --text-main: #3C4630;
 --text-sub: #86907A;
 --border-color: #E3EAD3;
@@ -35,8 +37,8 @@
 --plan-bg: #F3E9C6;
 --plan-border: #D9C27A;
 --olive: #55823F; /* positive amounts */
---danger: #CE6F63; /* expense / over budget */
---holiday-red: #CE6F63;
+--danger: #D4574A; /* expense / over budget */
+--holiday-red: #D4574A;
 --nav-height: 50px;
 --safe-bottom: env(safe-area-inset-bottom, 0px);
 --safe-top: env(safe-area-inset-top, 0px);
@@ -51,6 +53,7 @@ body.dark-mode {
 --primary-dark: #A8C686;
 --primary-hover: #BFD7A2;
 --primary-light: #38452D;
+--card-border: #44523A;
 --text-main: #EEF3E2;
 --text-sub: #A9B59A;
 --border-color: #3A4630;
@@ -58,8 +61,8 @@ body.dark-mode {
 --plan-bg: #3E3A28;
 --plan-border: #8A7A4A;
 --olive: #B5D69A;
---danger: #E58C80;
---holiday-red: #E58C80;
+--danger: #F0776A;
+--holiday-red: #F0776A;
 --input-bg: #38452D;
 }
 
@@ -144,7 +147,7 @@ display: inline-block;
 .card {
 background-color: var(--card-bg);
 border-radius: 10px;
-border: 1px solid var(--primary-light);
+border: 1px solid var(--card-border);
 box-shadow: 2px 4px 8px rgba(222, 195, 155, 0.015);
 overflow: hidden;
 transition: background-color 0.3s;
@@ -269,7 +272,7 @@ margin-bottom: 3px;
 flex-shrink: 0;
 }
 .day-cell.today {
-background-color: var(--primary-light);
+background-color: var(--card-border);
 }
 .day-cell.today .day-number {
 color: var(--primary-dark);
@@ -847,7 +850,7 @@ body.dark-mode .btn-submit {
 color: #1F2619;
 }
 .btn-delete-item {
-background-color: rgba(206, 111, 99, 0.15);
+background-color: rgba(212, 87, 74, 0.15);
 color: var(--danger);
 border: 1px solid var(--danger);
 padding: 12px;
@@ -905,7 +908,7 @@ body.dark-mode .action-sheet-btn.primary {
 color: #1F2619;
 }
 .action-sheet-btn.danger {
-background: rgba(206, 111, 99, 0.15);
+background: rgba(212, 87, 74, 0.15);
 color: var(--danger);
 border-color: var(--danger);
 }
@@ -1141,13 +1144,37 @@ body.no-fab .fab-add { display: none; }
 body.dark-mode .nav-item:not(.active) i { color: var(--text-sub); }
 .nav-item.active i { color: var(--primary-dark); }
 .settings-btn i,.subs-btn i{display:block;font-size:18px;line-height:1}
+/* ===== 分析 / 儲蓄 / 糧單：folder tabs + connected panel ===== */
+body.stats-open #top-sticky{padding-bottom:20px}
+.sn-tabs{position:sticky;top:var(--ts-h,0px);z-index:45;display:flex;background:var(--bg-color)}
+.sn-tab{flex:1;border:0;background:transparent;color:var(--text-sub);font-weight:800;font-size:.95rem;padding:13px 0;border-radius:14px 14px 0 0;cursor:pointer;font-family:inherit;transition:background-color .2s,color .2s}
+.sn-tab.on{background:var(--primary-light);color:var(--primary-dark)}
+body.stats-open #analysis-view,body.stats-open #overall-view,body.stats-open #analytics-view{background:var(--primary-light);border-radius:0 0 14px 14px;padding:14px 12px}
+body.stats-open #analysis-view>:last-child,body.stats-open #overall-view>:last-child,body.stats-open #analytics-view>:last-child{margin-bottom:0}
+body.stats-open #an-new>:last-child,body.stats-open #an-overall>:last-child{margin-bottom:0}
+body[data-sn="0"].stats-open #analysis-view,body[data-sn="1"].stats-open #overall-view,body[data-sn="2"].stats-open #analytics-view{border-top-left-radius:14px;border-top-right-radius:14px}
+body[data-sn="0"].stats-open #analysis-view{border-top-left-radius:0}
+body[data-sn="2"].stats-open #analytics-view{border-top-right-radius:0}
+body.stats-open #sub-nav{margin-bottom:-13px}
+.sn-tabs::after{content:'';position:absolute;left:0;right:0;top:100%;height:14px;background:var(--primary-light);border-radius:14px 14px 0 0;pointer-events:none}
+body[data-sn="0"] .sn-tabs::after{border-top-left-radius:0}
+body[data-sn="2"] .sn-tabs::after{border-top-right-radius:0}
+.pt-chips{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px;scrollbar-width:none}.pt-chips::-webkit-scrollbar{display:none}
+.pt-chips span{flex:none;font-size:.82rem;font-weight:700;padding:6px 13px;border-radius:10px;background:var(--card-bg);color:var(--text-sub);border:1px solid var(--card-border);cursor:pointer}
+.pt-chips span.on{background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+body.dark-mode .pt-chips span.on{color:#1F2619}
+.pt-r{display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer}.pt-r+.pt-r,.pt-x+.pt-r{border-top:1px solid var(--card-border)}
+.pt-ic{width:36px;height:36px;border-radius:10px;background:var(--primary-light);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.pt-m{flex:1;min-width:0}.pt-m b{display:block;font-size:.95rem;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pt-m span{font-size:.75rem;color:var(--text-sub)}
+.pt-p{font-weight:800;font-size:1.1rem}.pt-cv{color:var(--text-sub);font-size:16px}
+.pt-x{border-top:1px solid var(--card-border);padding:2px 12px 6px 60px}
 /* ===== 超市格價 page ===== */
 body.price-open .month-salary-card,body.price-open .top-month{display:none}
 body.price-open .top-title{display:block}
 .pt-seg{display:flex;gap:8px;margin:0 0 10px}.pt-seg button{flex:1;padding:9px 0;border:0;border-radius:12px;background:var(--card-bg);color:var(--text-sub);font-weight:800;font-size:.9rem;cursor:pointer;font-family:inherit}.pt-seg button.on{background:var(--primary-dark);color:#fff}
 .pt-q{width:100%;padding:11px 14px;border-radius:14px;border:0;background:var(--card-bg);color:var(--text-main);font-size:16px;margin-bottom:12px;font-family:inherit;outline:none}
 .pt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.pt-cc{background:var(--card-bg);border-radius:10px;border:1px solid var(--primary-light);padding:16px 4px;text-align:center;font-weight:800;font-size:.8rem;color:var(--primary-dark);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.05)}.pt-cc span{display:block;font-size:2.1rem;margin-bottom:4px}.pt-cc:active{transform:scale(.96)}
+.pt-cc{background:var(--card-bg);border-radius:10px;border:1px solid var(--card-border);padding:16px 4px;text-align:center;font-weight:800;font-size:.8rem;color:var(--primary-dark);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.05)}.pt-cc span{display:block;font-size:2.1rem;margin-bottom:4px}.pt-cc:active{transform:scale(.96)}
 .pt-back{display:flex;gap:8px;margin-bottom:10px}.pt-back button{border:0;border-radius:16px;padding:7px 12px;background:var(--card-bg);color:var(--text-main);font-weight:800;font-size:.8rem;cursor:pointer;font-family:inherit}.pt-back .on{background:var(--primary-dark);color:#fff}
 .pt-tag{background:var(--olive);color:#fff;border-radius:8px;font-size:.62rem;padding:1px 6px;margin-left:6px;font-weight:800;font-style:normal;display:inline-block}
 .pt-dot{display:inline-block;width:14px;height:14px;border-radius:50%}
@@ -1180,10 +1207,10 @@ body.dark-mode .pt-seg button.on,body.dark-mode .pt-back .on,body.dark-mode .pt-
 </div>
 
 <!-- 分析 / 儲蓄 / 糧單 sub navigation -->
-<div id="sub-nav" class="pt-seg" style="display:none">
-<button data-v="analysis-view" onclick="switchNav('analysis-view')">支出分析</button>
-<button data-v="overall-view" onclick="switchNav('overall-view')">儲蓄</button>
-<button data-v="analytics-view" onclick="switchNav('analytics-view')">糧單</button>
+<div id="sub-nav" class="sn-tabs" style="display:none">
+<button class="sn-tab" data-v="analysis-view" onclick="switchNav('analysis-view')">支出分析</button>
+<button class="sn-tab" data-v="overall-view" onclick="switchNav('overall-view')">儲蓄</button>
+<button class="sn-tab" data-v="analytics-view" onclick="switchNav('analytics-view')">糧單</button>
 </div>
 
 <!-- SETTINGS VIEW -->
@@ -1983,6 +2010,8 @@ function anDay(ds) {
 // ==================== 超市格價 ====================
 // PT-BEGIN
 let lastStat = 'analysis-view';
+let ptOpenP = null, ptList = [];
+const PT_ICONS = ['ti-meat','ti-milk','ti-bowl','ti-home','ti-sun','ti-bath','ti-droplet','ti-brush','ti-package'];
 let ptM = 'home', ptCat = 0, ptShopSel = null, ptQ = '', ptEditId = null, ptCatSel = 'others', ptShopPick = '';
 const ptShop = id => P.shops.find(s => s.id === id) || { name: '(已刪除)', color: '#999' };
 const ptLatest = a => { const m = {}; a.forEach(r => { if (!m[r.shop] || r.date >= m[r.shop].date) m[r.shop] = r; }); return Object.values(m); };
@@ -2013,7 +2042,14 @@ function parsePriceRows(data) {
 }
 
 function ptMode(m) { ptM = m; ptCat = 0; ptShopSel = null; renderPrice(); }
-function ptSetCat(i) { ptCat = i; renderPrice(); window.scrollTo(0, 0); }
+function ptSetCat(i) { ptCat = i; ptOpenP = null; renderPrice(); }
+function ptToggle(i) { const p = ptList[i] && ptList[i].p; ptOpenP = (ptOpenP === p) ? null : p; renderPrice(); }
+function ptDeal(i, idx) {
+  const open = ptOpenP === i.p, s = ptShop(i.min.shop), ci = PT_CATS.findIndex(x => x[1] === i.c), multi = i.l.length > 1;
+  const sub = multi ? `${btEsc(s.name)} · 比最貴平 $${formatMoney(i.save)}` : `${btEsc(s.name)} · 只有一間紀錄`;
+  return `<div class="pt-r" onclick="ptToggle(${idx})"><div class="pt-ic"><i class="ti ${PT_ICONS[ci < 0 ? 8 : ci]}"></i></div><div class="pt-m"><b>${btEsc(i.p)}${i.min.qty ? ' ' + btEsc(i.min.qty) : ''}</b><span>${sub}</span></div><div class="pt-p" style="color:${multi ? 'var(--olive)' : 'var(--text-main)'}">$${formatMoney(i.min.price)}</div><i class="ti ti-chevron-${open ? 'up' : 'down'} pt-cv"></i></div>`
+    + (open ? `<div class="pt-x">${i.l.map(r => ptCmpRow(r, multi && r.price === i.min.price)).join('')}</div>` : '');
+}
 function ptShopOpen(id) { ptShopSel = id; renderPrice(); window.scrollTo(0, 0); }
 
 function ptCmpRow(r, best) {
@@ -2032,20 +2068,12 @@ function renderPrice() {
   const names = Object.keys(g).filter(p => p.toLowerCase().includes(q));
   let h = '';
   if (ptM === 'home') {
-    if (!ptCat && !q) {
-      h = `<div class="pt-grid">${PT_CATS.map((c, i) => `<div class="pt-cc" onclick="ptSetCat(${i + 1})"><span>${c[0]}</span>${c[1]}</div>`).join('')}</div>`;
-    } else {
-      if (ptCat) h += `<div class="pt-back"><button onclick="ptSetCat(0)">‹ 返回</button><button class="on">${PT_CATS[ptCat - 1][0]} ${PT_CATS[ptCat - 1][1]}</button></div>`;
-      const list = names.filter(p => !ptCat || ptCatOf(g[p]) === PT_CATS[ptCat - 1][1])
-        .sort((a, b) => ptCI(ptCatOf(g[a])) - ptCI(ptCatOf(g[b])) || ptMin(g[a]) - ptMin(g[b]));
-      let last = '';
-      list.forEach(p => {
-        const l = ptLatest(g[p]).sort((a, b) => a.price - b.price), min = l[0].price, c = ptCatOf(g[p]);
-        if (!ptCat && c !== last) { h += `<div class="bt-day"><span>${ptIco(c)} ${btEsc(c)}</span></div>`; last = c; }
-        h += `<div class="card cd-pad"><div class="analytics-section-title" style="margin:0 0 6px"><span>${btEsc(p)}</span><small>${l.length} 間超市</small></div>${l.map(r => ptCmpRow(r, r.price === min && l.length > 1)).join('')}</div>`;
-      });
-      if (!list.length) h += '<div class="card cd-pad"><div class="empty-msg">仲未有紀錄<br>㩒右下角 + 新增</div></div>';
-    }
+    h = `<div class="pt-chips">${['全部'].concat(PT_CATS.map(c => c[1])).map((c, i) => `<span class="${i === ptCat ? 'on' : ''}" onclick="ptSetCat(${i})">${c}</span>`).join('')}</div>`;
+    ptList = names.filter(p => !ptCat || ptCatOf(g[p]) === PT_CATS[ptCat - 1][1]).map(p => {
+      const l = ptLatest(g[p]).sort((a, b) => a.price - b.price), min = l[0], max = l[l.length - 1];
+      return { p, l, min, c: ptCatOf(g[p]), save: l.length > 1 ? max.price - min.price : -1 };
+    }).sort((a, b) => b.save - a.save || a.p.localeCompare(b.p));
+    h += ptList.length ? `<div class="card">${ptList.map(ptDeal).join('')}</div>` : '<div class="card cd-pad"><div class="empty-msg">仲未有紀錄<br>㩒右下角 + 新增</div></div>';
   } else if (ptM === 'log') {
     const d = {};
     P.recs.filter(r => r.product.toLowerCase().includes(q)).sort((a, b) => b.date.localeCompare(a.date)).forEach(r => (d[r.date] = d[r.date] || []).push(r));
@@ -2146,6 +2174,7 @@ function openSettings() {
   document.body.classList.remove('price-open');
   document.getElementById('top-title').textContent = '設定';
   document.getElementById('sub-nav').style.display = 'none';
+  document.body.classList.remove('stats-open');
   document.getElementById('settings-btn').textContent = '‹';
   currentView = 'settings-view';
   renderSettings();
@@ -2290,6 +2319,8 @@ document.getElementById('nav-stats').classList.remove('active');
 const _grp = ['analysis-view', 'overall-view', 'analytics-view'].includes(viewId);
 if (_grp) { lastStat = viewId; document.getElementById('nav-stats').classList.add('active'); }
 document.getElementById('sub-nav').style.display = _grp ? 'flex' : 'none';
+document.body.classList.toggle('stats-open', _grp);
+document.body.dataset.sn = ['analysis-view', 'overall-view', 'analytics-view'].indexOf(viewId);
 document.querySelectorAll('#sub-nav button').forEach(b => b.classList.toggle('on', b.dataset.v === viewId));
 document.getElementById(viewId).style.display = 'block';
 if (viewId === 'calendar-view') {
